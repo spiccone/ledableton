@@ -8,17 +8,15 @@
 
 .top-container {
     flex: 1 1 auto;
-    min-height: 60px;
+    min-height: 30px;
 }
 
 .middle-container {
     flex: 0 0 auto;
-    height: 60px;
 }
 
 .bottom-container {
-    flex: 0 1 auto;
-    min-height: 200px;
+    flex: 0 0 auto;
 }
 
 .GrabBar {
@@ -26,4 +24,5 @@
     height: 4px;
     background-color: var(--border-color);
     cursor: ns-resize;
+    flex: 0 0 auto;
   }
