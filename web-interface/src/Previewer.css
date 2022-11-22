@@ -1,24 +1,43 @@
 .DeviceList {
   display: flex;
-  flex-direction: row;
   height: 100%;
+}
+.col-layout .DeviceList {
+  flex-direction: row;
   overflow-x: scroll;
+}
+.row-layout .DeviceList {
+  flex-direction: column;
+  width: 100%;
+  overflow-y: scroll;
 }
 
 .DevicePreview {
   box-sizing: border-box;
+  flex: 100 0 auto; /* grow is large to make AddDevice small */
+}
+.col-layout .DevicePreview {
   border-right: 4px solid var(--border-color);
   height: 100%;
   min-width: 300px;
-  flex: 100 0 auto; /* grow is large to make AddDevice small */
+}
+.row-layout .DevicePreview {
+  border-bottom: 4px solid var(--border-color);
+  width: 100%;
+  min-height: 300px;
 }
 
 .device-toolbar {
   align-content: center;
   box-sizing: border-box;
   display: flex;
-  height: 30px;
   padding: 8px;
+}
+.col-layout .device-toolbar {
+  height: 30px;
+}
+.row-layout .device-toolbar {
+  height: 30px;
 }
 
 .DeviceColorIndicator {
@@ -27,7 +46,7 @@
   flex: 0 0 auto;
   height: 14px;
   width: 14px;
-  margin-right: 10px;
+  margin: 0 10px 10px 0;
   cursor: pointer;
 }
 
@@ -37,13 +56,19 @@
 }
 
 .AddDeviceButton {
-  width: 40px;
-  height: 100%;
   flex: 1 1 auto;
   display: flex;
   justify-content: center;
   align-items: center;
   cursor: pointer;
+}
+.col-layout .AddDeviceButton {
+  width: 40px;
+  height: 100%;
+}
+.row-layout .AddDeviceButton {
+  height: 40px;
+  width: 100%;
 }
 
 .AddDeviceButton:hover {
@@ -51,8 +76,15 @@
 }
 
 .add-device-icon {
-  width: 100%;
-  max-width: 120px;
   fill: #fff;
   opacity: 40%;
+}
+.col-layout .add-device-icon {
+  width: 100%;
+  max-width: 120px;
+}
+.row-layout .add-device-icon {
+  width: 40px;
+  height: 100%;
+  max-height: 120px;
 }

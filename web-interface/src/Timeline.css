@@ -1,44 +1,81 @@
 .Timeline {
   display: flex;
-  flex-direction: column;
   height: 100%;
+}
+.col-layout .Timeline {
+  flex-direction: column;
+}
+.row-layout .DevicTimelineeList {
+  flex-direction: row;
+  width: 100%;
 }
 
 .TimelineList {
   display: flex;
+  flex: 1 1 auto;
+}
+.col-layout .TimelineList {
   flex-direction: column;
   overflow-y: scroll;
-  flex: 1 1 auto;
+}
+.row-layout .TimelineList {
+  flex-direction: row;
+  overflow-x: scroll;
+  height: 100%;
 }
 
 .DeviceTimeline {
-  border-bottom: 4px solid var(--border-color);
   flex: 1 0 auto;
-  height: 60px;
-  min-height: 30px;
+}
+.col-layout .DeviceTimeline {
+  border-bottom: 4px solid var(--border-color);
+  height: 80px;
   width: 100%;
+}
+.row-layout .DeviceTimeline {
+  border-right: 4px solid var(--border-color);
+  width: 80px;
+  height: 100%;
 }
 
 .DeviceTimeline .device-label-container {
-  height: 100%;
-  width: 24px;
-  border-right: 5px solid #fff;
   display: flex;
   align-items: center;
   justify-content: center;
   overflow: hidden;
 }
+.col-layout .device-label-container {
+  height: 100%;
+  width: 24px;
+  border-right: 5px solid #fff;
+}
+.row-layout .device-label-container {
+  width: 100%;
+  height: 24px;
+  border-bottom: 5px solid #fff;
+}
 
 .DeviceTimeline .device-label {
   color: #000;
   font-size: 10px;
-  transform: rotate(-90deg);
-  height: 10px;
   flex: 0 1 auto;
   white-space: nowrap;
+}
+.col-layout .device-label {
+  transform: rotate(-90deg);
+  height: 10px;
+}
+.row-layout .device-label {
+
 }
 
 .Scrubber {
   height: 30px;
   flex: 0 0 auto;
+}
+.col-layout .Scrubber {
+  height: 30px;
+}
+.row-layout .Scrubber {
+  width: 30px;
 }

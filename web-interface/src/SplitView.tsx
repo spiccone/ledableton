@@ -1,32 +1,43 @@
 import React, {createRef, useEffect, useState} from "react";
 import './SplitView.css';
 
-const MIN_HEIGHT = 30;
-const MIDDLE_HEIGHT = 60;
+const MIN_SIZE = 30;
+const MIDDLE_SIZE = 60;
 
 interface SplitViewProps {
   top: React.ReactElement;
   middle: React.ReactElement;
   bottom: React.ReactElement;
+  rowLayout: boolean;
 }
 
 const BottomPane: React.FunctionComponent<{
-  bottomHeight: number | undefined;
-  setBottomHeight: (value: number) => void;
+  bottomDimension: number | undefined;
+  setBottomDimension: (value: number) => void;
+  rowLayout: boolean
   children: any;
-}> = ({bottomHeight, setBottomHeight, children}) => {
+}> = ({bottomDimension, setBottomDimension, rowLayout, children}) => {
   const bottomRef = createRef<HTMLDivElement>();
 
   useEffect(() => {
     if (bottomRef.current) {
-      if (!bottomHeight) {
-        setBottomHeight(bottomRef.current.clientWidth);
+      if (!bottomDimension) {
+        if (rowLayout) {
+          setBottomDimension(bottomRef.current.clientHeight);
+        } else {
+          setBottomDimension(bottomRef.current.clientWidth);
+        }
         return;
       }
-
-      bottomRef.current.style.height = `${bottomHeight}px`;
+      if (rowLayout) {
+        bottomRef.current.style.height = '';
+        bottomRef.current.style.width = `${bottomDimension}px`;
+      } else {
+        bottomRef.current.style.height = `${bottomDimension}px`;
+        bottomRef.current.style.width = '';
+      }
     }
-  }, [bottomRef, bottomHeight, setBottomHeight]);
+  }, [bottomRef, bottomDimension, setBottomDimension]);
 
   return <div ref={bottomRef}>{children}</div>;
 };
@@ -35,52 +46,55 @@ export const SplitView: React.FunctionComponent<SplitViewProps> = ({
   top,
   middle,
   bottom,
+  rowLayout,
 }) => {
-  const [bottomHeight, setBottomHeight] = 
+  const [bottomDimension, setBottomDimension] = 
     useState<number>(200);
-  const [grabYPosition, setGrabYPosition] = 
+  const [grabPosition, setGrabPosition] = 
     useState<undefined | number>(undefined);
   const [resizing, setResizing] = useState(false);
 
   const splitPaneRef = createRef<HTMLDivElement>();
 
   const onMouseDown = (e: React.MouseEvent) => {
-    setGrabYPosition(e.clientY);
+    setGrabPosition(rowLayout ? e.clientX : e.clientY);
     setResizing(true);
   };
 
   const onTouchStart = (e: React.TouchEvent) => {
-    setGrabYPosition(e.touches[0].clientY);
+    setGrabPosition(rowLayout ? e.touches[0].clientX : e.touches[0].clientY);
     setResizing(true);
   };
 
-  const onMove = (clientY: number) => {
-    if (resizing && bottomHeight && grabYPosition) {
-      const newBottomHeight = bottomHeight + grabYPosition - clientY;
-      setGrabYPosition(clientY);
+  const onMove = (clientPos: number) => {
+    if (resizing && bottomDimension && grabPosition) {
+      const newBottomDimension = bottomDimension + grabPosition - clientPos;
+      setGrabPosition(clientPos);
 
-      if (newBottomHeight < MIN_HEIGHT) {
-        setBottomHeight(MIN_HEIGHT);
+      if (newBottomDimension < MIN_SIZE) {
+        setBottomDimension(MIN_SIZE);
         return;
       }
 
-      const splitPaneHeight = splitPaneRef.current ? splitPaneRef.current.clientHeight : window.outerHeight;
-      if (newBottomHeight > splitPaneHeight - MIN_HEIGHT - MIDDLE_HEIGHT - 16) {
-        setBottomHeight(splitPaneHeight - MIN_HEIGHT - MIDDLE_HEIGHT - 16);
+      const splitPaneDim = rowLayout ? 
+        splitPaneRef.current ? splitPaneRef.current.clientWidth : window.outerWidth: 
+        splitPaneRef.current ? splitPaneRef.current.clientHeight : window.outerHeight;
+      if (newBottomDimension > splitPaneDim - MIN_SIZE - MIDDLE_SIZE - 16) {
+        setBottomDimension(splitPaneDim - MIN_SIZE - MIDDLE_SIZE - 16);
         return;
       }
 
-      setBottomHeight(newBottomHeight);
+      setBottomDimension(newBottomDimension);
     }
   };
 
   const onMouseMove = (e: MouseEvent) => {
     e.preventDefault();
-    onMove(e.clientY);
+    onMove(rowLayout ? e.clientX : e.clientY);
   };
 
   const onTouchMove = (e: TouchEvent) => {
-    onMove(e.touches[0].clientY);
+    onMove(rowLayout ? e.touches[0].clientX : e.touches[0].clientY);
   };
 
   const onMouseUp = () => {
@@ -100,20 +114,20 @@ export const SplitView: React.FunctionComponent<SplitViewProps> = ({
   });
 
   return (
-    <div className="SplitView">
+    <div className={`SplitView ${rowLayout ? "row-layout" : "col-layout"}`}>
       <div className="top-container">{top}</div>
       <div className="GrabBar"
         onMouseDown={onMouseDown}
         onTouchStart={onTouchStart}
         onTouchEnd={onMouseUp}>
       </div>
-      <div className="middle-container" style={{height: MIDDLE_HEIGHT}}>{middle}</div>
+      <div className="middle-container" style={rowLayout ? {width: MIDDLE_SIZE} : {height: MIDDLE_SIZE}}>{middle}</div>
       <div className="GrabBar"
         onMouseDown={onMouseDown}
         onTouchStart={onTouchStart}
         onTouchEnd={onMouseUp}>
       </div>
-      <BottomPane bottomHeight={bottomHeight} setBottomHeight={setBottomHeight}>
+      <BottomPane bottomDimension={bottomDimension} setBottomDimension={setBottomDimension} rowLayout={rowLayout}>
         {bottom}
       </BottomPane>
     </div>

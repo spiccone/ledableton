@@ -1,14 +1,22 @@
 
 .SplitView {
     display: flex;
-    flex-direction: column;
     height: 100%;
     width: 100%;
+}
+
+.SplitView.row-layout {
+    flex-direction: row;
+}
+
+.SplitView.col-layout {
+    flex-direction: column;
 }
 
 .top-container {
     flex: 1 1 auto;
     min-height: 30px;
+    min-width: 30px;
 }
 
 .middle-container {
@@ -20,9 +28,16 @@
 }
 
 .GrabBar {
+    background-color: var(--border-color);
+    flex: 0 0 auto;
+}
+.col-layout .GrabBar {
     width: 100%;
     height: 4px;
-    background-color: var(--border-color);
     cursor: ns-resize;
-    flex: 0 0 auto;
-  }
+}
+.row-layout .GrabBar {
+    height: 100%;
+    width: 4px;
+    cursor: ew-resize;
+}

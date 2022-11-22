@@ -6,13 +6,15 @@ import {Device} from './Types';
 import {ColorChangeHandler, ColorResult, TwitterPicker} from 'react-color';
 import { SplitView } from './SplitView';
 
+
+enum Layout {row, column}
 interface AppProps {
 }
-
 interface AppState {
   devices: Array<Device>;
   activeDeviceColorPicker: Device | null;
-  timelineHeight: number;
+  layout: Layout;
+
 }
 
 class App extends React.Component<AppProps, AppState> {
@@ -23,9 +25,8 @@ class App extends React.Component<AppProps, AppState> {
         new Device(1, 'Picture Wall', '#FCB900'),
         new Device(2, 'Fireplace', '#8ED1FC')
       ],
-      activeDeviceColorPicker: null,
-      timelineHeight: 200,
-      
+      activeDeviceColorPicker: null, 
+      layout: Layout.row     
     }
   }
 
@@ -66,6 +67,7 @@ class App extends React.Component<AppProps, AppState> {
               devices={this.state.devices}
             />
           }
+          rowLayout={this.state.layout == Layout.row ? true : false}
         />
         {this.state.activeDeviceColorPicker ? 
           <DeviceColorPicker 
