@@ -8,13 +8,13 @@
 
 .Previewer {
   flex: 1 1 auto;
-  border-bottom: 1px solid var(--border-color);
+  border: 2px solid var(--border-color);
   min-height: 60px;
 }
 
 .Toolbar {
   flex: 0 0 auto;
-  height: 50px;
+  height: 60px;
   border-bottom: 1px solid var(--border-color);
 }
 
@@ -26,4 +26,13 @@
 .DeviceColorPicker {
   margin: 15px 0 0 -22px;
   position: absolute;
+  z-index: 2;
+}
+
+.cover {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
 }

@@ -2,6 +2,7 @@ import React from 'react';
 import './Previewer.css';
 import { render } from '@testing-library/react';
 import { Device } from './Types';
+import {Plus} from './Icons'
 
 
 function Previewer(props: {devices: Array<Device>, onIndicatorClick: any}) {
@@ -14,7 +15,7 @@ function Previewer(props: {devices: Array<Device>, onIndicatorClick: any}) {
           key={device.id}
         />;
       })}
-      <AddDevice />
+      <AddDeviceButton />
     </div>
   )
 }
@@ -33,14 +34,16 @@ function DevicePreview(props: {device: Device, onIndicatorClick: React.MouseEven
 
 function DeviceColorIndicator(props: {onClick: React.MouseEventHandler<HTMLButtonElement>, color: string}) {
   return (
-    <button className="DeviceColorIndicator" onClick={props.onClick} style={{backgroundColor: props.color}}></button>
+    <button className='DeviceColorIndicator' onClick={props.onClick} style={{backgroundColor: props.color}}></button>
   )
 }
 
-function AddDevice() {
+function AddDeviceButton() {
   return (
-    <div className='AddDevice'>
-
+    <div className='AddDeviceButton'>
+      <div className='add-device-icon'>
+        <Plus />
+      </div>
     </div>
   );
 }

@@ -9,8 +9,8 @@
   box-sizing: border-box;
   border: 2px solid var(--border-color);
   height: 100%;
-  min-width: 200px;
-  flex: 2 0 auto;
+  min-width: 300px;
+  flex: 100 0 auto; /* grow is large to make AddDevice small */
 }
 
 .device-toolbar {
@@ -28,6 +28,7 @@
   height: 14px;
   width: 14px;
   margin-right: 10px;
+  cursor: pointer;
 }
 
 .device-name {
@@ -35,8 +36,23 @@
   flex: 1 1 auto;
 }
 
-.AddDevice {
+.AddDeviceButton {
   border: 2px solid var(--border-color);
-  flex: 1 0 auto;
   width: 40px;
+  flex: 1 0 auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+}
+
+.AddDeviceButton:hover {
+  background-color: #555;
+}
+
+.add-device-icon {
+  width: 100%;
+  max-width: 120px;
+  fill: #fff;
+  opacity: 40%;
 }
