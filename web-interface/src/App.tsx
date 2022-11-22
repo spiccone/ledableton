@@ -4,6 +4,7 @@ import Previewer from './Previewer';
 import Timeline from './Timeline';
 import {Device} from './Types';
 import {ColorChangeHandler, ColorResult, TwitterPicker} from 'react-color';
+import { SplitView } from './SplitView';
 
 interface AppProps {
 }
@@ -11,6 +12,7 @@ interface AppProps {
 interface AppState {
   devices: Array<Device>;
   activeDeviceColorPicker: Device | null;
+  timelineHeight: number;
 }
 
 class App extends React.Component<AppProps, AppState> {
@@ -18,10 +20,12 @@ class App extends React.Component<AppProps, AppState> {
     super(props);
     this.state = {
       devices: [
-        new Device(1, 'test', '#593af3'),
-        new Device(2, 'test', '#593af3')
+        new Device(1, 'Picture Wall', '#FCB900'),
+        new Device(2, 'Fireplace', '#8ED1FC')
       ],
-      activeDeviceColorPicker: null
+      activeDeviceColorPicker: null,
+      timelineHeight: 200,
+      
     }
   }
 
@@ -47,20 +51,22 @@ class App extends React.Component<AppProps, AppState> {
   render() {
     return (
       <div className="App">
-        <div className="preview-container">
-          <Previewer
-            devices={this.state.devices}
-            onColorIndicatorClick={(device: Device) => this.handleDeviceIndicatorClick(device)}
-          />
-        </div>
-        <div className="toolbar-container">
-
-        </div>
-        <div className="timeline-container">
-          <Timeline
-            devices={this.state.devices}
-          />
-        </div>
+        <SplitView 
+          top={
+            <Previewer
+              devices={this.state.devices}
+              onColorIndicatorClick={(device: Device) => this.handleDeviceIndicatorClick(device)}
+            />
+          }
+          middle={
+            <div></div>
+          }
+          bottom={
+            <Timeline
+              devices={this.state.devices}
+            />
+          }
+        />
         {this.state.activeDeviceColorPicker ? 
           <DeviceColorPicker 
             device={this.state.activeDeviceColorPicker} 

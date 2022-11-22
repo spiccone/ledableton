@@ -7,7 +7,7 @@
 
 .DevicePreview {
   box-sizing: border-box;
-  border: 2px solid var(--border-color);
+  border-right: 4px solid var(--border-color);
   height: 100%;
   min-width: 300px;
   flex: 100 0 auto; /* grow is large to make AddDevice small */
@@ -37,7 +37,6 @@
 }
 
 .AddDeviceButton {
-  border: 2px solid var(--border-color);
   width: 40px;
   flex: 1 0 auto;
   display: flex;

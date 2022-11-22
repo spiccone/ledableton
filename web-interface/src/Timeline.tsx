@@ -22,7 +22,11 @@ function Timeline(props: {devices: Array<Device>}) {
 function DeviceTimeline(props: {device: Device}) {
   return (
     <div className='DeviceTimeline'>
-      <div className='DeviceColor' style={{backgroundColor: props.device.color}}></div>
+      <div className='device-label-container' style={{backgroundColor: props.device.color}}>
+        <div className='device-label'>
+          {props.device.label}
+        </div>
+      </div>
     </div>
   );
 }
