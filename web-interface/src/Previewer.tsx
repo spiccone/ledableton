@@ -1,18 +1,18 @@
 import React from 'react';
 import './Previewer.css';
 import { render } from '@testing-library/react';
-import { Device } from './Types';
+import {Device} from './Types';
 import {Plus} from './Icons'
 
 
-function Previewer(props: {devices: Array<Device>, onIndicatorClick: any}) {
+function Previewer(props: {devices: Array<Device>, onColorIndicatorClick: any}) {
   return (
     <div className="DeviceList">
-      {props.devices.map(function(device: Device, index: number){
+      {props.devices.map(function(device: Device){
         return <DevicePreview 
           device={device}
-          onIndicatorClick={() => props.onIndicatorClick(index)}
-          key={device.id}
+          onColorIndicatorClick={() => props.onColorIndicatorClick(device)}
+          key={device.previewElementId}
         />;
       })}
       <AddDeviceButton />
@@ -20,11 +20,11 @@ function Previewer(props: {devices: Array<Device>, onIndicatorClick: any}) {
   )
 }
 
-function DevicePreview(props: {device: Device, onIndicatorClick: React.MouseEventHandler<HTMLButtonElement>}) {
+function DevicePreview(props: {device: Device, onColorIndicatorClick: React.MouseEventHandler<HTMLButtonElement>}) {
   return (
-    <div id={props.device.id} className='DevicePreview'>
+    <div id={props.device.previewElementId} className='DevicePreview'>
       <div className='device-toolbar'>
-        <DeviceColorIndicator onClick={props.onIndicatorClick} color={props.device.color} />
+        <DeviceColorIndicator onClick={props.onColorIndicatorClick} color={props.device.color} />
         <div className='device-name'>{props.device.label}</div>
       </div>
       <div className='device-display'></div>

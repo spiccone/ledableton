@@ -1,0 +1,32 @@
+.Timeline {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.TimelineList {
+  border-top: 4px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  flex: 1 0 auto;
+}
+
+.DeviceTimeline {
+  border-bottom: 4px solid var(--border-color);
+  flex: 1 0 auto;
+  height: 60px;
+  width: 100%;
+  overflow: scroll;
+}
+
+.DeviceTimeline .DeviceColor {
+  height: 100%;
+  width: 24px;
+  border-right: 5px solid #fff;
+}
+
+.Scrubber {
+  height: 30px;
+  flex: 0 0 auto;
+}

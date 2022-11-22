@@ -1,7 +1,8 @@
 import React from 'react';
 import './App.css';
 import Previewer from './Previewer';
-import { Device } from './Types';
+import Timeline from './Timeline';
+import {Device} from './Types';
 import {ColorChangeHandler, ColorResult, TwitterPicker} from 'react-color';
 
 interface AppProps {
@@ -17,15 +18,16 @@ class App extends React.Component<AppProps, AppState> {
     super(props);
     this.state = {
       devices: [
-        {id: 'device_1', label: 'test', color: '#593af3'},
-        {id: 'device_2', label: 'test2', color: '#593af3'}],
+        new Device(1, 'test', '#593af3'),
+        new Device(2, 'test', '#593af3')
+      ],
       activeDeviceColorPicker: null
     }
   }
 
-  handleDeviceIndicatorClick(deviceIndex: number) {
+  handleDeviceIndicatorClick(device: Device) {
     this.setState({
-      activeDeviceColorPicker: this.state.devices[deviceIndex]
+      activeDeviceColorPicker: device
     });
   }
 
@@ -45,17 +47,19 @@ class App extends React.Component<AppProps, AppState> {
   render() {
     return (
       <div className="App">
-        <div className="Previewer">
+        <div className="preview-container">
           <Previewer
             devices={this.state.devices}
-            onIndicatorClick={(deviceIdex: number) => this.handleDeviceIndicatorClick(deviceIdex)}
+            onColorIndicatorClick={(device: Device) => this.handleDeviceIndicatorClick(device)}
           />
         </div>
-        <div className="Toolbar">
+        <div className="toolbar-container">
 
         </div>
-        <div className="Timeline">
-
+        <div className="timeline-container">
+          <Timeline
+            devices={this.state.devices}
+          />
         </div>
         {this.state.activeDeviceColorPicker ? 
           <DeviceColorPicker 
@@ -71,7 +75,7 @@ class App extends React.Component<AppProps, AppState> {
 }
 
 function DeviceColorPicker(props: {device: Device, onSelect: ColorChangeHandler, handleClose: any}) {
-  const el = document.getElementById(props.device.id)?.querySelector('.DeviceColorIndicator');
+  const el = document.getElementById(props.device.previewElementId)?.querySelector('.DeviceColorIndicator');
   const elRect = el?.getBoundingClientRect();
 
   return (
