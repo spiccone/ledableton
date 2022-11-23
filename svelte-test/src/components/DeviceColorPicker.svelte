@@ -1,10 +1,13 @@
 <script lang="ts">
+  import {ColorLevel, getColorLevel} from "../helper-functions";
+
   export let color: string;
 
   let open: boolean = false;
   let customColor: string = color.slice(1);
   let inputColor = color;
   let inputPrefixColor =  color;
+  let colorLevel = getColorLevel(color);
 
   const colorRegEx = /^([0-9a-f]{3}){1,2}$/i;
   export const colorOptions: Array<string> = 
@@ -24,6 +27,7 @@
     customColor = color.slice(1);
     inputColor = color;
     inputPrefixColor = color;
+    colorLevel = getColorLevel(color);
   }
 
   function handleColorInput() {
@@ -31,10 +35,12 @@
       color = '#' + customColor;
       inputColor = color;
       inputPrefixColor = color;
+      colorLevel = getColorLevel(color);
     } else {
       inputColor = '#F00';
       inputPrefixColor = '#CCC';
     }
+    console.log(colorLevel);
   }
 </script>
 
@@ -55,7 +61,10 @@
       <div class="custom-color" style="color: {inputColor}">
         <div 
           class="color-input-prefix"
-          style="background-color: {inputPrefixColor}">#</div>
+          style="
+            background-color: {inputPrefixColor};
+            color: {
+              colorLevel == ColorLevel.light ? '#000' : '#fff'}">#</div>
         <input 
           class="color-input" 
           bind:value="{customColor}"
