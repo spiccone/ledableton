@@ -4,10 +4,13 @@
   import GrabBar from '../components/GrabBar.svelte'
   import {Device, LayoutDirection as Layout} from '../types'
   import Icon from '@iconify/svelte';
-  import rotate90DegreesCcwOutlineRounded from '@iconify/icons-material-symbols/rotate-90-degrees-ccw-outline-rounded';
-  import rotate90DegreesCwOutlineRounded from '@iconify/icons-material-symbols/rotate-90-degrees-cw-outline-rounded';
+  import createIcon from '@iconify/icons-gridicons/create';
+  import folderOpenOutlineRounded from '@iconify/icons-material-symbols/folder-open-outline-rounded';
   import lockOpenOutline from '@iconify/icons-material-symbols/lock-open-outline';
   import lockOutline from '@iconify/icons-material-symbols/lock-outline';
+  import rotate90DegreesCcwOutlineRounded from '@iconify/icons-material-symbols/rotate-90-degrees-ccw-outline-rounded';
+  import rotate90DegreesCwOutlineRounded from '@iconify/icons-material-symbols/rotate-90-degrees-cw-outline-rounded';
+  import saveOutlineRounded from '@iconify/icons-material-symbols/save-outline-rounded';
 
   let locked = false;
   let layoutDirection = Layout.column;
@@ -20,6 +23,9 @@
   let scalableDimension = 500;
   let height = 500;
   let width = 500;
+
+  function handleSave() {}
+  function handleOpen() {}
 
   function handleRotate() {
     if(columnLayout) {
@@ -42,54 +48,61 @@
 </script>
 
 <div class="LightShowStudio {layoutDirectionClass}">
-  {#if columnLayout}
-    <div class="preview-area" style="height: {scalableDimension}px">
-      <PreviewList 
-        devices={devices} 
-        layoutDirection={oppositeLayoutDirection}
-        locked = {locked} />
-    </div>
-  {:else}
-    <div class="preview-area" style="width: {scalableDimension}px">
-      <PreviewList 
-        devices={devices} 
-        layoutDirection={oppositeLayoutDirection}
-        locked = {locked} />
-    </div>
-  {/if}
+  <div class="preview-area" style="{columnLayout ? 'height' : 'width'}: {scalableDimension}px">
+    <PreviewList 
+      devices={devices} 
+      layoutDirection={oppositeLayoutDirection}
+      locked = {locked} />
+  </div>
   <div class="grab-bar {layoutDirectionClass}">
     <GrabBar 
       bind:dimension={scalableDimension} 
       layoutDirection={layoutDirection} 
       locked = {locked} />
   </div>
-  <div class="toolbar-area"></div>
-  <div class="grab-bar {layoutDirectionClass}">
-    <GrabBar 
-      bind:dimension={scalableDimension} 
-      layoutDirection={layoutDirection} 
-      locked = {locked} />
-  </div>
-  <div class="timeline-area"></div>
+  <div class="toolbar-area">
 
+  </div>
+  <div class="grab-bar {layoutDirectionClass}">
+    <GrabBar 
+      bind:dimension={scalableDimension} 
+      layoutDirection={layoutDirection} 
+      locked = {locked} />
+  </div>
+  <div class="timeline-area">
+
+  </div>
 
   <div class="layout-button-area">
     <!-- svelte-ignore a11y-click-events-have-key-events -->
-    <div class="layout-button lock-button" on:click={handleLock}>
+    <div class="layout-button" on:click={handleOpen}>
+      <Icon icon={createIcon} />
+    </div>
+    <!-- svelte-ignore a11y-click-events-have-key-events -->
+    <div class="layout-button" on:click={handleOpen}>
+      <Icon icon={folderOpenOutlineRounded} />
+    </div>
+    <!-- svelte-ignore a11y-click-events-have-key-events -->
+    <div class="layout-button" on:click={handleSave}>
+      <Icon icon={saveOutlineRounded} />
+    </div>
+    <div class="button-separator"></div>
+    <!-- svelte-ignore a11y-click-events-have-key-events -->
+    <div class="layout-button" on:click={handleLock}>
       {#if locked}
-        <Icon icon={lockOutline} width="24" height="24"/>
+        <Icon icon={lockOutline} />
       {:else}
-        <Icon icon={lockOpenOutline} width="24" height="24" />
+        <Icon icon={lockOpenOutline} />
       {/if}
     </div>
 
     {#if !locked}
       <!-- svelte-ignore a11y-click-events-have-key-events -->
-      <div class="layout-button rotate-button" on:click={handleRotate}>
+      <div class="layout-button" on:click={handleRotate}>
         {#if layoutDirection == Layout.column}
-          <Icon icon={rotate90DegreesCcwOutlineRounded} width="24" height="24" rotate={3} />
+          <Icon icon={rotate90DegreesCcwOutlineRounded} rotate={3} />
         {:else}
-          <Icon icon={rotate90DegreesCwOutlineRounded} width="24" height="24" />
+          <Icon icon={rotate90DegreesCwOutlineRounded} />
         {/if}
       </div>
     {/if}
@@ -99,6 +112,10 @@
 <style>
   :global(body) {
       margin: 0;
+  }
+  :global(svg) {
+    height: 100%;
+    width: 100%;
   }
   .LightShowStudio {
     --background-color: #333;
@@ -166,13 +183,24 @@
   .layout-button {
     color: #fff;
     cursor: pointer;
-    margin-bottom: 6px;
+    height: 24px;
+    margin-bottom: 10px;
     opacity: 30%;
+    width: 24px;
   }
   .layout-button:hover {
     opacity: 80%;
   }
   .layout-button:active {
     opacity: 100%;
+  }
+
+  .button-separator {
+    background-color: #fff;
+    border-radius: 1px;
+    height: 2px;
+    margin: 10px 1px;
+    opacity: 8%;
+    width: 22px;
   }
 </style>

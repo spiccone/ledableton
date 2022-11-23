@@ -5,30 +5,36 @@
 
   export let layoutDirection: Layout = Layout.row;
   export let devices: Array<Device> = [];
-  export let locked: boolean = flase;
+  export let locked: boolean = false;
 
-  const previewSizes: number[] = new Array(devices.length).fill(300);
+  const previewWidths: number[] = new Array(devices.length).fill(300);
+  const previewHeights: number[] = new Array(devices.length).fill(300);
 
-  const layoutClassName = layoutDirection == Layout.row ? 'layout-row' : 'layout-column';
 </script>
 
-<div class="PreviewList {layoutClassName}">
+<div class="PreviewList {layoutDirection == Layout.row ? 'layout-row' : 'layout-column'}">
   {#each devices as device, i (device.previewElementId)}
     {#if layoutDirection == Layout.row}
-      <div class="device-preview-container" style="min-width: {previewSizes[i]}px">
+      <div class="device-preview-container" style="min-width: {previewWidths[i]}px">
         <DevicePreview device={device} />
+      </div>
+      <div class="grab-bar">
+        <GrabBar
+          bind:dimension={previewWidths[i]}
+          layoutDirection={layoutDirection}
+          locked={locked}/>
       </div>
     {:else}
-      <div class="device-preview-container" style="min-height: {previewSizes[i]}px">
+      <div class="device-preview-container" style="min-height: {previewHeights[i]}px">
         <DevicePreview device={device} />
       </div>
+      <div class="grab-bar">
+        <GrabBar
+          bind:dimension={previewHeights[i]}
+          layoutDirection={layoutDirection}
+          locked={locked}/>
+      </div>
     {/if}
-    <div class="grab-bar">
-      <GrabBar
-        bind:dimension={previewSizes[i]}
-        layoutDirection={layoutDirection}
-        locked={locked}/>
-    </div>
   {/each}
 </div>
 

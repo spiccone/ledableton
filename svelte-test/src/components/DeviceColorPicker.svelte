@@ -2,10 +2,14 @@
   export let color: string;
 
   let open: boolean = false;
+  let customColor: string = color.slice(1);
+  let inputColor = color;
+  let inputPrefixColor =  color;
 
+  const colorRegEx = /^([0-9a-f]{3}){1,2}$/i;
   export const colorOptions: Array<string> = 
     ['#F44336', '#FF6900', '#FCB900', '#CDDC39', '#8BC34A',  
-    '#2CCCE4','#64B5F6', '#9575CD', '#BA68C8', '#F06292'];
+    '#2CCCE4','#8F7FD7', '#C579d2', '#F78DA7'];
 
   function openPicker() {
     open = true;
@@ -17,6 +21,20 @@
 
   function selectColor(colorIndex: number) {
     color = colorOptions[colorIndex];
+    customColor = color.slice(1);
+    inputColor = color;
+    inputPrefixColor = color;
+  }
+
+  function handleColorInput() {
+    if (colorRegEx.test(customColor)) {
+      color = '#' + customColor;
+      inputColor = color;
+      inputPrefixColor = color;
+    } else {
+      inputColor = '#F00';
+      inputPrefixColor = '#CCC';
+    }
   }
 </script>
 
@@ -28,19 +46,34 @@
     <div class="picker-content">
       {#each colorOptions as colorOption, i (colorOption)}
         <!-- svelte-ignore a11y-click-events-have-key-events -->
-        <div 
+        <button 
           class="color-option {colorOption === color ? 'selected' : ''}" 
           style="color: {colorOption}" 
           on:click={() => selectColor(i)}>
-        </div>
+        </button>
       {/each}
+      <div class="custom-color" style="color: {inputColor}">
+        <div 
+          class="color-input-prefix"
+          style="background-color: {inputPrefixColor}">#</div>
+        <input 
+          class="color-input" 
+          bind:value="{customColor}"
+          on:input={() => handleColorInput()}
+          on:change={() => customColor = color.slice(1)}
+          maxlength="6"/>
+      </div>
     </div>
+    <!-- svelte-ignore a11y-click-events-have-key-events -->
+    <div class="cover" on:click={closePicker}></div>
   </div>
-  <!-- svelte-ignore a11y-click-events-have-key-events -->
-  <div class="cover" on:click={closePicker}></div>
 </div>
 
 <style>
+  .DeviceColorPicker.picker-open {
+    position: relative;
+    z-index: 10;
+  }
   .color-icon {
     border-radius: 100%;
     border: none;
@@ -48,30 +81,34 @@
     height: 14px;
     width: 14px;
     margin: 0 10px 10px 0;
-    cursor: pointer;
-    z-index: 0;
+    cursor: url("../static/eye-dropper.cur") 0 16, pointer;
     position: relative;
+    z-index: 3;
   }
   .picker-open .color-icon {
-    z-index: 1;
+    pointer-events: none;
   }
 
   .color-picker {
-    box-shadow: rgb(0 0 0 / 25%) 0px 1px 4px;
-    display: none;
     margin: -28px 0 0 -4px;
+    overflow:hidden;
+    position: absolute;
+    transition: width .19s ease-out;
+    width: 0;
+    z-index: 2;
   }
   .picker-open .color-picker {
-    display: block;
+    transition: width .23s ease-out;
+    width: 245px;
   }
-
   .pointer {
     background: #fff;
     border-radius: 11px 11px 0 0;
-    width: 22px;
     height: 24px;
+    position: relative;
+    width: 22px;
+    z-index: 2;
   }
-  
   .picker-content {
     background: #fff;
     border-radius: 0 6px 6px 6px;
@@ -80,24 +117,73 @@
     column-gap: 7px;
     row-gap: 7px;
     padding: 14px;
-    position: absolute;
-    width: 178px;
-    z-index: 3;
+    position: relative;
+    width: 215px;
+    z-index: 2;
   }
 
   .color-option {
     background: currentcolor;
+    border: none;
     border-radius: 4px;
     cursor: pointer;
     height: 30px;
     width: 30px;
+    transition: border-radius .2s;
+  }
+  .color-option:hover,
+  .color-option:focus {
+    box-shadow: currentColor 0 0 4px 0px
   }
   .color-option.selected {
-    box-shadow: currentColor 0 0 4px 0px;
+    border-radius: 50%;
+    box-shadow: none;
+    cursor: default;
   }
 
+  .custom-color {
+    border: 1px solid currentColor;
+    border-radius: 4px;
+    box-sizing: border-box;
+    display: flex;
+    height: 30px;
+    width: 104px;
+  }
+  .custom-color:focus-within {
+    box-shadow: currentColor 0 0 4px 0px
+  }
+
+  .color-input-prefix {
+    background: #eee;
+    border-radius: 3px 0 0 3px;
+    box-sizing: border-box;
+    color: #fff;
+    flex: 0 0 auto;
+    height: 100%;
+    width: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2px 1px 0 0;
+  }
+  .color-input {
+    background: none;
+    border: none;
+    box-sizing: border-box;
+    flex: 0 1 auto;
+    font-family: monospace;
+    height: 30px;
+    min-width: 30px;
+    padding-left: 6px;
+    text-transform: uppercase;
+  }
+  .color-input:focus{
+    outline: none;
+  }
+  
   .cover {
     display: none;
+    cursor: url('../static/close-palette.png') 7 7, auto;
     position: fixed;
     top: 0;
     bottom: 0;
@@ -106,6 +192,6 @@
   }
   .picker-open .cover {
     display: block;
-    z-index: 2;
+    z-index: 1;
   }
 </style>
