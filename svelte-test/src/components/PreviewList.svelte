@@ -37,10 +37,8 @@
 
   .layout-row .device-preview-container {
     height: 100%;
-    min-width: 300px;
   }
   .layout-column .device-preview-container {
-    min-height: 300px;
     width: 100%;
   }
 </style>
