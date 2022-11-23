@@ -23,7 +23,6 @@ class App extends React.Component<AppProps, AppState> {
     this.state = {
       devices: [
         new Device(1, 'Picture Wall', '#FCB900'),
-        new Device(2, 'Fireplace', '#8ED1FC')
       ],
       activeDeviceColorPicker: null, 
       layout: Layout.row     
