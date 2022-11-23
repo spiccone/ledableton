@@ -1,13 +1,13 @@
 <script lang="ts">
     import type {Device} from "../types";
-    import DeviceColorIndicator from './DeviceColorIndicator.svelte';
+    import DeviceColorPicker from './DeviceColorPicker.svelte';
 
     export let device: Device;
 </script>
 
 <div class="DevicePreview">
     <div class="device-toolbar">
-        <DeviceColorIndicator color={device.color} />
+        <DeviceColorPicker bind:color={device.color} />
         <div class="device-label">{device.label}</div>
     </div>
 </div>

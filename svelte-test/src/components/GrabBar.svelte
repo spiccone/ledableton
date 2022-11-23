@@ -1,16 +1,22 @@
 <script lang="ts">
-  import {LayoutDirection} from "../types";
+  import {afterUpdate } from 'svelte';
+  import {LayoutDirection as Layout} from "../types";
 
   //export let elementIdToScale: string;
-  export let layoutDirection: LayoutDirection = LayoutDirection.row;
+  export let layoutDirection: Layout;
   export let dimension: number;
   export let minDimension: number = 100;
   export let maxDimension: number = 800;
 
   let grabBarElement: Element | null;
 
-  const directionClassName = layoutDirection == LayoutDirection.row ? 'vertical' : 'horizontal';
-  const useX = layoutDirection == LayoutDirection.row;
+  let directionClassName = layoutDirection == Layout.row ? 'vertical' : 'horizontal';
+  let useX = layoutDirection == Layout.row;
+   
+  afterUpdate(() => {
+    directionClassName = layoutDirection == Layout.row ? 'vertical' : 'horizontal';
+    useX = layoutDirection == Layout.row;
+	})
 
   let currentMousePosition: number | null = null;
   let lastGrabBarPosition: number | undefined = undefined;
@@ -58,6 +64,7 @@
         stuckPosition = null;
       }
 
+      /* This will make sure the grab bar and cursor stay aligned */
       const mouseDistanceFromBar = grabBarPosition ? mousePosition - grabBarPosition : 0;
       if (!stuck &&
           (mouseDistanceFromBar < -5 || 
@@ -92,18 +99,14 @@
 
 <style>
   .GrabBar {
-    background-color: var(--border-color);
-    flex: 0 0 auto;
+    height: 100%;
+    width: 100%;
   }
   .GrabBar.vertical {
     cursor: ew-resize;
-    height: 100%;
-    width: 4px;
   }
   .GrabBar.horizontal {
     cursor: ns-resize;
-    height: 4px;
-    width: 100%;
   }
   
 </style>
