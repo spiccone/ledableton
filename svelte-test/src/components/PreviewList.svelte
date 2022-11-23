@@ -5,6 +5,7 @@
 
   export let layoutDirection: Layout = Layout.row;
   export let devices: Array<Device> = [];
+  export let locked: boolean = flase;
 
   const previewSizes: number[] = new Array(devices.length).fill(300);
 
@@ -23,7 +24,10 @@
       </div>
     {/if}
     <div class="grab-bar">
-      <GrabBar bind:dimension={previewSizes[i]} layoutDirection={layoutDirection} />
+      <GrabBar
+        bind:dimension={previewSizes[i]}
+        layoutDirection={layoutDirection}
+        locked={locked}/>
     </div>
   {/each}
 </div>

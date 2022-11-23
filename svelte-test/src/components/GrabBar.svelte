@@ -7,6 +7,7 @@
   export let dimension: number;
   export let minDimension: number = 100;
   export let maxDimension: number = 800;
+  export let locked: boolean = false;
 
   let grabBarElement: Element | null;
 
@@ -94,7 +95,11 @@
 
 </script>
 
-<div class="GrabBar {directionClassName}" on:mousedown={onMouseDown} bind:this={grabBarElement}>
+<div 
+  class="GrabBar {directionClassName}" 
+  on:mousedown={onMouseDown} 
+  bind:this={grabBarElement}
+  style="{locked ? 'pointer-events:none' : ''}">
 </div>
 
 <style>

@@ -6,7 +6,10 @@
   import Icon from '@iconify/svelte';
   import rotate90DegreesCcwOutlineRounded from '@iconify/icons-material-symbols/rotate-90-degrees-ccw-outline-rounded';
   import rotate90DegreesCwOutlineRounded from '@iconify/icons-material-symbols/rotate-90-degrees-cw-outline-rounded';
+  import lockOpenOutline from '@iconify/icons-material-symbols/lock-open-outline';
+  import lockOutline from '@iconify/icons-material-symbols/lock-outline';
 
+  let locked = false;
   let layoutDirection = Layout.column;
   let oppositeLayoutDirection = Layout.row;
   let layoutDirectionClass = "layout-column";
@@ -32,32 +35,63 @@
     layoutDirectionClass = layoutDirection == Layout.column ? "layout-column" : "layout-row";
 	}
 
+  function handleLock() {
+    locked = !locked;
+  }
+
 </script>
 
 <div class="LightShowStudio {layoutDirectionClass}">
   {#if columnLayout}
     <div class="preview-area" style="height: {scalableDimension}px">
-      <PreviewList devices={devices} layoutDirection={oppositeLayoutDirection} />
+      <PreviewList 
+        devices={devices} 
+        layoutDirection={oppositeLayoutDirection}
+        locked = {locked} />
     </div>
   {:else}
     <div class="preview-area" style="width: {scalableDimension}px">
-      <PreviewList devices={devices} layoutDirection={oppositeLayoutDirection} />
+      <PreviewList 
+        devices={devices} 
+        layoutDirection={oppositeLayoutDirection}
+        locked = {locked} />
     </div>
   {/if}
   <div class="grab-bar {layoutDirectionClass}">
-    <GrabBar bind:dimension={scalableDimension} layoutDirection={layoutDirection} />
+    <GrabBar 
+      bind:dimension={scalableDimension} 
+      layoutDirection={layoutDirection} 
+      locked = {locked} />
   </div>
   <div class="toolbar-area"></div>
   <div class="grab-bar {layoutDirectionClass}">
-    <GrabBar bind:dimension={scalableDimension} layoutDirection={layoutDirection} />
+    <GrabBar 
+      bind:dimension={scalableDimension} 
+      layoutDirection={layoutDirection} 
+      locked = {locked} />
   </div>
   <div class="timeline-area"></div>
-  <!-- svelte-ignore a11y-click-events-have-key-events -->
-  <div class="rotate-button" on:click={handleRotate}>
-    {#if layoutDirection == Layout.column}
-      <Icon icon={rotate90DegreesCcwOutlineRounded} width="24" height="24" rotate={3} />
-    {:else}
-      <Icon icon={rotate90DegreesCwOutlineRounded} width="24" height="24" />
+
+
+  <div class="layout-button-area">
+    <!-- svelte-ignore a11y-click-events-have-key-events -->
+    <div class="layout-button lock-button" on:click={handleLock}>
+      {#if locked}
+        <Icon icon={lockOutline} width="24" height="24"/>
+      {:else}
+        <Icon icon={lockOpenOutline} width="24" height="24" />
+      {/if}
+    </div>
+
+    {#if !locked}
+      <!-- svelte-ignore a11y-click-events-have-key-events -->
+      <div class="layout-button rotate-button" on:click={handleRotate}>
+        {#if layoutDirection == Layout.column}
+          <Icon icon={rotate90DegreesCcwOutlineRounded} width="24" height="24" rotate={3} />
+        {:else}
+          <Icon icon={rotate90DegreesCwOutlineRounded} width="24" height="24" />
+        {/if}
+      </div>
     {/if}
   </div>
 </div>
@@ -124,15 +158,21 @@
     width: 4px;
   }
 
-  .rotate-button {
+  .layout-button-area {
     position: fixed;
-    color: #fff;
-    opacity: 30%;
     right: 10px;
     top: 10px;
-    cursor: pointer;
   }
-  .rotate-button:hover {
+  .layout-button {
+    color: #fff;
+    cursor: pointer;
+    margin-bottom: 6px;
+    opacity: 30%;
+  }
+  .layout-button:hover {
     opacity: 80%;
+  }
+  .layout-button:active {
+    opacity: 100%;
   }
 </style>
