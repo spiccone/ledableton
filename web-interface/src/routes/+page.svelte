@@ -1,8 +1,9 @@
 <script lang="ts">
-	import PreviewList from '../components/PreviewList.svelte';
-  import TimelineList from '../components/TimelineList.svelte';
-  import GrabBar from '../components/GrabBar.svelte'
-  import {Device, LayoutDirection as Layout} from '../types'
+	import PreviewList from '$lib/components/PreviewList.svelte';
+  import TimelineList from '$lib/components/TimelineList.svelte';
+  import Waveform from '$lib/components/Waveform.svelte';
+  import GrabBar from '$lib/components/GrabBar.svelte'
+  import { Device, LayoutDirection as Layout } from '$lib/types';
   import Icon from '@iconify/svelte';
   import createIcon from '@iconify/icons-gridicons/create';
   import folderOpenOutlineRounded from '@iconify/icons-material-symbols/folder-open-outline-rounded';
@@ -49,6 +50,11 @@
   }
 </script>
 
+<svelte:head>
+	<title>Letableton</title>
+	<meta name="description" content="Ledableton" />
+</svelte:head>
+
 <div class="LightShowStudio {layoutDirectionClass}">
   <div class="preview-area" style="{columnLayout ? 'height' : 'width'}: {scalableDimension}px">
     <PreviewList 
@@ -63,7 +69,8 @@
       locked = {locked} />
   </div>
   <div class="toolbar-area">
-    
+    <!-- For testing - not where it goes. -->
+    <Waveform />
   </div>
   <div class="grab-bar {layoutDirectionClass}">
     <GrabBar 

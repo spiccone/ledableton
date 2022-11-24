@@ -1,5 +1,5 @@
 <script lang="ts">
-  import {Device, LayoutDirection as Layout} from "../types";
+  import {Device, LayoutDirection as Layout} from "$lib/types";
 	import DevicePreview from './DevicePreview.svelte';
   import GrabBar from './GrabBar.svelte';
 
