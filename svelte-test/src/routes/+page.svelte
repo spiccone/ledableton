@@ -63,7 +63,7 @@
       locked = {locked} />
   </div>
   <div class="toolbar-area">
-
+    
   </div>
   <div class="grab-bar {layoutDirectionClass}">
     <GrabBar 
@@ -76,7 +76,9 @@
       bind:devices={devices} 
       layoutDirection={layoutDirection} />
   </div>
-  <div class="bottom-toolbar"></div>
+  <div class="beat-area">
+
+  </div>
 
   <div class="layout-button-area">
     <!-- svelte-ignore a11y-click-events-have-key-events -->
@@ -156,6 +158,7 @@
 
   .toolbar-area {
     flex: 0 0 auto;
+    height: 60px;
   }
   .layout-column .toolbar-area {
     height: 60px;
@@ -167,7 +170,20 @@
   }
 
   .timeline-area {
-    flex: 1 1 auto;
+    flex: 1 1;
+    min-height: 0px;
+  }
+
+  .beat-area {
+    flex: 0 0 auto;
+  }
+  .layout-column .beat-area {
+    height: 20px;
+    width: 100vw;
+  }
+  .layout-row .beat-area {
+    height: 100vh;
+    width: 20px;
   }
 
   .grab-bar {
