@@ -11,6 +11,7 @@
   import rotate90DegreesCcwOutlineRounded from '@iconify/icons-material-symbols/rotate-90-degrees-ccw-outline-rounded';
   import rotate90DegreesCwOutlineRounded from '@iconify/icons-material-symbols/rotate-90-degrees-cw-outline-rounded';
   import saveOutlineRounded from '@iconify/icons-material-symbols/save-outline-rounded';
+  import settingsOutlineRounded from '@iconify/icons-material-symbols/settings-outline-rounded';
 
   let locked = false;
   let layoutDirection = Layout.column;
@@ -19,8 +20,8 @@
   let columnLayout = true;
 
   let devices: Array<Device> = [
-    new Device(1, 'Picture Wall', '#FCB900'), 
-    new Device(2, 'Fireplace', '#FCB900')];
+    new Device(1, 'Device 1', '#FCB900'), 
+    new Device(2, 'Device 2', '#F78DA7')];
 
   let scalableDimension = 500;
   let height = 500;
@@ -46,7 +47,6 @@
   function handleLock() {
     locked = !locked;
   }
-
 </script>
 
 <div class="LightShowStudio {layoutDirectionClass}">
@@ -74,7 +74,7 @@
   <div class="timeline-area">
     <TimelineList 
       bind:devices={devices} 
-      layoutDirection={oppositeLayoutDirection} />
+      layoutDirection={layoutDirection} />
   </div>
   <div class="bottom-toolbar"></div>
 
@@ -90,6 +90,9 @@
     <!-- svelte-ignore a11y-click-events-have-key-events -->
     <div class="layout-button" on:click={handleSave}>
       <Icon icon={saveOutlineRounded} />
+    </div>
+    <div class="layout-button">
+      <Icon icon={settingsOutlineRounded} />
     </div>
     <div class="button-separator"></div>
     <!-- svelte-ignore a11y-click-events-have-key-events -->
@@ -181,18 +184,35 @@
   }
 
   .layout-button-area {
+    display: flex;
+    position: fixed;
+  }
+  .layout-column .layout-button-area {
+    flex-direction: column;
     position: fixed;
     right: 10px;
     top: 10px;
   }
+  .layout-row .layout-button-area{
+    bottom: 10px;
+    left: 10px;
+    flex-direction: row;
+  }
+
   .layout-button {
     color: #fff;
     cursor: pointer;
     height: 24px;
-    margin-bottom: 10px;
     opacity: 30%;
     width: 24px;
   }
+  .layout-column  .layout-button{
+    margin-bottom: 10px;
+  }
+  .layout-row  .layout-button{
+    margin-right: 10px;
+  }
+
   .layout-button:hover {
     opacity: 80%;
   }
@@ -203,9 +223,16 @@
   .button-separator {
     background-color: #fff;
     border-radius: 1px;
+    opacity: 10%;
+  }
+  .layout-column .button-separator {
     height: 2px;
-    margin: 10px 1px;
-    opacity: 8%;
+    margin: 0 1px 10px 1px;
     width: 22px;
+  }
+  .layout-row .button-separator {
+    height: 22px;
+    margin: 1px 10px 1px 0;
+    width: 2px;
   }
 </style>

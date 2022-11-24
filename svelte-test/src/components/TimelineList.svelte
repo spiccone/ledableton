@@ -8,7 +8,7 @@
 
 <div class="TimelineList {layoutDirection == Layout.column ? 'layout-column' : 'layout-row'}">
   {#each devices as device, i (device.previewElementId)}
-    <DeviceTimeline device={device} />
+    <DeviceTimeline device={device} layoutDirection={layoutDirection} />
   {/each}
 </div>
 
@@ -16,8 +16,15 @@
   .TimelineList {
     display: flex;
     flex: 1 1 auto; 
+    height: 100%;
+    width: 100%;
+  }
+  .layout-column {
     flex-direction: column;
-    height:100%;
     overflow-y: scroll;
+  }
+  .layout-row {
+    flex-direction: row;
+    overflow-x: scroll;
   }
 </style>
