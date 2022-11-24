@@ -1,8 +1,8 @@
 <script lang="ts">
-    import type {Device} from "../types";
-    import DeviceColorPicker from './DeviceColorPicker.svelte';
+  import type {Device} from "../types";
+  import DeviceColorPicker from './DeviceColorPicker.svelte';
 
-    export let device: Device;
+  export let device: Device;
 </script>
 
 <div class="DevicePreview">
@@ -14,8 +14,8 @@
 
 <style>
   .DevicePreview {
-      box-sizing: border-box;
-      flex: 100 0 auto; /* grow is large to make AddDevice small */
+    box-sizing: border-box;
+    flex: 100 0 auto; /* grow is large to make AddDevice small */
   }
   .device-toolbar {
     align-content: center;

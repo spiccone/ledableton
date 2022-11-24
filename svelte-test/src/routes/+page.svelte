@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
 	import PreviewList from '../components/PreviewList.svelte';
+  import TimelineList from '../components/TimelineList.svelte';
   import GrabBar from '../components/GrabBar.svelte'
   import {Device, LayoutDirection as Layout} from '../types'
   import Icon from '@iconify/svelte';
@@ -18,7 +18,9 @@
   let layoutDirectionClass = "layout-column";
   let columnLayout = true;
 
-  let devices: Array<Device> = [new Device(1, 'Picture Wall', '#FCB900'), new Device(2, 'Fireplace', '#FCB900')];
+  let devices: Array<Device> = [
+    new Device(1, 'Picture Wall', '#FCB900'), 
+    new Device(2, 'Fireplace', '#FCB900')];
 
   let scalableDimension = 500;
   let height = 500;
@@ -50,7 +52,7 @@
 <div class="LightShowStudio {layoutDirectionClass}">
   <div class="preview-area" style="{columnLayout ? 'height' : 'width'}: {scalableDimension}px">
     <PreviewList 
-      devices={devices} 
+      bind:devices={devices} 
       layoutDirection={oppositeLayoutDirection}
       locked = {locked} />
   </div>
@@ -70,8 +72,11 @@
       locked = {locked} />
   </div>
   <div class="timeline-area">
-
+    <TimelineList 
+      bind:devices={devices} 
+      layoutDirection={oppositeLayoutDirection} />
   </div>
+  <div class="bottom-toolbar"></div>
 
   <div class="layout-button-area">
     <!-- svelte-ignore a11y-click-events-have-key-events -->

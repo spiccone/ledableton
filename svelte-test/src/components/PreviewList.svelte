@@ -9,14 +9,13 @@
 
   const previewWidths: number[] = new Array(devices.length).fill(300);
   const previewHeights: number[] = new Array(devices.length).fill(300);
-
 </script>
 
 <div class="PreviewList {layoutDirection == Layout.row ? 'layout-row' : 'layout-column'}">
   {#each devices as device, i (device.previewElementId)}
     {#if layoutDirection == Layout.row}
       <div class="device-preview-container" style="min-width: {previewWidths[i]}px">
-        <DevicePreview device={device} />
+        <DevicePreview bind:device={device} />
       </div>
       <div class="grab-bar">
         <GrabBar
@@ -26,7 +25,7 @@
       </div>
     {:else}
       <div class="device-preview-container" style="min-height: {previewHeights[i]}px">
-        <DevicePreview device={device} />
+        <DevicePreview bind:device={device} />
       </div>
       <div class="grab-bar">
         <GrabBar

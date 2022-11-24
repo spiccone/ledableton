@@ -40,7 +40,6 @@
       inputColor = '#F00';
       inputPrefixColor = '#CCC';
     }
-    console.log(colorLevel);
   }
 </script>
 
@@ -181,7 +180,7 @@
     box-sizing: border-box;
     flex: 0 1 auto;
     font-family: monospace;
-    height: 30px;
+    height: 100%;
     min-width: 30px;
     padding-left: 6px;
     text-transform: uppercase;

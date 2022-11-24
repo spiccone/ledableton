@@ -8,7 +8,7 @@ export function getColorLevel(hex: string) {
       0.587 * (rgb.g * rgb.g) +
       0.114 * (rgb.b * rgb.b)
     );
-    if (hsp>170) {
+    if (hsp>160) {
       return ColorLevel.light;
     } else if (hsp>60) {
       return ColorLevel.medium;
