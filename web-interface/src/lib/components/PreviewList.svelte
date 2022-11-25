@@ -60,7 +60,7 @@
   }
 
   .grab-bar {
-    background-color: var(--border-color);
+    background-color: var(--color-border);
     flex: 0 0 auto;
   }
   .layout-row .grab-bar {

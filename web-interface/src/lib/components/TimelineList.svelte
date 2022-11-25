@@ -4,6 +4,7 @@
 
   export let layoutDirection: Layout = Layout.column;
   export let devices: Array<Device> = [];
+
 </script>
 
 <div class="TimelineList {layoutDirection == Layout.column ? 'layout-column' : 'layout-row'}">

@@ -5,8 +5,8 @@
   //export let elementIdToScale: string;
   export let layoutDirection: Layout;
   export let dimension: number;
-  export let minDimension: number = 100;
-  export let maxDimension: number = 800;
+  export let minDimension: number = 20;
+  export let maxDimension: number = 2000;
   export let locked: boolean = false;
 
   let grabBarElement: Element | null;

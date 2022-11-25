@@ -1,0 +1,201 @@
+<script lang="ts">
+	import PreviewList from '$lib/components/PreviewList.svelte';
+  import TimelineList from '$lib/components/TimelineList.svelte';
+  import GrabBar from '$lib/components/GrabBar.svelte'
+  import { Device, LayoutDirection as Layout } from '$lib/types';
+  import Icon from '@iconify/svelte';
+  import createIcon from '@iconify/icons-gridicons/create';
+  import folderOpenOutlineRounded from '@iconify/icons-material-symbols/folder-open-outline-rounded';
+  import lockOpenOutline from '@iconify/icons-material-symbols/lock-open-outline';
+  import lockOutline from '@iconify/icons-material-symbols/lock-outline';
+  import rotate90DegreesCcwOutlineRounded from '@iconify/icons-material-symbols/rotate-90-degrees-ccw-outline-rounded';
+  import rotate90DegreesCwOutlineRounded from '@iconify/icons-material-symbols/rotate-90-degrees-cw-outline-rounded';
+  import saveOutlineRounded from '@iconify/icons-material-symbols/save-outline-rounded';
+  import settingsOutlineRounded from '@iconify/icons-material-symbols/settings-outline-rounded';
+	import AudioDisplay from '$lib/components/AudioDisplay.svelte';
+
+  let locked = false;
+  let layoutDirection = Layout.column;
+  let oppositeLayoutDirection = Layout.row;
+  let columnLayout = true;
+
+  let devices: Array<Device> = [
+    new Device(1, 'Device 1', '#FCB900'), 
+    new Device(2, 'Device 2', '#F78DA7')];
+
+  let windowHeight = 0;
+  let previewHeight = 500;
+  let previewWidth = 600;
+
+  function handleSave() {}
+  function handleOpen() {}
+
+  function handleRotate() {
+    columnLayout = !columnLayout;
+		layoutDirection = columnLayout ? Layout.column : Layout.row;
+    oppositeLayoutDirection = columnLayout ? Layout.row : Layout.column;
+	}
+
+  function handleLock() {
+    locked = !locked;
+  }
+</script>
+
+<svelte:window bind:innerHeight={windowHeight}/>
+
+<svelte:head>
+	<title>Letabledon</title>
+	<meta name="description" content="Ledableton" />
+</svelte:head>
+
+<div class="LightShowStudio" 
+     style="grid-template-columns: minmax(200px, {previewWidth}px) 4px minmax(200px, 1fr); 
+            grid-template-rows: minmax(20px, {previewHeight}px) 4px minmax(40px, 1fr) 60px">
+  <div class="preview-area">
+    <PreviewList 
+      bind:devices={devices} 
+      layoutDirection={oppositeLayoutDirection}
+      locked = {locked} />
+  </div>
+  <div class="grab-bar vertical">
+    <GrabBar 
+      bind:dimension={previewWidth} 
+      layoutDirection={oppositeLayoutDirection} 
+      locked = {locked} />
+  </div>
+  <div class="toolbar-area">
+  </div>
+  <div class="grab-bar horizontal">
+    <GrabBar 
+      bind:dimension={previewHeight} 
+      layoutDirection={layoutDirection} 
+      locked = {locked} />
+  </div>
+  <div class="timeline-area">
+    <TimelineList 
+      bind:devices={devices} 
+      layoutDirection={layoutDirection} />
+  </div>
+  <div class="audio-area">
+    <AudioDisplay />
+  </div>
+
+  <div class="layout-button-area">
+    <!-- svelte-ignore a11y-click-events-have-key-events -->
+    <div class="layout-button" on:click={handleOpen}>
+      <Icon icon={createIcon} />
+    </div>
+    <!-- svelte-ignore a11y-click-events-have-key-events -->
+    <div class="layout-button" on:click={handleOpen}>
+      <Icon icon={folderOpenOutlineRounded} />
+    </div>
+    <!-- svelte-ignore a11y-click-events-have-key-events -->
+    <div class="layout-button" on:click={handleSave}>
+      <Icon icon={saveOutlineRounded} />
+    </div>
+    <div class="layout-button">
+      <Icon icon={settingsOutlineRounded} />
+    </div>
+    <div class="button-separator"></div>
+    <!-- svelte-ignore a11y-click-events-have-key-events -->
+    <div class="layout-button" on:click={handleLock}>
+      {#if locked}
+        <Icon icon={lockOutline} />
+      {:else}
+        <Icon icon={lockOpenOutline} />
+      {/if}
+    </div>
+
+    {#if !locked}
+      <!-- svelte-ignore a11y-click-events-have-key-events -->
+      <div class="layout-button" on:click={handleRotate}>
+        {#if layoutDirection == Layout.column}
+          <Icon icon={rotate90DegreesCcwOutlineRounded} rotate={3} />
+        {:else}
+          <Icon icon={rotate90DegreesCwOutlineRounded} />
+        {/if}
+      </div>
+    {/if}
+  </div>
+</div>
+
+<style>
+  .LightShowStudio {
+    display: grid;
+    grid-template-areas: 
+      "preview grabv toolbar"
+      "grabh grabh grabh"
+      "timeline timeline timeline"
+      "audio audio audio";
+    height: 100vh;
+    width: 100vw;
+  }
+  .preview-area {
+    background: #000;
+    grid-area: preview;
+  }
+
+  .toolbar-area {
+    grid-area: toolbar;
+    width: 200px;
+  }
+
+  .timeline-area {
+    grid-area: timeline;
+    min-height: 0px;
+  }
+
+  .audio-area {
+    grid-area: audio;
+    height: 60px;
+  }
+
+  .grab-bar {
+    background-color: var(--color-border);
+    flex: 0 0 auto;
+  }
+  .grab-bar.horizontal {
+    grid-area: grabh;
+    height: 4px;
+    width: 100%;
+  }
+  .grab-bar.vertical {
+    grid-area: grabv;
+    height: 100%;
+    width: 4px;
+  }
+
+  .layout-button-area {
+    display: flex;
+    position: fixed;
+    flex-direction: column;
+    position: fixed;
+    right: 10px;
+    top: 10px;
+  }
+
+  .layout-button {
+    color: #fff;
+    cursor: pointer;
+    height: 24px;
+    opacity: 30%;
+    margin-bottom: 10px;
+    width: 24px;
+  }
+
+  .layout-button:hover {
+    opacity: 80%;
+  }
+  .layout-button:active {
+    opacity: 100%;
+  }
+
+  .button-separator {
+    background-color: #fff;
+    border-radius: 1px;
+    opacity: 10%;
+    height: 2px;
+    margin: 0 1px 10px 1px;
+    width: 22px;
+  }
+</style>

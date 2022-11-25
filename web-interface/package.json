@@ -8,7 +8,8 @@
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
 		"lint": "prettier --plugin-search-dir . --check . && eslint .",
-		"format": "prettier --plugin-search-dir . --write ."
+		"format": "prettier --plugin-search-dir . --write .",
+		"postinstall": "patch-package"
 	},
 	"devDependencies": {
 		"@fontsource/fira-mono": "^4.5.0",
@@ -19,11 +20,13 @@
 		"@sveltejs/adapter-auto": "next",
 		"@sveltejs/kit": "next",
 		"@types/cookie": "^0.5.1",
+		"@types/wavesurfer.js": "^6.0.3",
 		"@typescript-eslint/eslint-plugin": "^5.27.0",
 		"@typescript-eslint/parser": "^5.27.0",
 		"eslint": "^8.16.0",
 		"eslint-config-prettier": "^8.3.0",
 		"eslint-plugin-svelte3": "^4.0.0",
+		"patch-package": "^6.5.0",
 		"prettier": "^2.6.2",
 		"prettier-plugin-svelte": "^2.7.0",
 		"svelte": "^3.46.0",
@@ -35,6 +38,8 @@
 	},
 	"type": "module",
 	"dependencies": {
-		"waveform-data": "^4.3.0"
+		"colormap": "^2.3.2",
+		"waveform-data": "^4.3.0",
+		"wavesurfer.js": "^6.4.0"
 	}
 }

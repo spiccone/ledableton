@@ -14,22 +14,25 @@
         {device.label}
     </div>
   </div>
+  <div id="{device.timelineElementId}" class="waveform"></div>
 </div>
 
 <style>
   .DeviceTimeline {
     box-sizing: border-box;
+    display: flex;
     flex: 1 0 auto;
+    flex-direction: row;
     height: 80px;
     width: 100%;
   }
   .horizontal{
-    border-bottom: 4px solid var(--border-color);
+    border-bottom: 4px solid var(--color-border);
     height: 80px;
     width: 100%;
   }
   .vertical {
-    border-right: 4px solid var(--border-color);
+    border-right: 4px solid var(--color-border);
     width: 80px;
     height: 100%;
   }
@@ -59,6 +62,11 @@
   .horizontal .device-label {
     transform: rotate(-90deg);
     height: 10px;
-}
+  }
+
+  .waveform {
+    height: 60px;
+    width: 100%;
+  }
 
 </style>
