@@ -26,6 +26,8 @@
     new Device(1, 'Device 1', '#FCB900'), 
     new Device(2, 'Device 2', '#F78DA7')];
 
+  devices[1].previewLeft = 300;
+
   let windowHeight = 0;
   let previewHeight = 500;
   let previewWidth = 600;
@@ -143,7 +145,6 @@
   .preview-area {
     background: #000;
     grid-area: preview;
-    overflow: scroll;
   }
 
   .menu-area {
@@ -207,7 +208,7 @@
   .button-separator {
     background-color: #fff;
     border-radius: 1px;
-    opacity: 10%;
+    opacity: 15%;
     height: 2px;
     margin: 0 1px 10px 1px;
     width: 22px;

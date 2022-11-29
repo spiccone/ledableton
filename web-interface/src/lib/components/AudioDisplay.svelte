@@ -33,7 +33,7 @@
     horizontalWave.load('src/lib/static/bothOfUs.mp3');
 
     horizontalWave.on('ready', function () {
-    // horizontalWave.play();
+    //horizontalWave.play();
     });
   });
 

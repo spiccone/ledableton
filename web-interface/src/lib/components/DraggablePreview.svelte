@@ -4,8 +4,6 @@
   import DeviceColorPicker from './DeviceColorPicker.svelte';
 
   export let device: Device;
-  export let startLeft = 0;
-  export let startTop = 0;
   export let dragging = false;
   export let locked: boolean;
 
@@ -18,8 +16,8 @@
   let top: number;
 
   onMount(() => {
-    left = startLeft - element.getBoundingClientRect().left;
-    top = startTop - element.getBoundingClientRect().top;
+    left = device.previewLeft - element.getBoundingClientRect().left;
+    top = device.previewTop - element.getBoundingClientRect().top;
   });
 
   let xOffset = 0;
@@ -33,9 +31,7 @@
     hovering = false;
   }
 
-  function startDragging(event: {clientX: number, 
-                                 clientY:number, 
-                                 target: HTMLInputElement;}) {
+  function startDragging(event: MouseEvent) {
     if (locked) {
       return;
     }
@@ -52,7 +48,6 @@
       onMouseUp();
       return;
     }
-    event.preventDefault();
     left += event.clientX - xOffset;
     top += event.clientY - yOffset;
     xOffset = event.clientX;
@@ -64,27 +59,29 @@
     removeEventListener('mousemove', onMouseMove);
     removeEventListener('mouseup', onMouseUp);
     const rect = element.getBoundingClientRect();
-    startLeft = rect.x;
-    startTop = rect.y;
+    device.previewLeft = rect.x;
+    device.previewTop = rect.y;
     dragging = false;
     drag = false;
   }
 
+  // TODO: Change this so the container grows up/left
   function keepOnPage() {
     const rect = element.getBoundingClientRect();
     if(rect.left < 0) {
-      startLeft = 0;
+      device.previewLeft = 0;
       left -= rect.left;
     }
     if(rect.top < 0) {
-      startTop = 0;
+      device.previewTop = 0;
       top -= rect.top;
     }
+    element.scrollIntoView();
   }
 
 </script>
 
-<div class="DraggablePreview {drag || (hovering && !locked) ? 'hovering' : ''}"
+<div class="DraggablePreview {drag || (hovering && !locked) ? 'hovering' : ''} {locked ? 'locked' : ' '}"
     bind:this={element}
     on:mouseenter={enter}
     on:mouseleave={leave}
@@ -102,14 +99,18 @@
   .DraggablePreview {
     cursor: move;
     border: 2px solid rgba(0,0,0,0);
-    border-radius: 6px;
+    border-radius: 12px;
     height: 300px;
     padding: 6px;
     position: relative;
     width: 300px;
   }
+  .DraggablePreview.locked {
+    cursor: default;
+  }
   .DraggablePreview.hovering {
     border-color: var(--color-border);
+    cursor: move;
   }
 
   .device-toolbar {

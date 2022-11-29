@@ -1,32 +1,46 @@
 <script lang="ts">
-  import type {Device, Position} from "$lib/types";
+  import type {Device} from "$lib/types";
+  import AddDevice from "./AddDevice.svelte";
 	import DraggablePreview from './DraggablePreview.svelte';
 
   export let devices: Array<Device> = [];
   export let locked: boolean = false;
 
-
   let dragging= false;
-
-  // Storing positions on this layer so we can save the sate
-  const previewPositions: Position[] = new Array(devices.length);
-  for (let i=0; i<devices.length; i++) {
-    previewPositions[i] = {left: i*200 + 40, top: 100};
-  }
 </script>
 
-<div class="PreviewArea">
-  {#each devices as device, i (device.previewElementId)}
-      <DraggablePreview bind:device={device} 
-                        bind:dragging={dragging}
-                        bind:startLeft={previewPositions[i].left}
-                        bind:startTop={previewPositions[i].top}
-                        locked={locked || dragging} />
-  {/each}
+<div class="PreviewArea {locked ? 'locked' : ''}">
+  <div class="device-preview-container">
+    {#each devices as device, i (device.previewElementId)}
+      <div class="device-wrapper">
+        <DraggablePreview bind:device={device} 
+                          bind:dragging={dragging}
+                          locked={locked || dragging} />
+      </div>
+    {/each}
+  </div>
+  {#if !locked}
+    <AddDevice />
+  {/if}
 </div>
 
 <style>
   .PreviewArea {
+    height: 100%;
+    position: relative;
+    width: 100%;
   }
 
+  .device-preview-container {
+    height: 100%;
+    overflow: scroll;
+    position:static;
+    width: 100%;
+  }
+
+  .device-wrapper {
+    height: 0;
+    overflow: visible;
+    width: 0;
+  }
 </style>
