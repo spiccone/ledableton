@@ -1,45 +1,51 @@
 <script lang="ts">
   import WaveSurfer from 'wavesurfer.js';
   import MinimapPlugin from 'wavesurfer.js/dist/plugin/wavesurfer.minimap.min.js';
-  import {onMount} from 'svelte';
+  import {afterUpdate, onMount} from 'svelte';
   import {LayoutDirection as Layout} from "../types";
 
   export let layoutDirection: Layout = Layout.column;
-  export let minimapSelector: string|undefined;
+  export let minimapId: string|undefined;
+  export let vertical: boolean = false;
 
-  let wavesurfer: WaveSurfer; 
-
-  const plugins = minimapSelector ? [
-                          MinimapPlugin.create({
-                              container: minimapSelector,
-                              waveColor: '#777',
-                              progressColor: '#222',
-                              height: 50
-                          })] : [];
+  let horizontalWave: WaveSurfer; 
 
   onMount(() => {
-    wavesurfer = WaveSurfer.create({
+    horizontalWave = WaveSurfer.create({
+
       container: '#waveform',
-      waveColor: '#888',
+      waveColor: '#000',
       progressColor: '#666',
+      barWidth: 3,
       height: 40,
       fillParent: false,
       normalize: true,
       scrollParent: true,
-      minPxPerSec: 100,
-      plugins: plugins
+      minPxPerSec: 200,
+      plugins: [MinimapPlugin.create({
+                    container: '#' + minimapId,
+                    waveColor: '#777',
+                    progressColor: '#222',
+                    height: 30
+                })]
     });
 
-    wavesurfer.load('src/lib/static/strangeSternum.mp3');
+    horizontalWave.load('src/lib/static/bothOfUs.mp3');
 
-    wavesurfer.on('ready', function () {
+    horizontalWave.on('ready', function () {
+    // horizontalWave.play();
     });
   });
+
+  afterUpdate(() => {
+
+  });
+
 
 </script>
 
 <div class="AudioDisplay">
-  <div id="waveform"></div>
+  <div id="waveform" class="{vertical ? 'vertical' : ''}"></div>
 </div>
 
 <style>
@@ -47,7 +53,11 @@
 
   }
   #waveform {
-    height: 40px;
+    
+  }
+  #waveform.vertical {
+    display: flex;
+    height: 400px;
   }
 
 </style>

@@ -17,6 +17,7 @@
   afterUpdate(() => {
     directionClassName = layoutDirection == Layout.row ? 'vertical' : 'horizontal';
     useX = layoutDirection == Layout.row;
+    window.dispatchEvent(new Event('resize'));
 	})
 
   let currentMousePosition: number | null = null;

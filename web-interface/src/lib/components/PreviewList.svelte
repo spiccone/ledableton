@@ -17,21 +17,9 @@
       <div class="device-preview-container" style="min-width: {previewWidths[i]}px">
         <DevicePreview bind:device={device} />
       </div>
-      <div class="grab-bar">
-        <GrabBar
-          bind:dimension={previewWidths[i]}
-          layoutDirection={layoutDirection}
-          locked={locked}/>
-      </div>
     {:else}
       <div class="device-preview-container" style="min-height: {previewHeights[i]}px">
         <DevicePreview bind:device={device} />
-      </div>
-      <div class="grab-bar">
-        <GrabBar
-          bind:dimension={previewHeights[i]}
-          layoutDirection={layoutDirection}
-          locked={locked}/>
       </div>
     {/if}
   {/each}

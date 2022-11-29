@@ -1,8 +1,9 @@
 <script lang="ts">
+  import Menu from '$lib/components/Menu.svelte';
 	import PreviewList from '$lib/components/PreviewList.svelte';
   import TimelineList from '$lib/components/TimelineList.svelte';
   import GrabBar from '$lib/components/GrabBar.svelte'
-  import { Device, LayoutDirection as Layout } from '$lib/types';
+  import { Device, LayoutDirection as Layout, LayoutDirection } from '$lib/types';
   import Icon from '@iconify/svelte';
   import createIcon from '@iconify/icons-gridicons/create';
   import folderOpenOutlineRounded from '@iconify/icons-material-symbols/folder-open-outline-rounded';
@@ -14,6 +15,7 @@
   import settingsOutlineRounded from '@iconify/icons-material-symbols/settings-outline-rounded';
 	import AudioDisplay from '$lib/components/AudioDisplay.svelte';
 
+  const audioMinimapId = "audio-minimap";
   let locked = false;
   let layoutDirection = Layout.column;
   let oppositeLayoutDirection = Layout.row;
@@ -48,9 +50,12 @@
 	<meta name="description" content="Ledableton" />
 </svelte:head>
 
-<div class="LightShowStudio" 
-     style="grid-template-columns: minmax(200px, {previewWidth}px) 4px minmax(200px, 1fr); 
-            grid-template-rows: minmax(20px, {previewHeight}px) 4px minmax(40px, 1fr) 60px">
+<div class="LightShowStudio {columnLayout ? 'layout-column' : 'layout-row'}"
+     style="{columnLayout ?
+           'grid-template-columns: minmax(200px, ' + previewWidth + 'px) 4px minmax(200px, 1fr); ' + 
+           'grid-template-rows: minmax(20px, ' + previewHeight + 'px) 4px minmax(60px, 1fr)' :
+           'grid-template-columns: minmax(200px, ' + previewWidth + 'px) 4px minmax(100px, '+previewHeight+'px) 4px minmax(60px, 1fr);' +
+           'grid-template-rows: 1fr;'}">
   <div class="preview-area">
     <PreviewList 
       bind:devices={devices} 
@@ -60,10 +65,11 @@
   <div class="grab-bar vertical">
     <GrabBar 
       bind:dimension={previewWidth} 
-      layoutDirection={oppositeLayoutDirection} 
+      layoutDirection={LayoutDirection.row} 
       locked = {locked} />
   </div>
-  <div class="toolbar-area">
+  <div class="menu-area">
+    <Menu minimapId={audioMinimapId} />
   </div>
   <div class="grab-bar horizontal">
     <GrabBar 
@@ -74,10 +80,9 @@
   <div class="timeline-area">
     <TimelineList 
       bind:devices={devices} 
-      layoutDirection={layoutDirection} />
-  </div>
-  <div class="audio-area">
-    <AudioDisplay />
+      layoutDirection={layoutDirection}
+      audioMinimapId={audioMinimapId} 
+      verticalAudio={!columnLayout} />
   </div>
 
   <div class="layout-button-area">
@@ -122,22 +127,26 @@
 <style>
   .LightShowStudio {
     display: grid;
-    grid-template-areas: 
-      "preview grabv toolbar"
-      "grabh grabh grabh"
-      "timeline timeline timeline"
-      "audio audio audio";
     height: 100vh;
     width: 100vw;
+  }
+  .layout-column {
+    grid-template-areas: 
+      "preview grabv menu"
+      "grabh grabh grabh"
+      "timeline timeline timeline";
+  }
+  .layout-row {
+    grid-template-areas: 
+      "preview grabv menu grabh timeline";
   }
   .preview-area {
     background: #000;
     grid-area: preview;
   }
 
-  .toolbar-area {
-    grid-area: toolbar;
-    width: 200px;
+  .menu-area {
+    grid-area: menu;
   }
 
   .timeline-area {
@@ -163,6 +172,10 @@
     grid-area: grabv;
     height: 100%;
     width: 4px;
+  }
+  .layout-row .grab-bar.horizontal {
+    width: 4px;
+    height: 100%;
   }
 
   .layout-button-area {
