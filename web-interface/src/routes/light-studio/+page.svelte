@@ -1,6 +1,6 @@
 <script lang="ts">
   import Menu from '$lib/components/Menu.svelte';
-	import PreviewList from '$lib/components/PreviewList.svelte';
+	import PreviewArea from '$lib/components/PreviewArea.svelte';
   import TimelineList from '$lib/components/TimelineList.svelte';
   import GrabBar from '$lib/components/GrabBar.svelte'
   import { Device, LayoutDirection as Layout, LayoutDirection } from '$lib/types';
@@ -14,6 +14,7 @@
   import saveOutlineRounded from '@iconify/icons-material-symbols/save-outline-rounded';
   import settingsOutlineRounded from '@iconify/icons-material-symbols/settings-outline-rounded';
 	import AudioDisplay from '$lib/components/AudioDisplay.svelte';
+	import DraggablePreviews from '$lib/components/PreviewArea.svelte';
 
   const audioMinimapId = "audio-minimap";
   let locked = false;
@@ -57,9 +58,8 @@
            'grid-template-columns: minmax(200px, ' + previewWidth + 'px) 4px minmax(100px, '+previewHeight+'px) 4px minmax(60px, 1fr);' +
            'grid-template-rows: 1fr;'}">
   <div class="preview-area">
-    <PreviewList 
+    <PreviewArea 
       bind:devices={devices} 
-      layoutDirection={oppositeLayoutDirection}
       locked = {locked} />
   </div>
   <div class="grab-bar vertical">
@@ -143,6 +143,7 @@
   .preview-area {
     background: #000;
     grid-area: preview;
+    overflow: scroll;
   }
 
   .menu-area {
@@ -183,7 +184,7 @@
     position: fixed;
     flex-direction: column;
     position: fixed;
-    right: 10px;
+    left: 10px;
     top: 10px;
   }
 

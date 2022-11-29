@@ -16,3 +16,8 @@ export class Device {
     this.color = color;
   }
 }
+
+export interface Position {
+  left: number;
+  top: number;
+}

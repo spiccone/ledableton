@@ -2,7 +2,6 @@
   import {Device, LayoutDirection as Layout} from "../types";
 	import DeviceTimeline from './DeviceTimeline.svelte';
   import AudioDisplay from './AudioDisplay.svelte';
-	import Waveform from "./Waveform.svelte";
 
   export let layoutDirection: Layout = Layout.column;
   export let devices: Array<Device> = [];

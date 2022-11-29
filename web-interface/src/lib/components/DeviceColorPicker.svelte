@@ -2,8 +2,8 @@
   import {ColorLevel, getColorLevel} from "../helper-functions";
 
   export let color: string;
+  export let open: boolean = false;
 
-  let open: boolean = false;
   let customColor: string = color.slice(1);
   let inputColor = color;
   let inputPrefixColor =  color;

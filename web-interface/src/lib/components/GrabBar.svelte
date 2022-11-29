@@ -24,8 +24,8 @@
   let lastGrabBarPosition: number | undefined = undefined;
 
   function onMouseDown (event: MouseEvent) {
-    addEventListener('mousemove', onMouseMove)
-    addEventListener('mouseup', onMouseUp)
+    addEventListener('mousemove', onMouseMove);
+    addEventListener('mouseup', onMouseUp);
     currentMousePosition = useX ? event.clientX : event.clientY;
     lastGrabBarPosition = undefined;
   }
@@ -90,8 +90,8 @@
     }
     document.body.style.cursor = "";
     currentMousePosition = null;
-    removeEventListener('mousemove', onMouseMove)
-    removeEventListener('mouseup', onMouseUp)
+    removeEventListener('mousemove', onMouseMove);
+    removeEventListener('mouseup', onMouseUp);
   }
 
 </script>
