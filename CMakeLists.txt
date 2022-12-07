@@ -15,6 +15,8 @@ include(FetchContent)
 include(fetch-content-shim)
 include(ExternalProject)
 
+find_package(Boost REQUIRED)
+
 FetchContent_Declare(
     fake-fast-led
     GIT_REPOSITORY      https://github.com/ademuri/FakeFastLED.git
@@ -28,6 +30,8 @@ FetchContent_Declare(
     GIT_TAG             0.8.2
 )
 FetchContent_MakeAvailable(websocketpp)
+
+find_package(Protobuf REQUIRED)
 
 # Set appropriate warning levels and include debug symbols.
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -pedantic -g")
@@ -50,17 +54,22 @@ add_library(websocketpp INTERFACE)
 target_include_directories(websocketpp INTERFACE
   $<BUILD_INTERFACE:${WEBSOCKETPP_SOURCE_DIR}>
   $<INSTALL_INTERFACE:include>)
+target_link_libraries(websocketpp INTERFACE
+    Boost::boost
+)
 install(TARGETS websocketpp EXPORT websocketpp-config DESTINATION include)
 install(EXPORT websocketpp-config DESTINATION share/websocketpp/cmake)
 
 file(GLOB SIMULATOR_SOURCES
   "lib/simulator/*.cc"
+  "proto/generated/*.cc"
 )
 add_executable(simulator ${SIMULATOR_SOURCES})
-target_link_libraries(simulator generic websocketpp)
+target_link_libraries(simulator generic websocketpp ${PROTOBUF_LIBRARY})
 
 target_include_directories(simulator PUBLIC
     $<BUILD_INTERFACE:${websocketpp_SOURCE_DIR}>
+    $<BUILD_INTERFACE:/Users/sam/Programs/ledableton/proto/generated>
 )
 message (STATUS "** WEBSOCKETPP_ROOT" ${websocketpp_SOURCE_DIR})
 message (STATUS "** WEBSOCKETPP populated " ${websocketpp_POPULATED})

@@ -44,20 +44,20 @@ struct TableStruct_device_2eproto {
   static const uint32_t offsets[];
 };
 extern const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_device_2eproto;
-namespace test {
+namespace ledableton {
 class Device;
 struct DeviceDefaultTypeInternal;
 extern DeviceDefaultTypeInternal _Device_default_instance_;
-}  // namespace test
+}  // namespace ledableton
 PROTOBUF_NAMESPACE_OPEN
-template<> ::test::Device* Arena::CreateMaybeMessage<::test::Device>(Arena*);
+template<> ::ledableton::Device* Arena::CreateMaybeMessage<::ledableton::Device>(Arena*);
 PROTOBUF_NAMESPACE_CLOSE
-namespace test {
+namespace ledableton {
 
 // ===================================================================
 
 class Device final :
-    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:test.Device) */ {
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:ledableton.Device) */ {
  public:
   inline Device() : Device(nullptr) {}
   ~Device() override;
@@ -160,7 +160,7 @@ class Device final :
   private:
   friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
   static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
-    return "test.Device";
+    return "ledableton.Device";
   }
   protected:
   explicit Device(::PROTOBUF_NAMESPACE_ID::Arena* arena,
@@ -193,7 +193,7 @@ class Device final :
   std::string* _internal_mutable_name();
   public:
 
-  // @@protoc_insertion_point(class_scope:test.Device)
+  // @@protoc_insertion_point(class_scope:ledableton.Device)
  private:
   class _Internal;
 
@@ -223,7 +223,7 @@ inline void Device::clear_name() {
   _impl_.name_.ClearToEmpty();
 }
 inline const std::string& Device::name() const {
-  // @@protoc_insertion_point(field_get:test.Device.name)
+  // @@protoc_insertion_point(field_get:ledableton.Device.name)
   return _internal_name();
 }
 template <typename ArgT0, typename... ArgT>
@@ -231,11 +231,11 @@ inline PROTOBUF_ALWAYS_INLINE
 void Device::set_name(ArgT0&& arg0, ArgT... args) {
  
  _impl_.name_.Set(static_cast<ArgT0 &&>(arg0), args..., GetArenaForAllocation());
-  // @@protoc_insertion_point(field_set:test.Device.name)
+  // @@protoc_insertion_point(field_set:ledableton.Device.name)
 }
 inline std::string* Device::mutable_name() {
   std::string* _s = _internal_mutable_name();
-  // @@protoc_insertion_point(field_mutable:test.Device.name)
+  // @@protoc_insertion_point(field_mutable:ledableton.Device.name)
   return _s;
 }
 inline const std::string& Device::_internal_name() const {
@@ -250,7 +250,7 @@ inline std::string* Device::_internal_mutable_name() {
   return _impl_.name_.Mutable(GetArenaForAllocation());
 }
 inline std::string* Device::release_name() {
-  // @@protoc_insertion_point(field_release:test.Device.name)
+  // @@protoc_insertion_point(field_release:ledableton.Device.name)
   return _impl_.name_.Release();
 }
 inline void Device::set_allocated_name(std::string* name) {
@@ -265,7 +265,7 @@ inline void Device::set_allocated_name(std::string* name) {
     _impl_.name_.Set("", GetArenaForAllocation());
   }
 #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
-  // @@protoc_insertion_point(field_set_allocated:test.Device.name)
+  // @@protoc_insertion_point(field_set_allocated:ledableton.Device.name)
 }
 
 #ifdef __GNUC__
@@ -274,7 +274,7 @@ inline void Device::set_allocated_name(std::string* name) {
 
 // @@protoc_insertion_point(namespace_scope)
 
-}  // namespace test
+}  // namespace ledableton
 
 // @@protoc_insertion_point(global_scope)
 

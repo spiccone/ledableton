@@ -20,7 +20,7 @@ PROTOBUF_PRAGMA_INIT_SEG
 namespace _pb = ::PROTOBUF_NAMESPACE_ID;
 namespace _pbi = _pb::internal;
 
-namespace test {
+namespace ledableton {
 PROTOBUF_CONSTEXPR Device::Device(
     ::_pbi::ConstantInitialized): _impl_{
     /*decltype(_impl_.name_)*/{&::_pbi::fixed_address_empty_string, ::_pbi::ConstantInitialized{}}
@@ -34,35 +34,35 @@ struct DeviceDefaultTypeInternal {
   };
 };
 PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 DeviceDefaultTypeInternal _Device_default_instance_;
-}  // namespace test
+}  // namespace ledableton
 static ::_pb::Metadata file_level_metadata_device_2eproto[1];
 static constexpr ::_pb::EnumDescriptor const** file_level_enum_descriptors_device_2eproto = nullptr;
 static constexpr ::_pb::ServiceDescriptor const** file_level_service_descriptors_device_2eproto = nullptr;
 
 const uint32_t TableStruct_device_2eproto::offsets[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
   ~0u,  // no _has_bits_
-  PROTOBUF_FIELD_OFFSET(::test::Device, _internal_metadata_),
+  PROTOBUF_FIELD_OFFSET(::ledableton::Device, _internal_metadata_),
   ~0u,  // no _extensions_
   ~0u,  // no _oneof_case_
   ~0u,  // no _weak_field_map_
   ~0u,  // no _inlined_string_donated_
-  PROTOBUF_FIELD_OFFSET(::test::Device, _impl_.name_),
+  PROTOBUF_FIELD_OFFSET(::ledableton::Device, _impl_.name_),
 };
 static const ::_pbi::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
-  { 0, -1, -1, sizeof(::test::Device)},
+  { 0, -1, -1, sizeof(::ledableton::Device)},
 };
 
 static const ::_pb::Message* const file_default_instances[] = {
-  &::test::_Device_default_instance_._instance,
+  &::ledableton::_Device_default_instance_._instance,
 };
 
 const char descriptor_table_protodef_device_2eproto[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) =
-  "\n\014device.proto\022\004test\"\026\n\006Device\022\014\n\004name\030\001"
-  " \001(\tb\006proto3"
+  "\n\014device.proto\022\nledableton\"\026\n\006Device\022\014\n\004"
+  "name\030\001 \001(\tb\006proto3"
   ;
 static ::_pbi::once_flag descriptor_table_device_2eproto_once;
 const ::_pbi::DescriptorTable descriptor_table_device_2eproto = {
-    false, false, 52, descriptor_table_protodef_device_2eproto,
+    false, false, 58, descriptor_table_protodef_device_2eproto,
     "device.proto",
     &descriptor_table_device_2eproto_once, nullptr, 0, 1,
     schemas, file_default_instances, TableStruct_device_2eproto::offsets,
@@ -75,7 +75,7 @@ PROTOBUF_ATTRIBUTE_WEAK const ::_pbi::DescriptorTable* descriptor_table_device_2
 
 // Force running AddDescriptors() at dynamic initialization time.
 PROTOBUF_ATTRIBUTE_INIT_PRIORITY2 static ::_pbi::AddDescriptorsRunner dynamic_init_dummy_device_2eproto(&descriptor_table_device_2eproto);
-namespace test {
+namespace ledableton {
 
 // ===================================================================
 
@@ -87,7 +87,7 @@ Device::Device(::PROTOBUF_NAMESPACE_ID::Arena* arena,
                          bool is_message_owned)
   : ::PROTOBUF_NAMESPACE_ID::Message(arena, is_message_owned) {
   SharedCtor(arena, is_message_owned);
-  // @@protoc_insertion_point(arena_constructor:test.Device)
+  // @@protoc_insertion_point(arena_constructor:ledableton.Device)
 }
 Device::Device(const Device& from)
   : ::PROTOBUF_NAMESPACE_ID::Message() {
@@ -105,7 +105,7 @@ Device::Device(const Device& from)
     _this->_impl_.name_.Set(from._internal_name(), 
       _this->GetArenaForAllocation());
   }
-  // @@protoc_insertion_point(copy_constructor:test.Device)
+  // @@protoc_insertion_point(copy_constructor:ledableton.Device)
 }
 
 inline void Device::SharedCtor(
@@ -123,7 +123,7 @@ inline void Device::SharedCtor(
 }
 
 Device::~Device() {
-  // @@protoc_insertion_point(destructor:test.Device)
+  // @@protoc_insertion_point(destructor:ledableton.Device)
   if (auto *arena = _internal_metadata_.DeleteReturnArena<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>()) {
   (void)arena;
     return;
@@ -141,7 +141,7 @@ void Device::SetCachedSize(int size) const {
 }
 
 void Device::Clear() {
-// @@protoc_insertion_point(message_clear_start:test.Device)
+// @@protoc_insertion_point(message_clear_start:ledableton.Device)
   uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
@@ -162,7 +162,7 @@ const char* Device::_InternalParse(const char* ptr, ::_pbi::ParseContext* ctx) {
           auto str = _internal_mutable_name();
           ptr = ::_pbi::InlineGreedyStringParser(str, ptr, ctx);
           CHK_(ptr);
-          CHK_(::_pbi::VerifyUTF8(str, "test.Device.name"));
+          CHK_(::_pbi::VerifyUTF8(str, "ledableton.Device.name"));
         } else
           goto handle_unusual;
         continue;
@@ -191,7 +191,7 @@ failure:
 
 uint8_t* Device::_InternalSerialize(
     uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
-  // @@protoc_insertion_point(serialize_to_array_start:test.Device)
+  // @@protoc_insertion_point(serialize_to_array_start:ledableton.Device)
   uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
@@ -200,7 +200,7 @@ uint8_t* Device::_InternalSerialize(
     ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::VerifyUtf8String(
       this->_internal_name().data(), static_cast<int>(this->_internal_name().length()),
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::SERIALIZE,
-      "test.Device.name");
+      "ledableton.Device.name");
     target = stream->WriteStringMaybeAliased(
         1, this->_internal_name(), target);
   }
@@ -209,12 +209,12 @@ uint8_t* Device::_InternalSerialize(
     target = ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
         _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
   }
-  // @@protoc_insertion_point(serialize_to_array_end:test.Device)
+  // @@protoc_insertion_point(serialize_to_array_end:ledableton.Device)
   return target;
 }
 
 size_t Device::ByteSizeLong() const {
-// @@protoc_insertion_point(message_byte_size_start:test.Device)
+// @@protoc_insertion_point(message_byte_size_start:ledableton.Device)
   size_t total_size = 0;
 
   uint32_t cached_has_bits = 0;
@@ -241,7 +241,7 @@ const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*Device::GetClassData() const {
 void Device::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const ::PROTOBUF_NAMESPACE_ID::Message& from_msg) {
   auto* const _this = static_cast<Device*>(&to_msg);
   auto& from = static_cast<const Device&>(from_msg);
-  // @@protoc_insertion_point(class_specific_merge_from_start:test.Device)
+  // @@protoc_insertion_point(class_specific_merge_from_start:ledableton.Device)
   GOOGLE_DCHECK_NE(&from, _this);
   uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
@@ -253,7 +253,7 @@ void Device::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const ::PROTOBU
 }
 
 void Device::CopyFrom(const Device& from) {
-// @@protoc_insertion_point(class_specific_copy_from_start:test.Device)
+// @@protoc_insertion_point(class_specific_copy_from_start:ledableton.Device)
   if (&from == this) return;
   Clear();
   MergeFrom(from);
@@ -281,11 +281,11 @@ void Device::InternalSwap(Device* other) {
 }
 
 // @@protoc_insertion_point(namespace_scope)
-}  // namespace test
+}  // namespace ledableton
 PROTOBUF_NAMESPACE_OPEN
-template<> PROTOBUF_NOINLINE ::test::Device*
-Arena::CreateMaybeMessage< ::test::Device >(Arena* arena) {
-  return Arena::CreateMessageInternal< ::test::Device >(arena);
+template<> PROTOBUF_NOINLINE ::ledableton::Device*
+Arena::CreateMaybeMessage< ::ledableton::Device >(Arena* arena) {
+  return Arena::CreateMessageInternal< ::ledableton::Device >(arena);
 }
 PROTOBUF_NAMESPACE_CLOSE
 
