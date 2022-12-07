@@ -14,7 +14,8 @@
     ['#F44336', '#FF6900', '#FCB900', '#CDDC39', '#8BC34A',  
     '#2CCCE4','#8F7FD7', '#C579d2', '#F78DA7'];
 
-  function openPicker() {
+  function openPicker(event: MouseEvent) {
+    event.preventDefault();
     open = true;
   }
 
@@ -112,6 +113,7 @@
   .pointer {
     background: #fff;
     border-radius: 11px 11px 0 0;
+    cursor: default;
     height: 24px;
     position: relative;
     width: 22px;
@@ -121,6 +123,7 @@
     background: #fff;
     border-radius: 0 6px 6px 6px;
     display: flex;
+    cursor: default;
     flex-wrap: wrap;
     column-gap: 7px;
     row-gap: 7px;

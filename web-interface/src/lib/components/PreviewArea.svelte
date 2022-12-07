@@ -10,6 +10,7 @@
 </script>
 
 <div class="PreviewArea {locked ? 'locked' : ''}">
+  <div class='room-button'>Room name</div>
   <div class="device-preview-container">
     {#each devices as device, i (device.previewElementId)}
       <div class="device-wrapper">
@@ -29,6 +30,20 @@
     height: 100%;
     position: relative;
     width: 100%;
+  }
+
+  .room-button {
+    border: 2px solid rgba(0,0,0,0);
+    border-radius: 8px;
+    cursor: pointer;
+    padding: 6px 9px;
+    position: absolute;
+    font-size: 18px;
+    margin: 7px 40px;
+    z-index: 10;
+  }
+  .room-button:hover {
+    border: 2px solid var(--color-border);
   }
 
   .device-preview-container {

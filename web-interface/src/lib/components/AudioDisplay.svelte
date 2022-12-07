@@ -16,12 +16,11 @@
       container: '#waveform',
       waveColor: '#000',
       progressColor: '#666',
-      barWidth: 3,
       height: 40,
       fillParent: false,
       normalize: true,
       scrollParent: true,
-      minPxPerSec: 200,
+      minPxPerSec: 100,
       plugins: [MinimapPlugin.create({
                     container: '#' + minimapId,
                     waveColor: '#777',

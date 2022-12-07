@@ -1,15 +1,17 @@
 <script lang="ts">
   import {Device, LayoutDirection as Layout} from "../types";
-	import DeviceTimeline from './DeviceTimeline.svelte';
-  import AudioDisplay from './AudioDisplay.svelte';
+  import DeviceSelection from "./DeviceSelection.svelte";
 
+  export let devices: Array<Device> = [];
   export let layoutDirection: Layout = Layout.column;
   export let minimapId: string|undefined;
+  //export let CurrentEffect: Effect|null = null;
 
 </script>
 
 <div class="Menu {layoutDirection == Layout.column ? 'layout-column' : 'layout-row'}">
   <div class="controls"></div>
+  <DeviceSelection bind:devices={devices} />
   <div id="{minimapId}" class="audio-minimap"></div>
 </div>
 
@@ -23,6 +25,7 @@
     flex: 1 1 auto;
   }
   .audio-minimap {
+    border-top: 2px solid var(--color-border);
     flex: 0 0 20px;
   }
 </style>

@@ -89,7 +89,7 @@
   }
   .content-wrapper {
     background: #333;
-    border-radius: 12px;
+    border-radius: 24px;
     padding: 6px 24px;
     width: 500px;
     height: 500px;

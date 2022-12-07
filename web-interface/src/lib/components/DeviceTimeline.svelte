@@ -56,6 +56,10 @@
     color: #000;
     font-size: 10px;
     flex: 0 1 auto;
+    max-width: 100%;
+    overflow: hidden;
+    padding: 0 4px;
+    text-overflow: ellipsis;
     white-space: nowrap;
   }
   .vertical .device-label {

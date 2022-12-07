@@ -44,6 +44,7 @@
   }
 
   function onMouseMove(event: MouseEvent) {
+    event.preventDefault();
     if(colorPickerOpen) {
       onMouseUp();
       return;

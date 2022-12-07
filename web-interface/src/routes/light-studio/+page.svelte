@@ -71,7 +71,7 @@
       locked = {locked} />
   </div>
   <div class="menu-area">
-    <Menu minimapId={audioMinimapId} />
+    <Menu minimapId={audioMinimapId} bind:devices={devices} />
   </div>
   <div class="grab-bar horizontal">
     <GrabBar 
@@ -185,8 +185,8 @@
     position: fixed;
     flex-direction: column;
     position: fixed;
-    left: 10px;
-    top: 10px;
+    left: 12px;
+    top: 12px;
   }
 
   .layout-button {
