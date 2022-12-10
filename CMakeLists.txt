@@ -60,16 +60,14 @@ target_link_libraries(websocketpp INTERFACE
 install(TARGETS websocketpp EXPORT websocketpp-config DESTINATION include)
 install(EXPORT websocketpp-config DESTINATION share/websocketpp/cmake)
 
+include_directories(${CMAKE_CURRENT_BINARY_DIR})
+protobuf_generate_cpp(PROTO_SRCS PROTO_HDRS proto/device.proto)
 file(GLOB SIMULATOR_SOURCES
   "lib/simulator/*.cc"
-  "proto/generated/*.cc"
 )
-add_executable(simulator ${SIMULATOR_SOURCES})
-target_link_libraries(simulator generic websocketpp ${PROTOBUF_LIBRARY})
+add_executable(simulator ${SIMULATOR_SOURCES} ${PROTO_SRCS} ${PROTO_HDRS})
+target_link_libraries(simulator generic websocketpp ${PROTOBUF_LIBRARY} ${Protobuf_LIBRARIES})
 
 target_include_directories(simulator PUBLIC
     $<BUILD_INTERFACE:${websocketpp_SOURCE_DIR}>
-    $<BUILD_INTERFACE:/Users/sam/Programs/ledableton/proto/generated>
 )
-message (STATUS "** WEBSOCKETPP_ROOT" ${websocketpp_SOURCE_DIR})
-message (STATUS "** WEBSOCKETPP populated " ${websocketpp_POPULATED})
