@@ -1,7 +1,33 @@
 <script lang="ts">
+  import {onMount} from 'svelte';
+  import Select from './Select.svelte';
   import Modal from "./Modal.svelte";
   import Icon from '@iconify/svelte';
   import roundPlus from '@iconify/icons-ic/round-plus';
+  import protobuf from 'protobufjs';
+  import {nameFormat} from "../helper-functions";
+
+  let deviceTypes : {value : string, label : string}[] = [];
+  
+  onMount(() => {
+    protobuf.load("src/protos/device.proto").then(function(root) {
+      if (!root) {
+        throw "error";
+      }
+
+      let TypeMessage = root.lookupType("devicepackage.Type");
+      for (const [key, value] of Object.entries(TypeMessage.fields)) {
+        deviceTypes.push({value: key, label: nameFormat(key)});
+      }
+    });
+  });
+
+  let deviceName : string;
+  let type : {value : number, label : string};
+
+  function handleSubmit() {
+    
+	}
 </script>
 
 <Modal>
@@ -15,7 +41,16 @@
     <h1>Add Device</h1>
   </div>
   <div slot="content">
-    Content here
+    <form on:submit|preventDefault={handleSubmit}>
+      <label for="name">Name</label>
+      <input name="name" bind:value={deviceName}>
+
+      <Select items={deviceTypes} />
+    
+      <button disabled={!deviceName} type=submit>
+        Submit
+      </button>
+    </form>
   </div>
 </Modal>
 

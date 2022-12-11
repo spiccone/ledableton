@@ -26,7 +26,7 @@ void on_message(Server *s, websocketpp::connection_hdl hdl,
     return;
   }
 
-  Device device;
+  devicepackage::Device device;
   *device.mutable_name() = "My Device";
 
   try {

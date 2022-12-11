@@ -96,8 +96,46 @@
     z-index: 2;
   }
   .content {
+    display: flex;
+    flex-direction: row;
     min-width: 300px;
     min-height: 300px;
+  }
+
+  /* Styles for select */
+  .content {
+    --background: #111;
+    --border: 1px solid var(--color-border);
+    --borderFocusColor: #888;
+    --borderRadius: 12px;
+    --indicatorColor: #666;
+    --indicatorTop: 9px;
+    --inputColor: #666;
+    --itemHoverBG: #222;
+    --listBackground: #111;
+  }
+  :global(.selectContainer::after) {
+    border: 2px solid transparent;
+    border-radius: 1px;
+    border-right: 0;
+    border-top: 0;
+    content: " ";
+    display: block;
+    height: 0.5em;
+    width: 0.5em;
+    margin-top: -0.5em;
+    pointer-events: none;
+    position: absolute;
+    top: 50%;
+    -webkit-transform: rotate(-45deg);
+    transform: rotate(-45deg);
+    -webkit-transform-origin: center;
+    transform-origin: center;
+    border-color: var(--inputColor);
+    right: 1em;
+    z-index: 4;
+    opacity: 0.33;
+    transition: all 0.5s ease;
   }
 
 </style>

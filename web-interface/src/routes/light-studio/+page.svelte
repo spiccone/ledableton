@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { onMount } from 'svelte';
   import Menu from '$lib/components/Menu.svelte';
 	import PreviewArea from '$lib/components/PreviewArea.svelte';
   import TimelineList from '$lib/components/TimelineList.svelte';
@@ -13,8 +14,6 @@
   import rotate90DegreesCwOutlineRounded from '@iconify/icons-material-symbols/rotate-90-degrees-cw-outline-rounded';
   import saveOutlineRounded from '@iconify/icons-material-symbols/save-outline-rounded';
   import settingsOutlineRounded from '@iconify/icons-material-symbols/settings-outline-rounded';
-	import AudioDisplay from '$lib/components/AudioDisplay.svelte';
-	import DraggablePreviews from '$lib/components/PreviewArea.svelte';
 
   const audioMinimapId = "audio-minimap";
   let locked = false;
@@ -31,6 +30,10 @@
   let windowHeight = 0;
   let previewHeight = 500;
   let previewWidth = 600;
+
+  onMount(async () => {
+		previewWidth = window.innerWidth - 400;
+	});
 
   function handleSave() {}
   function handleOpen() {}

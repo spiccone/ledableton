@@ -19,7 +19,7 @@ export function getColorLevel(hex: string) {
   else return ColorLevel.medium;
 }
 
-export function hexToRgb (hex: string): {r:number, g:number, b:number} | null {
+export function hexToRgb(hex: string) : {r:number, g:number, b:number} | null {
   let h = hex[0] == '#' ? hex.slice(1) : hex;
   h[4]||(h=h.replace(/./g,'$&$&'));
   const aRgbHex = h.match(/.{1,2}/g); 
@@ -31,4 +31,9 @@ export function hexToRgb (hex: string): {r:number, g:number, b:number} | null {
     };
   }
   return null;
+}
+
+export function nameFormat(name: string) : string {
+  let result = name.replace(/([A-Z]+)/g, ' $1');
+  return result.charAt(0).toUpperCase() + result.slice(1);
 }
