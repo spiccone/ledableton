@@ -1,6 +1,6 @@
 <script lang="ts">
   import {onMount} from 'svelte';
-  import {DeviceType, SavedDevice} from '$lib/types';
+  import {DeviceType, Field, SavedDevice} from '$lib/types';
   import Select from './SelectDevice.svelte';
   import Modal from "./Modal.svelte";
   import Icon from '@iconify/svelte';
@@ -31,7 +31,7 @@
         let isBucket = false;
         for (const [key, value] of Object.entries(fieldMessage)) {
           if (!value.partOf) {
-            fields.push({key: key, type: value.type});
+            fields.push(new Field(key, nameFormat(key), value.type));
             isBucket = isBucket || value.type == "Type";
           }
         }
@@ -41,7 +41,9 @@
             for (const [key, value] of Object.entries(oneof.fieldsArray)) {
               oneofFields.push({key: value.name, label: nameFormat(value.name), type: value.type});
             }
-            fields.push({key: name, oneofs: oneofFields});
+            const newField = new Field(key, nameFormat(key), value.type);
+            newField.addOneofList(oneofFields);
+            fields.push(newField);
           }
         }
         

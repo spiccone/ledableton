@@ -27,17 +27,30 @@ export interface Position {
   top: number;
 }
 
+export class Field {
+  key: string;
+  label: string;
+  type: string;
+  oneofs: {key: string, label: string, type: string}[];
+
+  constructor(key: string, label: string, type: string) {
+    this.key = key;
+    this.label = label;
+    this.type = type;
+    this.oneofs = [];
+  }
+
+  addOneofList(oneoflist: {key: string, label: string, type: string}[]) {
+    this.oneofs = oneoflist;
+  }
+}
 
 export class DeviceType {
   key: string;
   label: string;
-  fields: ({key: string, type: string} | 
-          {key: string, oneofs: {key: string, label: string, type: string}[]})[];
+  fields: Field[];
 
-  constructor(key: string, 
-              label: string, 
-              fields: ({key: string, type: string} | 
-                      {key: string, oneofs: {key: string, label: string, type: string}[]})[]) {
+  constructor(key: string, label: string, fields: Field[]) {
     this.key = key;
     this.label = label;
     this.fields = fields;

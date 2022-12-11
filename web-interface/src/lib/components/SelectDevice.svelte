@@ -4,7 +4,7 @@
   import Select from './Select.svelte';
   import Icon from '@iconify/svelte';
   import roundPlus from '@iconify/icons-ic/round-plus';
-  import arrowBackRounded from '@iconify/icons-material-symbols/arrow-back-rounded';
+  import folderOpenOutlineRounded from '@iconify/icons-material-symbols/folder-open-outline-rounded';
 
   export let savedDevices : SavedDevice[] = [];
   export let deviceTypes : DeviceType[] = [];
@@ -50,7 +50,7 @@
       {#if savedDevices.length > 0}
         <!-- svelte-ignore a11y-click-events-have-key-events -->
         <button class="back" on:click={backToDevices}>
-          <Icon icon={arrowBackRounded} />
+          <Icon icon={folderOpenOutlineRounded} />
         </button>
       {/if}
     </div>
@@ -59,11 +59,11 @@
         {#each selectedType.fields as field}
           {#if field.type === "Type"}
             <slot name="type-field"/>
-          {:else if field.oneofs}
+          {:else if field.oneofs.length > 0}
             <Select items={field.oneofs}  />
           {:else}
             <div class="device-field">
-              {field.key}
+              {field.label}
             </div>
           {/if}
         {/each}
