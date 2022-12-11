@@ -15,32 +15,42 @@ message Type {
   }
 }
 
+enum Unit {
+  MM = 0;
+  IN = 1;
+}
+
+message Dimension {
+  Unit unit = 1;
+  float dimension = 2;
+}
+
 message Strip {
   int32 leds = 1;
-  int32 spacing = 2;
+  Dimension spacing = 2;
 }
 
 message Arc {
   int32 leds = 1;
-  int32 radius = 2;
+  Dimension radius = 2;
   oneof dimension {
-    uint32 arc_length = 3;
+    Dimension arc_length = 3;
     uint32 angle = 4;
-    uint32 chord_length = 5;
+    Dimension chord_length = 5;
   }
 }
 
 message Grid {
   int32 rows = 1;
   int32 columns = 2;
-  int32 row_spacing = 3;
-  int32 column_spacing = 4;
+  Dimension row_spacing = 3;
+  Dimension column_spacing = 4;
 }
 
 message BucketedGrid {
   int32 rows = 1;
   int32 columns = 2;
-  int32 row_spacing = 3;
-  int32 column_spacing = 4;
+  Dimension row_spacing = 3;
+  Dimension column_spacing = 4;
   Type bucket_type = 5;
 }

@@ -13,6 +13,7 @@
   let devices : SavedDevice[] = [new SavedDevice("test", "test")];
   let deviceTypes : DeviceType[] = [];
   let deviceTypesNoBuckets : DeviceType[] = [];
+  let units : {key: string, label: string}[] = [];
 
   let selectedDevice : SavedDevice | DeviceType;
   let selectedDeviceField : SavedDevice | DeviceType;
@@ -21,6 +22,11 @@
     protobuf.load("src/protos/device.proto").then(function(root) {
       if (!root) {
         throw "Error loading device.proto in AddDevice.";
+      }
+
+      let unitMessage = root.lookupEnum("devicepackage.Unit");
+      for (const [key, value] of Object.entries(unitMessage.valuesById)) {
+        units.push({key: key, label: value});
       }
 
       let TypeMessage = root.lookupType("devicepackage.Type");
@@ -52,7 +58,6 @@
         }
         deviceTypes.push(new DeviceType(key, nameFormat(key), fields));
       }
-      console.log(deviceTypes);
     });
   });
 
@@ -87,15 +92,18 @@
   <div class="content" slot="content">
     <form class="form" on:submit|preventDefault={handleSubmit}>
       <div class="outer-section">
-        <SelectDevice bind:selectedItem={selectedDevice} savedDevices={devices} deviceTypes={deviceTypes}>
+        <SelectDevice bind:selectedItem={selectedDevice} 
+                      savedDevices={devices} 
+                      deviceTypes={deviceTypes}
+                      units={units}>
           <div slot="type-field">
             <div class="inner-section">
-              <SelectDevice 
-                bind:selectedItem={selectedDeviceField} 
-                savedDevices={devices}
-                deviceTypes={deviceTypesNoBuckets}
-                savedDeviceLabel="Bucket device:"
-                deviceTypeLabel="Bucket device type:"/>
+              <SelectDevice bind:selectedItem={selectedDeviceField} 
+                            savedDevices={devices}
+                            deviceTypes={deviceTypesNoBuckets}
+                            units={units}
+                            savedDeviceLabel="Bucket device:"
+                            deviceTypeLabel="Bucket device type:"/>
               </div>
           </div>
         </SelectDevice>
@@ -138,6 +146,22 @@
     position: relative;
     height: 100%;
     width: 100%;
+  }
+
+  .device-name {
+    background: none;
+    border: 0 solid var(--color-border);
+    border-radius: var(--border-radius-input);
+    margin: 2px;
+    padding: 4px 6px 2px;
+  }
+  .device-name:hover {
+    border-width: 1px;
+    margin: 1px;
+  }
+  .device-name:focus {
+    border-width: 2px;
+    margin: 0;
   }
 
   .form {

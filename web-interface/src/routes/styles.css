@@ -47,42 +47,25 @@ pre {
 
 input,
 button {
-  background: none;
-  border: none;
-  color: var(--color-text);
-	font-size: inherit;
-	font-family: inherit;
-}
-
-button {
   background: var(--color-form-bg);
   border: 1px solid var(--color-form-bg-hover);;
   border-radius: var(--border-radius-input);
   color: var(--color-form-text);
   cursor: pointer;
+  font-size: inherit;
+	font-family: inherit;
   padding: 8px 12px;
 }
+input:hover,
 button:hover {
   background: var(--color-form-bg-hover);
   color: var(--color-form-text-hover);
 }
-
 input:focus,
 button:focus:not(:focus-visible) {
 	outline: none;
 }
 
 input {
-  border: 0 solid var(--color-border);
-  border-radius: var(--border-radius-input);
-  margin: 2px;
-  padding: 4px 6px 2px;
-}
-input:hover {
-  border-width: 1px;
-  margin: 1px;
-}
-input:focus {
-  border-width: 2px;
-  margin: 0;
+  cursor: text;
 }

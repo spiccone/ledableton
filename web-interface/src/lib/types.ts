@@ -45,6 +45,18 @@ export class Field {
   }
 }
 
+export class FieldValue {
+  key: string;
+  value: number;
+  unitKey: number | null;
+
+  constructor(key: string, value: number, unitKey: number | null) {
+    this.key = key;
+    this.value = value;
+    this.unitKey = unitKey;
+  }
+}
+
 export class DeviceType {
   key: string;
   label: string;

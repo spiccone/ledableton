@@ -2,13 +2,22 @@
   import {onMount} from 'svelte';
 
   export let items : {key : string, label : string}[] = [];
-  export let selectedItem : {key : string, label : string} | undefined;
+  export let selectedItem : {key : string, label : string} | undefined | null = undefined;
+  export let selectedIndex : number | null = 0;
   export let id = "";
+  export let showArrow = true;
 
   let open = false;
   let selectedLabel = selectedItem ? selectedItem.label : "";
 
-  let selectedListItemElement : HTMLElement;
+  onMount(() => {
+    if (!selectedIndex && !selectedItem && items.length > 0) {
+      selectedIndex = 0;
+      selectItem(0);
+    } else if (selectedIndex && selectedIndex < items.length) {
+      selectItem(selectedIndex);
+    }
+  });
 
   function toggleSelect() {
     open = !open;
@@ -18,22 +27,25 @@
     open = false;
   }
 
-  function selectItem(key : string, label : string) {
-    selectedListItemElement.innerHTML = label;
-    selectedItem = items.find(o => o.key === key);
-    selectedLabel = label;
+  function selectItem(index : number) {
+    selectedIndex = index;
+    selectedItem = items[index];
+    selectedLabel = selectedItem.label;
     open = false;
   }
 </script>
 
-<div id={id} class="Select {open ? 'open' : 'closed'}">
+<div id={id} class="Select {open ? 'open' : 'closed'}{showArrow ? ' arrow' : ''}">
   <div class="item-spacer"></div>
   <div class="select-list">
     <!-- svelte-ignore a11y-click-events-have-key-events -->
-    <div class="selected-list-item" bind:this={selectedListItemElement} on:click={toggleSelect}>{selectedLabel}</div>
-    {#each items as item}
+    <div class="selected-list-item {id}" 
+         on:click={toggleSelect}>
+      {selectedLabel}
+    </div>
+    {#each items as item, i (id + "_select_" + i)}
       <!-- svelte-ignore a11y-click-events-have-key-events -->
-      <div class="select-list-item" on:click={() => selectItem(item.key, item.label)}>
+      <div class="select-list-item" on:click={() => selectItem(i)}>
         {item.label}
       </div>
     {/each}
@@ -110,7 +122,7 @@
     display: block;
   }
 
-  .selected-list-item::after {
+  .arrow .selected-list-item::after {
     border: 2px solid #999;;
     border-radius: 1px;
     border-right: 0;
@@ -127,10 +139,10 @@
     transition: transform 0.5s ease;
     width: 6px;
   }
-  .selected-list-item:hover::after {
+  .arrow .selected-list-item:hover::after {
     border-color: #ccc;
   }
-  .open .selected-list-item::after {
+  .arrow.open .selected-list-item::after {
     -webkit-transform: rotate(135deg);
     transform: rotate(135deg);
   }

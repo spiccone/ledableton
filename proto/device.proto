@@ -15,6 +15,11 @@ message Type {
   }
 }
 
+enum Unit {
+  MM = 0;
+  IN = 1;
+}
+
 message Strip {
   int32 leds = 1;
   int32 spacing = 2;
