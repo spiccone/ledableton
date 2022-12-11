@@ -118,7 +118,6 @@
   .header {
     align-items: center;
     display: flex;
-    margin-bottom: 12px;
     justify-content: space-between;
   }
 

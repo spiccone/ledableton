@@ -38,17 +38,9 @@ message Grid {
 }
 
 message BucketedGrid {
-  Type bucket_type = 1;
-  int32 rows = 2;
-  int32 columns = 3;
-  int32 row_spacing = 4;
-  int32 column_spacing = 5;
-}
-
-message BucketedGrid2 {
-  Type bucket_type = 1;
-  int32 rows = 2;
-  int32 columns = 3;
-  int32 row_spacing = 4;
-  int32 column_spacing = 5;
+  int32 rows = 1;
+  int32 columns = 2;
+  int32 row_spacing = 3;
+  int32 column_spacing = 4;
+  Type bucket_type = 5;
 }

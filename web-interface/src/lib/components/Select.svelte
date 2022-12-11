@@ -1,8 +1,8 @@
 <script lang="ts">
   import {onMount} from 'svelte';
 
-  export let items : {value : string, label : string}[] = [];
-  export let selectedItem : {value : string, label : string};
+  export let items : {key : string, label : string}[] = [];
+  export let selectedItem : {key : string, label : string} | undefined;
   export let id = "";
 
   let open = false;
@@ -18,9 +18,9 @@
     open = false;
   }
 
-  function selectItem(value : string, label : string) {
+  function selectItem(key : string, label : string) {
     selectedListItemElement.innerHTML = label;
-    selectedItem = items.find(o => o.value === value);
+    selectedItem = items.find(o => o.key === key);
     selectedLabel = label;
     open = false;
   }
@@ -33,7 +33,7 @@
     <div class="selected-list-item" bind:this={selectedListItemElement} on:click={toggleSelect}>{selectedLabel}</div>
     {#each items as item}
       <!-- svelte-ignore a11y-click-events-have-key-events -->
-      <div class="select-list-item" on:click={() => selectItem(item.value, item.label)}>
+      <div class="select-list-item" on:click={() => selectItem(item.key, item.label)}>
         {item.label}
       </div>
     {/each}

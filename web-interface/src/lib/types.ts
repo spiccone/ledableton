@@ -26,3 +26,25 @@ export interface Position {
   left: number;
   top: number;
 }
+
+export class DeviceType {
+  key: string;
+  label: string;
+  fields: {key: string, type: string}[];
+
+  constructor(key: string, label: string, fields: {key: string, type: string}[]) {
+    this.key = key;
+    this.label = label;
+    this.fields = fields;
+  }
+}
+
+export class SavedDevice {
+  key: string;
+  label: string;
+
+  constructor(key: string, label: string) {
+    this.key = key;
+    this.label = label;
+  }
+}
