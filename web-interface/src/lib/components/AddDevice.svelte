@@ -9,23 +9,38 @@
   import {nameFormat} from "../helper-functions";
 
   let devices : {value : string, label : string}[] = [{value: "test", label: "Test"}];
-  let deviceTypes : {value : string, label : string}[] = [];
+  let deviceTypes : {value : string, label : string, fields : {key: string, type: string}[]}[] = [];
+  let deviceTypesNoBuckets : {value : string, label : string, fields : {key: string, type: string}[]}[] = [];
+
+  let selectedDevice : {value : string, label : string};
+  let selectedDeviceType : {value : string, label : string, fields : {key: string, type: string}[]};
   
   onMount(() => {
     protobuf.load("src/protos/device.proto").then(function(root) {
       if (!root) {
         throw "error";
       }
+      selectedDevice = devices[0];
 
       let TypeMessage = root.lookupType("devicepackage.Type");
       for (const [key, value] of Object.entries(TypeMessage.fields)) {
-        deviceTypes.push({value: key, label: nameFormat(key)});
+        const fieldMessage = root.lookupType("devicepackage." + value.type).fields;
+        const fields = [];
+        let isBucket = false;
+        for (const [key, value] of Object.entries(fieldMessage)) {
+          fields.push({key: key, type:value.type});
+          isBucket = isBucket || value.type == "Type";
+        }
+        if (!isBucket) {
+          deviceTypesNoBuckets.push({value: key, label: nameFormat(key), fields: fields});
+        }
+        deviceTypes.push({value: key, label: nameFormat(key), fields: fields});
       }
+      selectedDeviceType = deviceTypes[0];
     });
   });
 
   let deviceName = "";
-  let type : {value : number, label : string};
   let newDevice = false;
 
   function addNewDevice() {
@@ -58,7 +73,7 @@
       {#if devices.length > 0 && !newDevice}
         <label class="label" for="devices">Choose device:</label>
         <div class="device-select">
-          <Select id="devices" items={devices} selectedValue={devices[0].value} />
+          <Select id="devices" items={devices} bind:selectedItem={selectedDevice} />
           <!-- svelte-ignore a11y-click-events-have-key-events -->
           <button class="add" on:click={addNewDevice}>
             <Icon icon={roundPlus} />
@@ -67,13 +82,20 @@
       {:else}
         <label class="label" for="deviceTypes">Type:</label>
         <div class="device-select">
-          <Select id="deviceTypes" items={deviceTypes} selectedValue={deviceTypes[0].value}/>
+          <Select id="deviceTypes" items={deviceTypes} bind:selectedItem={selectedDeviceType}/>
           {#if devices.length > 0}
             <!-- svelte-ignore a11y-click-events-have-key-events -->
             <button class="back" on:click={backToDevices}>
               <Icon icon={arrowBackRounded} />
             </button>
           {/if}
+        </div>
+        <div class="device-fields">
+          {#each selectedDeviceType.fields as field}
+            <div class="device-field">
+              {field.key}
+            </div>
+          {/each}
         </div>
       {/if}
     </form>
@@ -136,8 +158,11 @@
     width: 36px;
   }
   .device-select {
+    border-bottom: 1px dashed var(--color-border);
     display: flex;
     flex-direction: row;
+    margin-bottom: 12px;
+    padding-bottom: 12px;
     width: 100%;
   }
 

@@ -2,11 +2,11 @@
   import {onMount} from 'svelte';
 
   export let items : {value : string, label : string}[] = [];
-  export let selectedValue : string;
+  export let selectedItem : {value : string, label : string};
   export let id = "";
 
   let open = false;
-  let selectedLabel = items.find(o => o.value === selectedValue)?.label;
+  let selectedLabel = selectedItem ? selectedItem.label : "";
 
   let selectedListItemElement : HTMLElement;
 
@@ -20,7 +20,7 @@
 
   function selectItem(value : string, label : string) {
     selectedListItemElement.innerHTML = label;
-    selectedValue = value;
+    selectedItem = items.find(o => o.value === value);
     selectedLabel = label;
     open = false;
   }
