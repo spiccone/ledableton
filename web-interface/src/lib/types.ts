@@ -27,12 +27,17 @@ export interface Position {
   top: number;
 }
 
+
 export class DeviceType {
   key: string;
   label: string;
-  fields: {key: string, type: string}[];
+  fields: ({key: string, type: string} | 
+          {key: string, oneofs: {key: string, label: string, type: string}[]})[];
 
-  constructor(key: string, label: string, fields: {key: string, type: string}[]) {
+  constructor(key: string, 
+              label: string, 
+              fields: ({key: string, type: string} | 
+                      {key: string, oneofs: {key: string, label: string, type: string}[]})[]) {
     this.key = key;
     this.label = label;
     this.fields = fields;

@@ -16,32 +16,41 @@
 
   let selectedDevice : SavedDevice | DeviceType;
   let selectedDeviceField : SavedDevice | DeviceType;
-
-  // let selectedDevice : {value : string, label : string};
-  // let selectedDeviceType : {value : string, label : string, fields : {key: string, type: string}[]};
   
   onMount(() => {
     protobuf.load("src/protos/device.proto").then(function(root) {
       if (!root) {
-        throw "error";
+        throw "Error loading device.proto in AddDevice.";
       }
-      //selectedDevice = devices[0];
 
       let TypeMessage = root.lookupType("devicepackage.Type");
       for (const [key, value] of Object.entries(TypeMessage.fields)) {
-        const fieldMessage = root.lookupType("devicepackage." + value.type).fields;
+        const oneofs = root.lookupType("devicepackage." + value.type).oneofs;
+        const fieldMessage =  root.lookupType("devicepackage." + value.type).fields;
         const fields = [];
         let isBucket = false;
         for (const [key, value] of Object.entries(fieldMessage)) {
-          fields.push({key: key, type: value.type});
-          isBucket = isBucket || value.type == "Type";
+          if (!value.partOf) {
+            fields.push({key: key, type: value.type});
+            isBucket = isBucket || value.type == "Type";
+          }
         }
+        if (oneofs) {
+          for (const [name, oneof] of Object.entries(oneofs)) {
+            const oneofFields : {key: string, label: string, type: string}[] = [];
+            for (const [key, value] of Object.entries(oneof.fieldsArray)) {
+              oneofFields.push({key: value.name, label: nameFormat(value.name), type: value.type});
+            }
+            fields.push({key: name, oneofs: oneofFields});
+          }
+        }
+        
         if (!isBucket) {
           deviceTypesNoBuckets.push(new DeviceType(key, nameFormat(key), fields));
         }
         deviceTypes.push(new DeviceType(key, nameFormat(key), fields));
       }
-      //selectedDeviceType = deviceTypes[0];
+      console.log(deviceTypes);
     });
   });
 

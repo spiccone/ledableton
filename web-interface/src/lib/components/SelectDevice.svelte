@@ -17,6 +17,11 @@
 
   let newDevice = false;
 
+  onMount(() => {
+    selectedSaved = savedDevices[0];
+    selectedType = deviceTypes[0];
+  });
+
   function addNewDevice() {
     newDevice = true;
     selectedItem = selectedSaved;
@@ -54,6 +59,8 @@
         {#each selectedType.fields as field}
           {#if field.type === "Type"}
             <slot name="type-field"/>
+          {:else if field.oneofs}
+            <Select items={field.oneofs}  />
           {:else}
             <div class="device-field">
               {field.key}
@@ -81,7 +88,7 @@
     box-sizing: border-box;
     flex: 0 0 auto;
     height: 36px;
-    margin-left: 16px;
+    margin-left: 8px;
     padding: 6px;
     width: 36px;
   }

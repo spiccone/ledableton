@@ -63,12 +63,13 @@
     top: 0;
     width: 100%;
     transition: max-height 0.15s ease-out;
-    z-index: 2;
+    z-index: 1;
   }
   .open .select-list {
     max-height: 400px;
     overflow-y: scroll;
     transition: max-height 0.25s ease-in;
+    z-index: 3;
   }
 
   .select-list-item,
@@ -103,7 +104,7 @@
     bottom: 0;
     left: 0;
     right: 0;
-    z-index: 1;
+    z-index: 2;
   }
   .open .cover {
     display: block;
