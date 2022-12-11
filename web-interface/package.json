@@ -41,7 +41,6 @@
 	"dependencies": {
 		"colormap": "^2.3.2",
 		"protobufjs": "^7.1.2",
-		"svelte-select": "^4.4.7",
 		"waveform-data": "^4.3.0",
 		"wavesurfer.js": "^6.4.0",
 		"websocket": "^1.0.34"

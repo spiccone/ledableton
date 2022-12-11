@@ -3,15 +3,15 @@
 
   export let items : {value : string, label : string}[] = [];
   export let selectedValue : string;
+  export let id = "";
 
   let open = false;
   let selectedLabel = items.find(o => o.value === selectedValue)?.label;
 
-  let selectedItemElement : HTMLElement;
   let selectedListItemElement : HTMLElement;
 
-  function openSelect() {
-    open = true;
+  function toggleSelect() {
+    open = !open;
   }
 
   function closeSelect() {
@@ -19,7 +19,6 @@
   }
 
   function selectItem(value : string, label : string) {
-    selectedItemElement.innerHTML = label;
     selectedListItemElement.innerHTML = label;
     selectedValue = value;
     selectedLabel = label;
@@ -27,18 +26,11 @@
   }
 </script>
 
-<div class="Select {open ? 'open' : 'closed'}">
-  <select class="select" bind:value={selectedValue}>
-    {#each items as item}
-      <option value={item.value}>
-        {item.label}
-      </option>
-    {/each}
-  </select>
-  <!-- svelte-ignore a11y-click-events-have-key-events -->
-  <div class="selected-item" bind:this={selectedItemElement} on:click={openSelect}>{selectedLabel}</div>
+<div id={id} class="Select {open ? 'open' : 'closed'}">
+  <div class="item-spacer"></div>
   <div class="select-list">
-    <div class="selected-list-item" bind:this={selectedListItemElement}>{selectedLabel}</div>
+    <!-- svelte-ignore a11y-click-events-have-key-events -->
+    <div class="selected-list-item" bind:this={selectedListItemElement} on:click={toggleSelect}>{selectedLabel}</div>
     {#each items as item}
       <!-- svelte-ignore a11y-click-events-have-key-events -->
       <div class="select-list-item" on:click={() => selectItem(item.value, item.label)}>
@@ -53,32 +45,20 @@
 <style>
   .Select {
     position: relative;
+    font-size: 14px;
     width: 100%;
   }
 
-  .select {
-    display: none;
-  }
-
-  .selected-item {
-    background: #f00;
-    border: 1px solid #444;
-    border-radius: 6px;
-    box-sizing: border-box;
-    color: #aaa;
-    cursor: pointer;
+  .item-spacer {
     height: 36px;
-    padding: 8px 12px;
-    position: relative;
   }
 
   .select-list {
-    border: 1px solid #444;
-    border-radius: 6px;
+    border: 1px solid var(--color-form-bg-hover);
+    border-radius: 12px;
     box-sizing: border-box;
     overflow: hidden;
     position: absolute;
-    pointer-events: none;
     max-height: 36px;
     top: 0;
     width: 100%;
@@ -88,25 +68,32 @@
   .open .select-list {
     max-height: 400px;
     overflow-y: scroll;
-    pointer-events: all;
     transition: max-height 0.25s ease-in;
   }
 
   .select-list-item,
   .selected-list-item {
-    background: #222;
-    padding: 8px 12px;
+    align-items: center;
+    background: var(--color-form-bg);
+    box-sizing: border-box;
+    display: flex;
+    height: 36px;
+    padding: 0 12px;
+    cursor: pointer;
   }
 
   .select-list-item {
-    cursor: pointer;
+    color: #ccc;
   }
   .select-list-item:hover {
-    background: #444;
+    background: var(--color-form-bg-hover);
   }
 
   .selected-list-item {
-    color: #aaa;
+    color: var(--color-form-text);
+  }
+  .closed .selected-list-item:hover {
+    color: var(--color-form-text-hover);
   }
 
   .cover {
@@ -120,5 +107,30 @@
   }
   .open .cover {
     display: block;
+  }
+
+  .selected-list-item::after {
+    border: 2px solid #999;;
+    border-radius: 1px;
+    border-right: 0;
+    border-top: 0;
+    content: " ";
+    display: block;
+    height: 6px;
+    pointer-events: none;
+    position: absolute;
+    right: 1em;
+    top: 11px;
+    transform: rotate(-45deg);
+    transform-origin: 3px 6px;
+    transition: transform 0.5s ease;
+    width: 6px;
+  }
+  .selected-list-item:hover::after {
+    border-color: #ccc;
+  }
+  .open .selected-list-item::after {
+    -webkit-transform: rotate(135deg);
+    transform: rotate(135deg);
   }
 </style>

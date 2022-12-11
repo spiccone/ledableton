@@ -5,6 +5,8 @@
   const modalList: HTMLElement[] = [];
 </script>
 <script lang="ts">
+  import Icon from '@iconify/svelte';
+  import roundClose from '@iconify/icons-ic/round-close';
   import {booleanStore} from '../stores';
 
   const store = booleanStore(false);
@@ -54,13 +56,20 @@
   <!-- svelte-ignore a11y-no-noninteractive-tabindex -->
   <div class="Modal" use:modalAction tabindex="0">
     <!-- svelte-ignore a11y-click-events-have-key-events -->
-    <div class="backdrop" on:click={close}/>
+    <div class="backdrop" on:click={close} />
+    <!-- svelte-ignore a11y-click-events-have-key-events -->
     <div class="content-wrapper">
       <div class="header">
         <slot name="header" {store}/>
+        <div class="close" on:click={close}>
+          <Icon icon={roundClose} />
+        </div>
       </div>
       <div class="content">
         <slot name="content" {store}/>
+      </div>
+      <div class="footer">
+        <slot name="footer" {store}/>
       </div>
     </div>
   </div>
@@ -90,52 +99,41 @@
   .content-wrapper {
     background: #333;
     border-radius: 24px;
-    padding: 6px 24px;
-    width: 500px;
-    height: 500px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    height: 600px;
+    padding: 6px 24px 20px;
+    position: relative;
+    width: 600px;
     z-index: 2;
   }
   .content {
-    display: flex;
-    flex-direction: row;
+    flex: 1 1 auto;
+    height: 100%;
     min-width: 300px;
     min-height: 300px;
   }
 
-  /* Styles for select */
-  .content {
-    --background: #111;
-    --border: 1px solid var(--color-border);
-    --borderFocusColor: #888;
-    --borderRadius: 12px;
-    --indicatorColor: #666;
-    --indicatorTop: 9px;
-    --inputColor: #666;
-    --itemHoverBG: #222;
-    --listBackground: #111;
-  }
-  :global(.selectContainer::after) {
-    border: 2px solid transparent;
-    border-radius: 1px;
-    border-right: 0;
-    border-top: 0;
-    content: " ";
-    display: block;
-    height: 0.5em;
-    width: 0.5em;
-    margin-top: -0.5em;
-    pointer-events: none;
-    position: absolute;
-    top: 50%;
-    -webkit-transform: rotate(-45deg);
-    transform: rotate(-45deg);
-    -webkit-transform-origin: center;
-    transform-origin: center;
-    border-color: var(--inputColor);
-    right: 1em;
-    z-index: 4;
-    opacity: 0.33;
-    transition: all 0.5s ease;
+  .header {
+    align-items: center;
+    display: flex;
+    margin-bottom: 12px;
+    justify-content: space-between;
   }
 
+  .footer {
+    flex: 0 0 auto;
+  }
+
+  .close {
+    color: var(--color-form-text);
+    cursor: pointer;
+    flex: 0 0 auto;
+    height: 36px;
+    width: 36px;
+  }
+  .close:hover {
+    color: var(--color-form-text-hover);
+  }
 </style>
