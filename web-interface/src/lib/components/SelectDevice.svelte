@@ -7,6 +7,7 @@
   import folderOpenOutlineRounded from '@iconify/icons-material-symbols/folder-open-outline-rounded';
 	import { assign } from 'svelte/internal';
 	import FieldInput from './FieldInput.svelte';
+	import BucketedVariableColumn from './BucketedVariableColumn.svelte';
 
   export let savedDevices : SavedDevice[] = [];
   export let deviceTypes : DeviceType[] = [];
@@ -47,14 +48,8 @@
     selectedItem = savedDevices.length > 0 ? savedDevices[selectedSavedIndex] : null; 
   }
 
-  function addRow(i: number) {
-    typesOptions[selectedTypeIndex][i].addToRepeatedValue([]);
-    typesOptions = typesOptions;
-  }
-
-  function addColumn(i: number, j: number) {
-    typesOptions[selectedTypeIndex][i].addToNestedRepeatedValue(j, 0);
-    typesOptions = typesOptions;
+  function handleDeviceSelect(e: CustomEvent) {
+    selectedItemOptions = typesOptions[e.detail.selectedIndex];
   }
 </script>
 
@@ -77,7 +72,8 @@
       <Select id="deviceTypes" 
               items={deviceTypes} 
               bind:selectedItem={selectedItem}
-              bind:selectedIndex={selectedTypeIndex}/>
+              bind:selectedIndex={selectedTypeIndex}
+              on:select={handleDeviceSelect}/>
       {#if savedDevices.length > 0}
         <!-- svelte-ignore a11y-click-events-have-key-events -->
         <button class="back" on:click={backToDevices}>
@@ -91,24 +87,7 @@
           {#if field.type === "Type"}
             <slot name="type-field"/>
           {:else if field.type === "VariableColumn"}
-            <div class="variable-rows">
-              {#each typesOptions[selectedTypeIndex][i].nestedRepeatedValue as value, j}
-                <div class="row">
-                  <div class="bucket"></div>
-                  {#each typesOptions[selectedTypeIndex][i].nestedRepeatedValue[j] as value, k}
-                    <input bind:value={typesOptions[selectedTypeIndex][i].nestedRepeatedValue[j][k]} />
-                    <div class="bucket"></div>
-                  {/each}
-                  <button class="add" on:click|preventDefault={() => addColumn(i, j)}>
-                    <Icon icon={roundPlus} />
-                  </button>
-                </div>
-              {/each}
-              <!-- svelte-ignore a11y-click-events-have-key-events -->
-              <button class="add" on:click|preventDefault={() => addRow(i)}>
-                <Icon icon={roundPlus} />
-              </button>
-            </div>
+            <BucketedVariableColumn columnField={typesOptions[selectedTypeIndex][i]} />
           {:else if field.oneofs.length > 0}
             <div class="field" style="z-index: {100-i}">
               <div class="label">
@@ -123,7 +102,16 @@
                             field={field.oneofs[typesOptions[selectedTypeIndex][i].oneofKey]} />
               </div>
             </div>
-          {:else}
+          {:else if field.type === "Unit"}
+            <div class="field" style="z-index: {100-i}">
+              <label class="label" for={"field_" + selectedTypeIndex + "_" + field.key}>
+                {field.label}
+              </label>
+              <Select id={"field_" + selectedTypeIndex + "_" + field.key}
+                      items={units}
+                      bind:selectedIndex={typesOptions[selectedTypeIndex][i].oneofKey} />
+            </div>
+          {:else if field.repeated === false}
             <div class="field" style="z-index: {100-i}">
               <label class="label" for="{"field_" + selectedTypeIndex + "_" + field.key}">
                 {field.label}
@@ -198,18 +186,5 @@
   .field-input-container {
     display: flex;
     flex-direction: row;
-  }
-
-  .variable-rows {
-    display: flex;
-    flex-direction: row;
-    overflow: scroll;
-    width: 100%;
-  }
-
-  .bucket {
-    background: #000;
-    height: 5px;
-    width: 5px;
   }
 </style>

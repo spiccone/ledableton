@@ -1,5 +1,5 @@
 <script lang="ts">
-  import {onMount} from 'svelte';
+  import {onMount, createEventDispatcher} from 'svelte';
 
   export let items : {key : string, label : string}[] = [];
   export let selectedItem : {key : string, label : string} | undefined | null = undefined;
@@ -27,12 +27,17 @@
   function closeSelect() {
     open = false;
   }
+  
+  const dispatch = createEventDispatcher();
 
   function selectItem(index : number) {
     selectedIndex = index;
     selectedItem = items[index];
     selectedLabel = selectedItem.label;
     open = false;
+    dispatch('select', {
+			selectedIndex: selectedIndex
+		});
   }
 </script>
 
