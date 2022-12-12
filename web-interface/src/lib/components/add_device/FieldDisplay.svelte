@@ -12,9 +12,7 @@
 
 </script>
 
-{#if field.type === "Type"}
-<slot name="type-field"/>
-{:else if field.type === "VariableColumn"}
+{#if field.type === "VariableColumn"}
   <BucketedVariableColumn columnField={fieldValue} />
 {:else if field.oneofs.length > 0}
   <div class="field" style="z-index: {zIndex}">

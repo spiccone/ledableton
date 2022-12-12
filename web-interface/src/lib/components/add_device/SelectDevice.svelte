@@ -83,11 +83,15 @@
     {#if selectedTypeIndex < deviceTypes.length}
       <div class="device-fields" style="z-index: 1">
         {#each deviceTypes[selectedTypeIndex].fields as field, i (field.key)}
-          <FieldDisplay inputId={"field_" + selectedTypeIndex + "_" + field.key}
-                        field={field}
-                        fieldValue={typesOptions[selectedTypeIndex][i]}
-                        units={units}
-                        zIndex={100-i} />
+          {#if field.type === "Type"}
+            <slot name="type-field"/>
+          {:else}
+            <FieldDisplay inputId={"field_" + selectedTypeIndex + "_" + field.key}
+                          field={field}
+                          fieldValue={typesOptions[selectedTypeIndex][i]}
+                          units={units}
+                          zIndex={100-i} />
+          {/if}
         {/each}
       </div>
     {/if}
