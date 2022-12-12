@@ -6,6 +6,7 @@
   export let selectedIndex : number | null = 0;
   export let id = "";
   export let showArrow = true;
+  export let arrowRight = true;
 
   let open = false;
   let selectedLabel = selectedItem ? selectedItem.label : "";
@@ -35,8 +36,16 @@
   }
 </script>
 
-<div id={id} class="Select {open ? 'open' : 'closed'}{showArrow ? ' arrow' : ''}">
-  <div class="item-spacer"></div>
+<div id={id} class="Select {open ? 'open' : 'closed'}
+                   {showArrow ? 'has-arrow' : ''}
+                   {arrowRight ? 'arrow-right' : ''}">
+  <div class="item-spacer-list">
+    {#each items as item, i (id + "_spacer_" + i)}
+      <div class="item-spacer">
+        {item.label}
+      </div>
+    {/each}
+  </div>
   <div class="select-list">
     <!-- svelte-ignore a11y-click-events-have-key-events -->
     <div class="selected-list-item {id}" 
@@ -57,42 +66,61 @@
 <style>
   .Select {
     position: relative;
-    font-size: 14px;
+    font-size: var(--select-font-size, 14px);
+    margin: var(--select-margin, 0);
     width: 100%;
-  }
-
-  .item-spacer {
-    height: 36px;
   }
 
   .select-list {
-    border: 1px solid var(--color-form-bg-hover);
-    border-radius: 12px;
+    border-color: var(--select-border-color, var(--color-form-bg-hover));
+    border-style: solid;
+    border-width: var(--select-border-width, 1px);
+    border-radius: var(--select-border-radius, 12px);
     box-sizing: border-box;
     overflow: hidden;
     position: absolute;
-    max-height: 36px;
+    max-height: var(--select-height, 36px);
     top: 0;
-    width: 100%;
     transition: max-height 0.15s ease-out;
+    width: var(--select-width, auto);
     z-index: 1;
   }
   .open .select-list {
+    border-radius: var(--select-border-radius-open, 12px);
     max-height: 400px;
     overflow-y: scroll;
     transition: max-height 0.25s ease-in;
     z-index: 3;
   }
-
   .select-list-item,
-  .selected-list-item {
+  .selected-list-item,
+  .item-spacer {
     align-items: center;
-    background: var(--color-form-bg);
+    background: var(--select-color-bg, #222);
+    box-sizing: border-box;
+    cursor: pointer;
+    display: flex;
+    min-height: var(--select-height, 36px);
+    overflow: hidden;
+    padding: 0 12px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .has-arrow .select-list-item,
+  .has-arrow .selected-list-item,
+  .has-arrow .item-spacer {
+    padding-right: var(--select-arrow-gap, 34px);
+  }
+  .item-spacer-list {
+    border-style: solid;
+    border-width: var(--select-border-width, 1px);
+    border-radius: var(--select-border-radius, 12px);
     box-sizing: border-box;
     display: flex;
-    height: 36px;
-    padding: 0 12px;
-    cursor: pointer;
+    flex-direction: column;
+    width: var(--select-width, auto);
+    height: var(--select-height, 36px); 
+    visibility: hidden;
   }
 
   .select-list-item {
@@ -103,10 +131,10 @@
   }
 
   .selected-list-item {
-    color: var(--color-form-text);
+    color: var(--select-color, var(--color-form-text));
   }
   .closed .selected-list-item:hover {
-    color: var(--color-form-text-hover);
+    color: var(--select-color-hover, var(--color-form-text-hover));
   }
 
   .cover {
@@ -122,27 +150,32 @@
     display: block;
   }
 
-  .arrow .selected-list-item::after {
+  .has-arrow .selected-list-item::after {
     border: 2px solid #999;;
     border-radius: 1px;
     border-right: 0;
     border-top: 0;
     content: " ";
     display: block;
-    height: 6px;
+    height: var(--select-arrow-size, 6px);
+    margin: var(--select-arrow-margin, 0 0 0 10px);
     pointer-events: none;
+    position: relative;
+    transform: rotate(-45deg);
+    transform-origin: 40% 60%;
+    transition: transform 0.5s ease;
+    width: var(--select-arrow-size, 6px);
+  }
+  .has-arrow.arrow-right .selected-list-item::after {
+    content: " ";
     position: absolute;
     right: 1em;
-    top: 11px;
-    transform: rotate(-45deg);
-    transform-origin: 3px 6px;
-    transition: transform 0.5s ease;
-    width: 6px;
+    top: 12px;
   }
-  .arrow .selected-list-item:hover::after {
+  .has-arrow .selected-list-item:hover::after {
     border-color: #ccc;
   }
-  .arrow.open .selected-list-item::after {
+  .has-arrow.open .selected-list-item::after {
     -webkit-transform: rotate(135deg);
     transform: rotate(135deg);
   }

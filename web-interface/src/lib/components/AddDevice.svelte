@@ -10,7 +10,7 @@
   import {nameFormat} from "../helper-functions";
 	import SelectDevice from './SelectDevice.svelte';
 
-  let devices : SavedDevice[] = [new SavedDevice("test", "test")];
+  let devices : SavedDevice[] = [new SavedDevice("test", "test", [])];
   let deviceTypes : DeviceType[] = [];
   let deviceTypesNoBuckets : DeviceType[] = [];
   let units : {key: string, label: string}[] = [];
@@ -47,7 +47,7 @@
             for (const [key, value] of Object.entries(oneof.fieldsArray)) {
               oneofFields.push({key: value.name, label: nameFormat(value.name), type: value.type});
             }
-            const newField = new Field(key, nameFormat(key), value.type);
+            const newField = new Field(name, nameFormat(key), value.type);
             newField.addOneofList(oneofFields);
             fields.push(newField);
           }
@@ -96,15 +96,15 @@
                       savedDevices={devices} 
                       deviceTypes={deviceTypes}
                       units={units}>
-          <div slot="type-field">
-            <div class="inner-section">
+          <div class="inner-section" slot="type-field">
+           
               <SelectDevice bind:selectedItem={selectedDeviceField} 
                             savedDevices={devices}
                             deviceTypes={deviceTypesNoBuckets}
                             units={units}
-                            savedDeviceLabel="Bucket device:"
-                            deviceTypeLabel="Bucket device type:"/>
-              </div>
+                            savedDeviceLabel="Bucket device"
+                            deviceTypeLabel="Bucket device type"/>
+             
           </div>
         </SelectDevice>
       </div>
@@ -181,6 +181,7 @@
   .inner-section {
     margin-top: 12px;
     padding: 8px;
+    width: 100%;
   }
 
   .footer {

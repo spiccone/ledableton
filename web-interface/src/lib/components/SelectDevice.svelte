@@ -1,18 +1,20 @@
 <script lang="ts">
   import {onMount} from 'svelte';
-  import {FieldValue, DeviceType, type SavedDevice} from '$lib/types';
+  import {DeviceFieldValue as FieldValue, DeviceType, type SavedDevice} from '$lib/types';
   import Select from './Select.svelte';
   import Icon from '@iconify/svelte';
   import roundPlus from '@iconify/icons-ic/round-plus';
   import folderOpenOutlineRounded from '@iconify/icons-material-symbols/folder-open-outline-rounded';
+	import { assign } from 'svelte/internal';
+	import FieldInput from './FieldInput.svelte';
 
   export let savedDevices : SavedDevice[] = [];
   export let deviceTypes : DeviceType[] = [];
   export let selectedItem : SavedDevice|DeviceType|null;
   export let selectedItemOptions : FieldValue[]|null = null;
   export let units : {key: string, label: string}[] = [];
-  export let savedDeviceLabel = "Saved device:";
-  export let deviceTypeLabel = "Device type:";
+  export let savedDeviceLabel = "Saved device";
+  export let deviceTypeLabel = "Device type";
 
   let typesOptions : FieldValue[][] = [];
 
@@ -26,7 +28,7 @@
       const options = [];
       for (let field of types.fields) {
         options.push(
-          new FieldValue(field.key, 0, field.type === "Dimension" ? 0 : null));
+          new FieldValue(field.key, 0, field.type === "Dimension" ? 0 : null, 0));
       }
       typesOptions.push(options);
     }
@@ -57,7 +59,7 @@
     </div>
   {:else}
     <label class="label" for="deviceTypes">{deviceTypeLabel}</label>
-    <div class="device-select">
+    <div class="device-select" style="z-index: 2">
       <Select id="deviceTypes" 
               items={deviceTypes} 
               bind:selectedIndex={selectedTypeIndex}/>
@@ -69,25 +71,34 @@
       {/if}
     </div>
     {#if selectedTypeIndex < deviceTypes.length}
-      <div class="device-fields">
+      <div class="device-fields" style="z-index: 1">
         {#each deviceTypes[selectedTypeIndex].fields as field, i (field.key)}
           {#if field.type === "Type"}
             <slot name="type-field"/>
           {:else if field.oneofs.length > 0}
-            <Select items={field.oneofs} selectedItem={field.oneofs[0]} />
+            <div class="field" style="z-index: {100-i}">
+              <div class="label">
+                <Select items={field.oneofs} 
+                        bind:selectedIndex={typesOptions[selectedTypeIndex][i].oneofKey}
+                        arrowRight={false} />
+              </div>
+              <div class="field-input-container">
+                <FieldInput id={"field_" + selectedTypeIndex + "_" + field.key}
+                            typeOption={typesOptions[selectedTypeIndex][i]}
+                            units={units}
+                            field={field.oneofs[typesOptions[selectedTypeIndex][i].oneofKey]} />
+              </div>
+            </div>
           {:else}
-            <div class="field">
-              <label class="label" for="{"field_" + i + "_" + field.key}">{field.label}:</label>
-              <div class="field-input">
-              <input id="{"field_" + i + "_" + field.key}" 
-                     type="number"
-                     bind:value= {typesOptions[selectedTypeIndex][i].value}/>
-                {#if field.type === "Dimension"}
-                  <Select id={"field_" + i + "_" + field.key + "_units"} 
-                          items={units} 
-                          bind:selectedIndex={typesOptions[selectedTypeIndex][i].unitKey}
-                          showArrow={false} />
-                {/if}
+            <div class="field" style="z-index: {100-i}">
+              <label class="label" for="{"field_" + selectedTypeIndex + "_" + field.key}">
+                {field.label}
+              </label>
+              <div class="field-input-container">
+                <FieldInput id={"field_" + selectedTypeIndex + "_" + field.key}
+                            typeOption={typesOptions[selectedTypeIndex][i]}
+                            units={units}
+                            field={field} />
               </div>
             </div>
           {/if}
@@ -104,6 +115,16 @@
   }
 
   .label {
+    --select-arrow-size: 4px;
+    --select-arrow-gap: 36px;
+    --select-arrow-margin: -2px 10px 0;
+    --select-border-width: 0;
+    --select-color: var(--color-text);
+    --select-color-hover: #fff;
+    --select-color-bg: var(--color-bg-main);
+    --select-font-size: 12px;
+    --select-height: 20px;
+    --select-margin: -3px 0 -3px -10px;
     font-size: 12px;
     margin: 0 0 4px 4px;
   }
@@ -118,6 +139,8 @@
     width: 36px;
   }
   .device-select {
+    --select-width: 100%;
+    --select-color-bg: var(--color-form-bg);
     display: flex;
     flex-direction: row;
     width: 100%;
@@ -127,7 +150,7 @@
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
-    gap: 8px;
+    gap: 12px 8px;
     margin-top: 10px;
   }
 
@@ -135,9 +158,10 @@
     display: flex;
     flex: 1 0 40px;
     flex-direction: column;
+    max-width: 127px;
   }
 
-  .field-input {
+  .field-input-container {
     display: flex;
     flex-direction: row;
   }

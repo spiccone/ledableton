@@ -27,11 +27,22 @@ export interface Position {
   top: number;
 }
 
+export class SimpleField {
+  key: string;
+  label: string;
+  type: string;
+
+  constructor(key: string, label: string, type: string) {
+    this.key = key;
+    this.label = label;
+    this.type = type;
+  }
+}
 export class Field {
   key: string;
   label: string;
   type: string;
-  oneofs: {key: string, label: string, type: string}[];
+  oneofs: SimpleField[];
 
   constructor(key: string, label: string, type: string) {
     this.key = key;
@@ -45,15 +56,17 @@ export class Field {
   }
 }
 
-export class FieldValue {
+export class DeviceFieldValue {
   key: string;
   value: number;
   unitKey: number | null;
+  oneofKey: number;
 
-  constructor(key: string, value: number, unitKey: number | null) {
+  constructor(key: string, value: number, unitKey: number | null, oneofKey: number | null) {
     this.key = key;
     this.value = value;
     this.unitKey = unitKey;
+    this.oneofKey = oneofKey ? oneofKey : 0;
   }
 }
 
@@ -72,9 +85,11 @@ export class DeviceType {
 export class SavedDevice {
   key: string;
   label: string;
+  fields: DeviceFieldValue[];
 
-  constructor(key: string, label: string) {
+  constructor(key: string, label: string, fields: DeviceFieldValue[]) {
     this.key = key;
     this.label = label;
+    this.fields = fields;
   }
 }
