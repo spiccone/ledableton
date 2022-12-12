@@ -60,33 +60,45 @@ export class Field {
 
 export class DeviceFieldValue {
   key: string;
-  nestedRepeatedValue: number[][];
   value: number;
+  repeatedValue: number[];
+  nestedRepeatedValue: number[][];
   unitKey: number | null;
   oneofKey: number;
+  booleanValue : boolean;
 
-  constructor(key: string, value: number, unitKey: number | null, oneofKey: number | null) {
+  constructor(key: string, unitKey: number | null) {
     this.key = key;
-    this.value = value;
+    this.value = 0;
     this.unitKey = unitKey;
-    this.oneofKey = oneofKey ? oneofKey : 0;
+    this.oneofKey = 0;
+    this.repeatedValue = [];
     this.nestedRepeatedValue = [];
+    this.booleanValue = false;
   }
 
-  addToRepeatedValue(value: number[]) {
-    this.nestedRepeatedValue.push(value);
+  addToRepeatedValue(value: number[] | number) {
+    if (typeof value === "number") {
+      this.repeatedValue.push(value);
+    } else {
+      this.nestedRepeatedValue.push(value);
+    }
   }
 
   removeFromRepeatedValue() {
+    this.repeatedValue.pop();
     this.nestedRepeatedValue.pop();
   }
 
   addToNestedRepeatedValue(index: number, value: number) {
-    this.nestedRepeatedValue[index].push(value);
+    if (index < this.nestedRepeatedValue.length) {
+      this.nestedRepeatedValue[index].push(value);
+    }
   }
-
   removeFromNestedRepeatedValue(index: number) {
-    this.nestedRepeatedValue[index].pop();
+    if (index < this.nestedRepeatedValue.length) {
+      this.nestedRepeatedValue[index].pop();
+    }
   }
 }
 

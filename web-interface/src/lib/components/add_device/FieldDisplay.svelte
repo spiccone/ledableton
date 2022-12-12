@@ -1,21 +1,18 @@
 <script lang="ts">
-	import type {Field,  DeviceFieldValue as FieldValue, SimpleField } from "$lib/types";
+	import type {Field,  DeviceFieldValue as FieldValue } from "$lib/types";
+	import Checkbox from "../basic/Checkbox.svelte";
 	import Select from "../Select.svelte";
   import FieldInput from './FieldInput.svelte';
-	import BucketedVariableColumn from './BucketedVariableColumn.svelte';
 
   export let field: Field;
   export let fieldValue: FieldValue;
   export let inputId: string;
   export let units: {key: string, label: string}[] = [];
-  export let zIndex: number;
-
+  export let zIndex = 1;
 </script>
 
-{#if field.type === "VariableColumn"}
-  <BucketedVariableColumn columnField={fieldValue} />
-{:else if field.oneofs.length > 0}
-  <div class="field" style="z-index: {zIndex}">
+<div class="field" style="z-index: {zIndex}">
+  {#if field.oneofs.length > 0}
     <div class="label">
       <Select items={field.oneofs} 
               bind:selectedIndex={fieldValue.oneofKey}
@@ -27,18 +24,18 @@
                   units={units}
                   field={field.oneofs[fieldValue.oneofKey]} />
     </div>
-  </div>
-{:else if field.type === "Unit"}
-  <div class="field" style="z-index: {zIndex}">
+  {:else if field.type === "Unit"}
     <label class="label" for={inputId}>
       {field.label}
     </label>
     <Select id={inputId}
             items={units}
             bind:selectedIndex={fieldValue.oneofKey} />
-  </div>
-{:else if field.repeated === false}
-  <div class="field" style="z-index: {zIndex}">
+  {:else if field.type === "bool"}
+    <Checkbox bind:value={fieldValue.booleanValue}>
+      {field.label}
+    </Checkbox>
+  {:else if field.repeated === false}
     <label class="label" for="{inputId}">
       {field.label}
     </label>
@@ -48,8 +45,8 @@
                   units={units}
                   field={field} />
     </div>
-  </div>
-{/if}
+  {/if}
+</div>
 
 <style>
   .label {

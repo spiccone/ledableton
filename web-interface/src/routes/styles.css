@@ -56,16 +56,54 @@ button {
 	font-family: inherit;
   padding: 8px 12px;
 }
-input:hover,
-button:hover {
+input:enabled:hover,
+button:enabled:hover {
   background: var(--color-form-bg-hover);
   color: var(--color-form-text-hover);
+}
+input:disabled,
+button:disabled {
+  cursor: inherit;
+  opacity: 50%;
 }
 input:focus,
 button:focus:not(:focus-visible) {
 	outline: none;
 }
 
-input {
+input[type="text"] {
   cursor: text;
+}
+
+input[type="checkbox"] {
+  appearance: none;
+  background: var(--color-form-bg, #222);
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  cursor: pointer;
+  display: grid;
+  height: 18px;
+  margin: 0;
+  padding: 0;
+  place-content: center;
+  width: 18px;
+}
+input[type="checkbox"]::before {
+  content: "";
+  background: var(--color-form-text);
+  border-radius: 2px;
+  clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%);
+  height: 8px;
+  transform: scale(0);
+  transition: 120ms transform ease-in-out;
+  width: 8px;
+}
+input[type="checkbox"]:checked::before {
+  transform: scale(1);
+}
+input[type="checkbox"]:hover {
+  background-color: var(--color-form-bg-hover, #444);
+}
+input[type="checkbox"]:hover:checked::before {
+  background-color: var(--color-form-text-hover, #444);
 }

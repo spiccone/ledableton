@@ -6,7 +6,7 @@
   import roundPlus from '@iconify/icons-ic/round-plus';
   import folderOpenOutlineRounded from '@iconify/icons-material-symbols/folder-open-outline-rounded';
 	import FieldDisplay from './FieldDisplay.svelte';
-
+	import BucketedVariableColumns from './BucketedVariableColumns.svelte';
 
   export let savedDevices : SavedDevice[] = [];
   export let deviceTypes : DeviceType[] = [];
@@ -27,14 +27,15 @@
     for (let types of deviceTypes) {
       const options = [];
       for (let field of types.fields) {
-        const fieldValue = new FieldValue(field.key, 0, field.type === "Dimension" ? 0 : null, 0);
-        if (field.repeated) {
+        const fieldValue = new FieldValue(field.key, field.type === "Dimension" ? 0 : null);
+        if (field.type === "VariableColumn") {
           fieldValue.addToRepeatedValue([]);
         }
         options.push(fieldValue);
       }
       typesOptions.push(options);
     }
+    console.log(typesOptions);
   });
 
   function addNewDevice() {
@@ -82,17 +83,26 @@
     </div>
     {#if selectedTypeIndex < deviceTypes.length}
       <div class="device-fields" style="z-index: 1">
-        {#each deviceTypes[selectedTypeIndex].fields as field, i (field.key)}
-          {#if field.type === "Type"}
-            <slot name="type-field"/>
-          {:else}
-            <FieldDisplay inputId={"field_" + selectedTypeIndex + "_" + field.key}
-                          field={field}
-                          fieldValue={typesOptions[selectedTypeIndex][i]}
-                          units={units}
-                          zIndex={100-i} />
-          {/if}
-        {/each}
+        {#if deviceTypes[selectedTypeIndex].key === "bucketedVariableColumns"} 
+          <BucketedVariableColumns fields={deviceTypes[selectedTypeIndex].fields}
+                                   fieldValues={typesOptions[selectedTypeIndex]}>
+            <div class="device-select" slot="type-field">
+              <slot name="type-field"/>
+            </div>
+          </BucketedVariableColumns>
+        {:else}
+          {#each deviceTypes[selectedTypeIndex].fields as field, i (field.key)}
+            {#if field.type === "Type"}
+              <slot name="type-field"/>
+            {:else}
+              <FieldDisplay inputId={"field_" + selectedTypeIndex + "_" + field.key}
+                            field={field}
+                            fieldValue={typesOptions[selectedTypeIndex][i]}
+                            units={units}
+                            zIndex={100-i} />
+            {/if}
+          {/each}
+        {/if}
       </div>
     {/if}
   {/if}

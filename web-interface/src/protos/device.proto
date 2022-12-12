@@ -12,7 +12,7 @@ message Type {
     Arc arc = 2;
     Grid grid = 3;
     BucketedGrid bucketed_grid = 4;
-    BucketedVariableColumnGrid bucketed_variable_column_grid = 5;
+    BucketedVariableColumns bucketed_variable_columns = 5;
   }
 }
 
@@ -56,12 +56,12 @@ message BucketedGrid {
   Type bucket_type = 5;
 }
 
-message BucketedVariableColumnGrid {
+message BucketedVariableColumns {
   message VariableColumn {
     repeated uint32 column_spacing = 1;
   }
-  Unit unit = 1;
-  uint32 row_spacing = 2;
+  repeated uint32 row_spacing = 2;
   repeated VariableColumn columns = 3;
-  Type bucket_type = 4;
+  Unit unit = 4;
+  Type bucket_type = 5;
 }
