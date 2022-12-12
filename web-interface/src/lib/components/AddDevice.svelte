@@ -1,11 +1,9 @@
 <script lang="ts">
   import {onMount} from 'svelte';
-  import {DeviceType, Field, SavedDevice} from '$lib/types';
-  import Select from './SelectDevice.svelte';
+  import {DeviceType, Field, DeviceFieldValue as FieldValue, SavedDevice} from '$lib/types';
   import Modal from "./Modal.svelte";
   import Icon from '@iconify/svelte';
   import roundPlus from '@iconify/icons-ic/round-plus';
-  import arrowBackRounded from '@iconify/icons-material-symbols/arrow-back-rounded';
   import protobuf from 'protobufjs';
   import {nameFormat} from "../helper-functions";
 	import SelectDevice from './SelectDevice.svelte';
@@ -16,7 +14,8 @@
   let units : {key: string, label: string}[] = [];
 
   let selectedDevice : SavedDevice | DeviceType;
-  let selectedDeviceField : SavedDevice | DeviceType;
+  let selectedDeviceBucket : SavedDevice | DeviceType;
+  let selectedItemOptions : FieldValue[] | null;
   
   onMount(() => {
     protobuf.load("src/protos/device.proto").then(function(root) {
@@ -31,23 +30,25 @@
 
       let TypeMessage = root.lookupType("devicepackage.Type");
       for (const [key, value] of Object.entries(TypeMessage.fields)) {
-        const oneofs = root.lookupType("devicepackage." + value.type).oneofs;
-        const fieldMessage =  root.lookupType("devicepackage." + value.type).fields;
+        const valueTypeMessage = root.lookupType("devicepackage." + value.type);
+        const fieldMessage =  valueTypeMessage.fields;
         const fields = [];
         let isBucket = false;
+        console.log(fieldMessage);
         for (const [key, value] of Object.entries(fieldMessage)) {
           if (!value.partOf) {
-            fields.push(new Field(key, nameFormat(key), value.type));
+            fields.push(new Field(key, nameFormat(key), value.type, value.repeated));
             isBucket = isBucket || value.type == "Type";
           }
         }
+        const oneofs = valueTypeMessage.oneofs;
         if (oneofs) {
           for (const [name, oneof] of Object.entries(oneofs)) {
             const oneofFields : {key: string, label: string, type: string}[] = [];
             for (const [key, value] of Object.entries(oneof.fieldsArray)) {
               oneofFields.push({key: value.name, label: nameFormat(value.name), type: value.type});
             }
-            const newField = new Field(name, nameFormat(key), value.type);
+            const newField = new Field(name, nameFormat(key), value.type, value.repeated);
             newField.addOneofList(oneofFields);
             fields.push(newField);
           }
@@ -62,18 +63,11 @@
   });
 
   let deviceName = "";
-  let newDevice = false;
-
-  function addNewDevice() {
-    newDevice = true;
-  }
-
-  function backToDevices() {
-    newDevice = false;
-  }
 
   function handleSubmit() {
-    
+    console.log(selectedDevice);
+    console.log(selectedDeviceBucket);
+    console.log(selectedItemOptions);
 	}
 </script>
 
@@ -90,17 +84,17 @@
     </h1>
   </div>
   <div class="content" slot="content">
-    <form class="form" on:submit|preventDefault={handleSubmit}>
+    <form id="add-device" class="form" >
       <div class="outer-section">
         <SelectDevice bind:selectedItem={selectedDevice} 
+                      bind:selectedItemOptions={selectedItemOptions}
                       savedDevices={devices} 
                       deviceTypes={deviceTypes}
                       units={units}>
           <div class="inner-section" slot="type-field">
-           
-              <SelectDevice bind:selectedItem={selectedDeviceField} 
+              <SelectDevice bind:selectedItem={selectedDeviceBucket} 
                             savedDevices={devices}
-                            deviceTypes={deviceTypesNoBuckets}
+                            deviceTypes={deviceTypes}
                             units={units}
                             savedDeviceLabel="Bucket device"
                             deviceTypeLabel="Bucket device type"/>
@@ -111,7 +105,7 @@
     </form>
   </div>
   <div class="footer" slot="footer">
-    <button class="submit" disabled={!deviceName} type=submit>
+    <button class="submit" on:click={handleSubmit}>
       Add Device
     </button>
   </div>

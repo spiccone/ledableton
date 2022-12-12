@@ -27,8 +27,11 @@
     for (let types of deviceTypes) {
       const options = [];
       for (let field of types.fields) {
-        options.push(
-          new FieldValue(field.key, 0, field.type === "Dimension" ? 0 : null, 0));
+        const fieldValue = new FieldValue(field.key, 0, field.type === "Dimension" ? 0 : null, 0);
+        if (field.repeated) {
+          fieldValue.addToRepeatedValue([]);
+        }
+        options.push(fieldValue);
       }
       typesOptions.push(options);
     }
@@ -36,12 +39,22 @@
 
   function addNewDevice() {
     newDevice = true;
-    selectedItem = savedDevices.length > 0 ? savedDevices[selectedSavedIndex] : null;   
+    selectedItem = deviceTypes.length > 0 ? deviceTypes[selectedTypeIndex] : null;
   }
 
   function backToDevices() {
     newDevice = false;
-    selectedItem = deviceTypes.length > 0 ? deviceTypes[selectedTypeIndex] : null;
+    selectedItem = savedDevices.length > 0 ? savedDevices[selectedSavedIndex] : null; 
+  }
+
+  function addRow(i: number) {
+    typesOptions[selectedTypeIndex][i].addToRepeatedValue([]);
+    typesOptions = typesOptions;
+  }
+
+  function addColumn(i: number, j: number) {
+    typesOptions[selectedTypeIndex][i].addToNestedRepeatedValue(j, 0);
+    typesOptions = typesOptions;
   }
 </script>
 
@@ -51,6 +64,7 @@
     <div class="device-select">
       <Select id="devices" 
               items={savedDevices} 
+              bind:selectedItem={selectedItem}
               bind:selectedIndex={selectedSavedIndex} />
       <!-- svelte-ignore a11y-click-events-have-key-events -->
       <button class="add" on:click={addNewDevice}>
@@ -62,6 +76,7 @@
     <div class="device-select" style="z-index: 2">
       <Select id="deviceTypes" 
               items={deviceTypes} 
+              bind:selectedItem={selectedItem}
               bind:selectedIndex={selectedTypeIndex}/>
       {#if savedDevices.length > 0}
         <!-- svelte-ignore a11y-click-events-have-key-events -->
@@ -75,6 +90,25 @@
         {#each deviceTypes[selectedTypeIndex].fields as field, i (field.key)}
           {#if field.type === "Type"}
             <slot name="type-field"/>
+          {:else if field.type === "VariableColumn"}
+            <div class="variable-rows">
+              {#each typesOptions[selectedTypeIndex][i].nestedRepeatedValue as value, j}
+                <div class="row">
+                  <div class="bucket"></div>
+                  {#each typesOptions[selectedTypeIndex][i].nestedRepeatedValue[j] as value, k}
+                    <input bind:value={typesOptions[selectedTypeIndex][i].nestedRepeatedValue[j][k]} />
+                    <div class="bucket"></div>
+                  {/each}
+                  <button class="add" on:click|preventDefault={() => addColumn(i, j)}>
+                    <Icon icon={roundPlus} />
+                  </button>
+                </div>
+              {/each}
+              <!-- svelte-ignore a11y-click-events-have-key-events -->
+              <button class="add" on:click|preventDefault={() => addRow(i)}>
+                <Icon icon={roundPlus} />
+              </button>
+            </div>
           {:else if field.oneofs.length > 0}
             <div class="field" style="z-index: {100-i}">
               <div class="label">
@@ -164,5 +198,18 @@
   .field-input-container {
     display: flex;
     flex-direction: row;
+  }
+
+  .variable-rows {
+    display: flex;
+    flex-direction: row;
+    overflow: scroll;
+    width: 100%;
+  }
+
+  .bucket {
+    background: #000;
+    height: 5px;
+    width: 5px;
   }
 </style>

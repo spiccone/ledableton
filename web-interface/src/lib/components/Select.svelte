@@ -81,7 +81,7 @@
     position: absolute;
     max-height: var(--select-height, 36px);
     top: 0;
-    transition: max-height 0.15s ease-out;
+    transition: max-height 0.15s ease-out, border-radius 0.5s ease-out;
     width: var(--select-width, auto);
     z-index: 1;
   }

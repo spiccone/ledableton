@@ -42,13 +42,15 @@ export class Field {
   key: string;
   label: string;
   type: string;
+  repeated: boolean = false;
   oneofs: SimpleField[];
 
-  constructor(key: string, label: string, type: string) {
+  constructor(key: string, label: string, type: string, repeated: boolean) {
     this.key = key;
     this.label = label;
     this.type = type;
     this.oneofs = [];
+    this.repeated = repeated;
   }
 
   addOneofList(oneoflist: {key: string, label: string, type: string}[]) {
@@ -58,6 +60,7 @@ export class Field {
 
 export class DeviceFieldValue {
   key: string;
+  nestedRepeatedValue: number[][];
   value: number;
   unitKey: number | null;
   oneofKey: number;
@@ -67,6 +70,15 @@ export class DeviceFieldValue {
     this.value = value;
     this.unitKey = unitKey;
     this.oneofKey = oneofKey ? oneofKey : 0;
+    this.nestedRepeatedValue = [];
+  }
+
+  addToRepeatedValue(value: number[]) {
+    this.nestedRepeatedValue.push(value);
+  }
+
+  addToNestedRepeatedValue(index: number, value: number) {
+    this.nestedRepeatedValue[index].push(value);
   }
 }
 
