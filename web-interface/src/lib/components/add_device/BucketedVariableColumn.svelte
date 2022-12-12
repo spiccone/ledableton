@@ -2,6 +2,7 @@
 	import type { DeviceFieldValue } from "$lib/types";
   import Icon from '@iconify/svelte';
   import roundPlus from '@iconify/icons-ic/round-plus';
+  import roundMinus from '@iconify/icons-ic/round-minus';
 
   export let columnField : DeviceFieldValue;
 
@@ -10,8 +11,18 @@
     columnField = columnField;
   }
 
+  function subtractRow() {
+    columnField.removeFromRepeatedValue();
+    columnField = columnField;
+  }
+
   function addColumn(index: number) {
     columnField.addToNestedRepeatedValue(index, 0);
+    columnField = columnField;
+  }
+
+  function subtractColumn(index: number) {
+    columnField.removeFromNestedRepeatedValue(index);
     columnField = columnField;
   }
 
@@ -29,12 +40,19 @@
       <button class="add" on:click|preventDefault={() => addColumn(i)}>
         <Icon icon={roundPlus} />
       </button>
+      <button class="subtract" on:click|preventDefault={() => subtractColumn(i)}>
+        <Icon icon={roundMinus} />
+      </button>
     </div>
   {/each}
-  <!-- svelte-ignore a11y-click-events-have-key-events -->
-  <button class="add add-row" on:click|preventDefault={() => addRow()}>
-    <Icon icon={roundPlus} />
-  </button>
+  <div class="row-buttons">
+    <button class="add" on:click|preventDefault={() => addRow()}>
+      <Icon icon={roundPlus} />
+    </button>
+    <button class="subtract" on:click|preventDefault={() => subtractRow()}>
+      <Icon icon={roundMinus} />
+    </button>
+  </div>
 </div>
 
 <style>
@@ -75,18 +93,21 @@
     width: 100%;
   }
 
-  .add {
-    box-sizing: content-box;
-    border-radius: 50%;
+  .row-buttons {
     display: flex;
     flex: 0 0 auto;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .add,
+  .subtract {
+    box-sizing: content-box;
+    border-radius: 50%;
     height: 14px;
     margin-top: 8px;
     padding: 5px;
     width: 14px;
-  }
-  .add-row {
-    align-self: center;
   }
 </style>
 

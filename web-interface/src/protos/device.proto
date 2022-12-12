@@ -12,7 +12,7 @@ message Type {
     Arc arc = 2;
     Grid grid = 3;
     BucketedGrid bucketed_grid = 4;
-    BucketedVariableColumnGrid variable_column_buckets = 5;
+    BucketedVariableColumnGrid bucketed_variable_column_grid = 5;
   }
 }
 

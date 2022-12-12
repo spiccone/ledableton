@@ -43,7 +43,7 @@ export class Field {
   label: string;
   type: string;
   repeated: boolean = false;
-  oneofs: SimpleField[];
+  oneofs: Field[];
 
   constructor(key: string, label: string, type: string, repeated: boolean) {
     this.key = key;
@@ -53,7 +53,7 @@ export class Field {
     this.repeated = repeated;
   }
 
-  addOneofList(oneoflist: {key: string, label: string, type: string}[]) {
+  addOneofList(oneoflist: Field[]) {
     this.oneofs = oneoflist;
   }
 }
@@ -77,8 +77,16 @@ export class DeviceFieldValue {
     this.nestedRepeatedValue.push(value);
   }
 
+  removeFromRepeatedValue() {
+    this.nestedRepeatedValue.pop();
+  }
+
   addToNestedRepeatedValue(index: number, value: number) {
     this.nestedRepeatedValue[index].push(value);
+  }
+
+  removeFromNestedRepeatedValue(index: number) {
+    this.nestedRepeatedValue[index].pop();
   }
 }
 

@@ -1,13 +1,12 @@
 <script lang="ts">
   import {onMount} from 'svelte';
   import {DeviceFieldValue as FieldValue, DeviceType, type SavedDevice} from '$lib/types';
-  import Select from './Select.svelte';
+  import Select from '../Select.svelte';
   import Icon from '@iconify/svelte';
   import roundPlus from '@iconify/icons-ic/round-plus';
   import folderOpenOutlineRounded from '@iconify/icons-material-symbols/folder-open-outline-rounded';
-	import { assign } from 'svelte/internal';
-	import FieldInput from './FieldInput.svelte';
-	import BucketedVariableColumn from './BucketedVariableColumn.svelte';
+	import FieldDisplay from './FieldDisplay.svelte';
+
 
   export let savedDevices : SavedDevice[] = [];
   export let deviceTypes : DeviceType[] = [];
@@ -84,46 +83,11 @@
     {#if selectedTypeIndex < deviceTypes.length}
       <div class="device-fields" style="z-index: 1">
         {#each deviceTypes[selectedTypeIndex].fields as field, i (field.key)}
-          {#if field.type === "Type"}
-            <slot name="type-field"/>
-          {:else if field.type === "VariableColumn"}
-            <BucketedVariableColumn columnField={typesOptions[selectedTypeIndex][i]} />
-          {:else if field.oneofs.length > 0}
-            <div class="field" style="z-index: {100-i}">
-              <div class="label">
-                <Select items={field.oneofs} 
-                        bind:selectedIndex={typesOptions[selectedTypeIndex][i].oneofKey}
-                        arrowRight={false} />
-              </div>
-              <div class="field-input-container">
-                <FieldInput id={"field_" + selectedTypeIndex + "_" + field.key}
-                            typeOption={typesOptions[selectedTypeIndex][i]}
-                            units={units}
-                            field={field.oneofs[typesOptions[selectedTypeIndex][i].oneofKey]} />
-              </div>
-            </div>
-          {:else if field.type === "Unit"}
-            <div class="field" style="z-index: {100-i}">
-              <label class="label" for={"field_" + selectedTypeIndex + "_" + field.key}>
-                {field.label}
-              </label>
-              <Select id={"field_" + selectedTypeIndex + "_" + field.key}
-                      items={units}
-                      bind:selectedIndex={typesOptions[selectedTypeIndex][i].oneofKey} />
-            </div>
-          {:else if field.repeated === false}
-            <div class="field" style="z-index: {100-i}">
-              <label class="label" for="{"field_" + selectedTypeIndex + "_" + field.key}">
-                {field.label}
-              </label>
-              <div class="field-input-container">
-                <FieldInput id={"field_" + selectedTypeIndex + "_" + field.key}
-                            typeOption={typesOptions[selectedTypeIndex][i]}
-                            units={units}
-                            field={field} />
-              </div>
-            </div>
-          {/if}
+          <FieldDisplay inputId={"field_" + selectedTypeIndex + "_" + field.key}
+                        field={field}
+                        fieldValue={typesOptions[selectedTypeIndex][i]}
+                        units={units}
+                        zIndex={100-i} />
         {/each}
       </div>
     {/if}
@@ -137,16 +101,6 @@
   }
 
   .label {
-    --select-arrow-size: 4px;
-    --select-arrow-gap: 36px;
-    --select-arrow-margin: -2px 10px 0;
-    --select-border-width: 0;
-    --select-color: var(--color-text);
-    --select-color-hover: #fff;
-    --select-color-bg: var(--color-bg-main);
-    --select-font-size: 12px;
-    --select-height: 20px;
-    --select-margin: -3px 0 -3px -10px;
     font-size: 12px;
     margin: 0 0 4px 4px;
   }
@@ -174,17 +128,5 @@
     flex-wrap: wrap;
     gap: 12px 8px;
     margin-top: 10px;
-  }
-
-  .field {
-    display: flex;
-    flex: 1 0 40px;
-    flex-direction: column;
-    max-width: 127px;
-  }
-
-  .field-input-container {
-    display: flex;
-    flex-direction: row;
   }
 </style>

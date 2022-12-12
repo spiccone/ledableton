@@ -1,11 +1,11 @@
 <script lang="ts">
   import {onMount} from 'svelte';
   import {DeviceType, Field, DeviceFieldValue as FieldValue, SavedDevice} from '$lib/types';
-  import Modal from "./Modal.svelte";
+  import Modal from '../Modal.svelte';
   import Icon from '@iconify/svelte';
   import roundPlus from '@iconify/icons-ic/round-plus';
   import protobuf from 'protobufjs';
-  import {nameFormat} from "../helper-functions";
+  import {nameFormat} from "../../helper-functions";
 	import SelectDevice from './SelectDevice.svelte';
 
   let devices : SavedDevice[] = [new SavedDevice("test", "test", [])];

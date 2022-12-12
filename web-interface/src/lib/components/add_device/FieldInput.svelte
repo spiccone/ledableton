@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type {Field,  DeviceFieldValue as FieldValue, SimpleField } from "$lib/types";
-	import Select from "./Select.svelte";
+	import Select from "../Select.svelte";
 
 
   export let id = "";

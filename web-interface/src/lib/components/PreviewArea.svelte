@@ -1,6 +1,6 @@
 <script lang="ts">
   import type {Device} from "$lib/types";
-  import AddDevice from "./AddDevice.svelte";
+  import AddDevice from "./add_device/AddDevice.svelte";
 	import DraggablePreview from './DraggablePreview.svelte';
 
   export let devices: Array<Device> = [];
