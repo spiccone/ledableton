@@ -9,7 +9,7 @@
 	import BucketedVariableColumns from './BucketedVariableColumns.svelte';
 
   export let deviceTypes : DeviceType[] = [];
-  export let selectedItem : SavedDevice|DeviceType|null;
+  export let selectedItem : DeviceType|null;
   export let selectedItemOptions : FieldValue[]|null = null;
   export let units : {key: string, label: string}[] = [];
   export let deviceTypeLabel = "Device type";
@@ -18,16 +18,22 @@
 
   let selectedTypeIndex = 0;
 
-  for (let types of deviceTypes) {
-    const options = [];
-    for (let field of types.fields) {
-      const fieldValue = new FieldValue(field.key, field.type === "Dimension" ? 0 : null);
-      if (field.type === "VariableColumn") {
-        fieldValue.addToRepeatedValue([]);
+  for (let i=0; i<deviceTypes.length; i++) {
+    const types = deviceTypes[i];
+    if (selectedItem === types && selectedItemOptions) {
+     typesOptions.push(selectedItemOptions);
+     selectedTypeIndex = i;
+    } else {
+      const options = [];
+      for (let field of types.fields) {
+        const fieldValue = new FieldValue(field.key, field.type === "Dimension" ? 0 : null);
+        if (field.type === "VariableColumn") {
+          fieldValue.addToRepeatedValue([]);
+        }
+        options.push(fieldValue);
       }
-      options.push(fieldValue);
+      typesOptions.push(options);
     }
-    typesOptions.push(options);
   }
 
 

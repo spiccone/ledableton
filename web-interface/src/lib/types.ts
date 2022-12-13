@@ -117,14 +117,13 @@ export class DeviceType {
 export class SavedDevice {
   key: string;
   label: string;
-  type: string;
+  type: DeviceType | null = null;
   fields: DeviceFieldValue[] | null = null;
-  bucketType: string | null = null;
+  bucketType: DeviceType | null = null;
   bucketFields: DeviceFieldValue[] | null = null;
 
-  constructor(type: string, label: string) {
-    this.key = type;
-    this.type = type;
+  constructor(key: string, label: string) {
+    this.key = key;
     this.label = label;
   }
 }

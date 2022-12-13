@@ -147,7 +147,7 @@
   <div id={id} class="select-box">
     <div class="item-spacer-list">
       {#each items as item, i (id + "_spacer_" + i)}
-        <div class="item-spacer">
+        <div class="item-label">
           {item.label}
         </div>
       {/each}
@@ -157,8 +157,10 @@
          on:keydown={keydown}
          tabindex=0>
       <div class="selected-list-item {id}"
-           on:mousedown={toggleSelect} >
-        {selectedItem?.label}
+           on:mousedown={toggleSelect}>
+        <div class="item-label">
+          {selectedItem?.label}
+        </div>
       </div>
       {#each items as item, i (item.key)}
         <!-- svelte-ignore a11y-mouse-events-have-key-events -->
@@ -167,7 +169,9 @@
              on:mousedown={() => selectItem(i)}
              on:mouseover={() => mouseoverItem(i)}
              on:mouseleave={() => mouseleaveItem(i)}>
-          {item.label}
+          <div class="item-label">
+            {item.label}
+          </div>
         </div>
       {/each}
     </div>
@@ -193,19 +197,28 @@
     margin: 0 0 4px 4px;
   }
 
-  .select-list {
-    border-color: var(--select-border-color, var(--color-form-bg-hover));
+  .select-list,
+  .item-spacer-list {
     border-style: solid;
     border-width: var(--select-border-width, 1px);
     border-radius: var(--select-border-radius, 12px);
     box-sizing: border-box;
+    width: var(--select-width, auto);
+  }
+  .select-list {
+    border-color: var(--select-border-color, var(--color-form-bg-hover));
     overflow: hidden;
     position: absolute;
     max-height: var(--select-height, 36px);
     top: 0;
     transition: max-height 0.15s ease-out, border-radius 0.5s ease-out;
-    width: var(--select-width, auto);
     z-index: 1;
+  }
+  .item-spacer-list {
+    display: flex;
+    flex-direction: column;
+    height: var(--select-height, 36px); 
+    visibility: hidden;
   }
   .open .select-list {
     border-radius: var(--select-border-radius-open, 12px);
@@ -228,26 +241,16 @@
     text-overflow: ellipsis;
     white-space: nowrap;
   }
-  .has-arrow .select-list-item,
   .has-arrow .selected-list-item,
   .has-arrow .item-spacer {
     padding-right: var(--select-arrow-gap, 34px);
-  }
-  .item-spacer-list {
-    border-style: solid;
-    border-width: var(--select-border-width, 1px);
-    border-radius: var(--select-border-radius, 12px);
-    box-sizing: border-box;
-    display: flex;
-    flex-direction: column;
-    width: var(--select-width, auto);
-    height: var(--select-height, 36px); 
-    visibility: hidden;
   }
 
   .select-list-item {
     color: #ccc;
   }
+
+  .selected-list-item:hover,
   .select-list-item.hover,
   .select-list-item.focused {
     background: var(--color-form-bg-hover);
@@ -258,6 +261,12 @@
   }
   .closed .selected-list-item:hover {
     color: var(--select-color-hover, var(--color-form-text-hover));
+  }
+
+  .item-label {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   .cover {

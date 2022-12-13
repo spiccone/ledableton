@@ -5,6 +5,7 @@
   import Select from '../Select.svelte';
   import Icon from '@iconify/svelte';
   import roundPlus from '@iconify/icons-ic/round-plus';
+  import editOutlineRounded from '@iconify/icons-material-symbols/edit-outline-rounded';
   import deleteOutlineRounded from '@iconify/icons-material-symbols/delete-outline-rounded';
   import roundArrowBackIos from '@iconify/icons-ic/round-arrow-back-ios';
   import protobuf from 'protobufjs';
@@ -28,6 +29,8 @@
   let deviceName = "";
   
   let deviceKeyIndex = 0;
+
+  let edit = false;
 
   onMount(() => {
     protobuf.load("src/protos/device.proto").then(function(root) {
@@ -86,6 +89,19 @@
     }
   }
 
+  function editDevice() {
+    if (!selectedSavedDevice || !selectedSavedDevice.type) {
+      return;
+    }
+    deviceName = selectedSavedDevice.label;
+    selectedDeviceType = selectedSavedDevice.type;
+    selectedTypeFields = selectedSavedDevice.fields;
+    selectedDeviceBucket = selectedSavedDevice.bucketType;
+    selectedDeviceBucketFields = selectedSavedDevice.bucketFields;
+    edit = true;
+    openCreateNewDevice();
+  }
+
   function deleteDevice() {
     const index = savedDevices.indexOf(selectedSavedDevice);
     if (index > -1) {
@@ -102,14 +118,19 @@
   }
 
   function handleSave() {
-    const device = 
-      new SavedDevice(selectedDeviceType.key + '_' + deviceKeyIndex++, deviceName);
+    const deviceKey = selectedDeviceType.key + '_' + deviceKeyIndex++;
+    const device = edit ?
+        selectedSavedDevice :
+        new SavedDevice(deviceKey, deviceName);
+    device.type = selectedDeviceType;
     device.fields = selectedTypeFields;
     if (selectedDeviceBucket) {
-      device.bucketType = selectedDeviceBucket.key;
+      device.bucketType = selectedDeviceBucket;
       device.bucketFields = selectedDeviceBucketFields;
     }
-    savedDevices.push(device);
+    if (!edit) {
+      savedDevices.push(device);
+    }
     deviceName = "";
     openAddDevice();
   }
@@ -133,7 +154,7 @@
           <Icon icon={roundArrowBackIos} />
         </button>
       {/if}
-      <h1>Create New Device</h1>
+      <h1>{edit ? "Edit" : "Create"} New Device</h1>
     {:else}
       <h1>Add Device</h1>
     {/if}
@@ -166,11 +187,14 @@
                     items={savedDevices} 
                     bind:selectedItem={selectedSavedDevice} />
           </div>
+          <button class="edit-button" on:click={editDevice}>
+            <Icon icon={editOutlineRounded} />
+          </button>
           <button class="delete-button" on:click={deleteDevice}>
             <Icon icon={deleteOutlineRounded} />
           </button>
           <button class="add-button" on:click={openCreateNewDevice}>
-            Create new device
+            Create device
             <div class="add-button-icon"><Icon icon={roundPlus} /></div>
           </button>
         </div>
@@ -244,8 +268,9 @@
 
   .saved-select {
     --select-width: 100%;
-    flex: 1 0 auto;
+    flex: 1 1 auto;
     gap: 8px;
+    min-width: 60px;
   }
 
   .add-button {
@@ -262,8 +287,10 @@
     width: 18px;
   }
 
+  .edit-button,
   .delete-button {
     height: 36px;
+    flex: 0 0 auto;
     padding: 7px;
     width: 36px;
   }
