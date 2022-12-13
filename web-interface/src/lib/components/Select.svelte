@@ -10,7 +10,6 @@
   export let arrowRight = true;
 
   let open = false;
-  let selectedLabel = selectedItem ? selectedItem.label : "";
 
   onMount(() => {
     if (!selectedIndex && !selectedItem && items.length > 0) {
@@ -34,7 +33,6 @@
   function selectItem(index : number) {
     selectedIndex = index;
     selectedItem = items[index];
-    selectedLabel = selectedItem.label;
     open = false;
     dispatch('select', {
 			selectedIndex: selectedIndex
@@ -62,7 +60,7 @@
       <!-- svelte-ignore a11y-click-events-have-key-events -->
       <div class="selected-list-item {id}" 
           on:click={toggleSelect}>
-        {selectedLabel}
+        {selectedItem?.label}
       </div>
       {#each items as item, i (id + "_select_" + i)}
         <!-- svelte-ignore a11y-click-events-have-key-events -->

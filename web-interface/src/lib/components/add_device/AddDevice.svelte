@@ -5,30 +5,29 @@
   import Select from '../Select.svelte';
   import Icon from '@iconify/svelte';
   import roundPlus from '@iconify/icons-ic/round-plus';
+  import deleteOutlineRounded from '@iconify/icons-material-symbols/delete-outline-rounded';
   import roundArrowBackIos from '@iconify/icons-ic/round-arrow-back-ios';
   import protobuf from 'protobufjs';
   import {nameFormat} from "../../helper-functions";
-	import SelectDevice from './SelectDevice.svelte';
 	import CreateDevice from './CreateDevice.svelte';
 
-  let savedDevices : SavedDevice[] = [new SavedDevice("test", "test", [])];
+  let savedDevices : SavedDevice[] = [];
   let deviceTypes : DeviceType[] = [];
   let deviceTypesNoBuckets : DeviceType[] = [];
   let units : {key: string, label: string}[] = [];
-
-  let selectedDevice : SavedDevice | DeviceType;
 
   let selectedSavedDevice : SavedDevice;
 
   let selectedDeviceType : DeviceType;
   let selectedTypeFields : FieldValue[] | null;
-  let selectedDeviceBucket : DeviceType;
+  let selectedDeviceBucket : DeviceType | null;
   let selectedDeviceBucketFields : FieldValue[] | null;
 
-  
   let createDevice = savedDevices.length == 0;
 
   let deviceName = "";
+  
+  let deviceKeyIndex = 0;
 
   onMount(() => {
     protobuf.load("src/protos/device.proto").then(function(root) {
@@ -47,7 +46,6 @@
         const fieldMessage =  valueTypeMessage.fields;
         const fields = [];
         let isBucket = false;
-        console.log(fieldMessage);
         for (const [key, value] of Object.entries(fieldMessage)) {
           if (!value.partOf) {
             fields.push(new Field(key, nameFormat(key), value.type, value.repeated));
@@ -57,9 +55,10 @@
         const oneofs = valueTypeMessage.oneofs;
         if (oneofs) {
           for (const [name, oneof] of Object.entries(oneofs)) {
-            const oneofFields : {key: string, label: string, type: string}[] = [];
+            const oneofFields : Field[] = [];
             for (const [key, value] of Object.entries(oneof.fieldsArray)) {
-              oneofFields.push({key: value.name, label: nameFormat(value.name), type: value.type});
+              oneofFields.push(
+                new Field(value.name, nameFormat(value.name), value.type, value.repeated));
             }
             const newField = new Field(name, nameFormat(key), value.type, value.repeated);
             newField.addOneofList(oneofFields);
@@ -73,22 +72,50 @@
         deviceTypes.push(new DeviceType(key, nameFormat(key), fields));
       }
     });
+    deviceKeyIndex = savedDevices.length;
   });
 
-  function createNewDevice() {
+  function openCreateNewDevice() {
     createDevice = true;
-    selectedDevice = selectedDeviceType;
   }
 
-  function addDevice() {
-    createDevice = false;
-    selectedDevice = selectedSavedDevice;
+  function openAddDevice() {
+    if (savedDevices.length > 0) { // should always be true
+      createDevice = false;
+      selectedSavedDevice = savedDevices[0];
+    }
   }
 
-  function handleSubmit() {
-    console.log(selectedDevice);
-    console.log(selectedDeviceBucket);
-    console.log(selectedTypeFields);
+  function deleteDevice() {
+    const index = savedDevices.indexOf(selectedSavedDevice);
+    if (index > -1) {
+      savedDevices.splice(index, 1);
+    }
+    if (savedDevices.length == 0) {
+      createDevice = true;
+    } else if (index == 0) {
+      selectedSavedDevice = savedDevices[0]
+    } else {
+      selectedSavedDevice = savedDevices[index - 1];
+    }
+    savedDevices = savedDevices;
+  }
+
+  function handleSave() {
+    const device = 
+      new SavedDevice(selectedDeviceType.key + '_' + deviceKeyIndex++, deviceName);
+    device.fields = selectedTypeFields;
+    if (selectedDeviceBucket) {
+      device.bucketType = selectedDeviceBucket.key;
+      device.bucketFields = selectedDeviceBucketFields;
+    }
+    savedDevices.push(device);
+    deviceName = "";
+    openAddDevice();
+  }
+
+  function handleAdd() {
+    console.log(selectedSavedDevice);
 	}
 </script>
 
@@ -101,9 +128,11 @@
   </div>
   <div class="header" slot="header">
     {#if createDevice}
-    <button class="back-button" on:click={addDevice}>
-      <Icon icon={roundArrowBackIos} />
-    </button>
+      {#if savedDevices.length > 0}
+        <button class="back-button" on:click={openAddDevice}>
+          <Icon icon={roundArrowBackIos} />
+        </button>
+      {/if}
       <h1>Create New Device</h1>
     {:else}
       <h1>Add Device</h1>
@@ -111,7 +140,8 @@
   </div>
   <div class="content" slot="content">
     <div class="outer-section">
-      {#if createDevice}
+      {#if createDevice || savedDevices.length == 0}
+      <!-- createDevice should be true when savedDevices is empty -->
         <div class="device-name-container">
           <input type="text" 
                  class="device-name" 
@@ -136,7 +166,10 @@
                     items={savedDevices} 
                     bind:selectedItem={selectedSavedDevice} />
           </div>
-          <button class="add-button" on:click={createNewDevice}>
+          <button class="delete-button" on:click={deleteDevice}>
+            <Icon icon={deleteOutlineRounded} />
+          </button>
+          <button class="add-button" on:click={openCreateNewDevice}>
             Create new device
             <div class="add-button-icon"><Icon icon={roundPlus} /></div>
           </button>
@@ -145,9 +178,11 @@
     </div>
   </div>
   <div class="footer" slot="footer">
-    <button class="submit" on:click={handleSubmit}>
-      Add Device
-    </button>
+    {#if createDevice}
+      <button class="submit" on:click={handleSave} disabled={deviceName === ''}>Save Device</button>
+    {:else}
+      <button class="submit" on:click={handleAdd}>Add Device</button>
+    {/if}
   </div>
 </Modal>
 
@@ -225,6 +260,12 @@
     height: 24px;
     margin: -5px -3px -3px 6px;
     width: 18px;
+  }
+
+  .delete-button {
+    height: 36px;
+    padding: 7px;
+    width: 36px;
   }
   
   .outer-section,
