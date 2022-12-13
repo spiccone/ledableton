@@ -111,8 +111,11 @@
   .content {
     flex: 1 1 auto;
     height: 100%;
+    margin-right: -12px;
     min-width: 300px;
     min-height: 300px;
+    overflow: scroll;
+    padding-right: 12px;
   }
 
   .header {

@@ -8,8 +8,8 @@
 	--color-text: #CCC;
   --color-form-bg: #222;
   --color-form-bg-hover: #444;
-  --color-form-text: #999;
-  --color-form-text-hover: #DDD;
+  --color-form-text: #aaa;
+  --color-form-text-hover: #eee;
   --font-body: 'Comfortaa', 'Segoe UI', Roboto, Oxygen, Ubuntu,
   Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
   --font-mono: 'Fira Mono', monospace;
@@ -71,7 +71,8 @@ button:focus:not(:focus-visible) {
 	outline: none;
 }
 
-input[type="text"] {
+input[type="text"],
+input[type="number"] {
   cursor: text;
 }
 
@@ -106,4 +107,7 @@ input[type="checkbox"]:hover {
 }
 input[type="checkbox"]:hover:checked::before {
   background-color: var(--color-form-text-hover, #444);
+}
+input[type=number]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
 }

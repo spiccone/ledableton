@@ -26,7 +26,9 @@
 
 <style>
   .field-input {
+    flex: 1 1 0;
     min-width: 40px;
+    width: 0;
   }
 
   .field-input.has-select {

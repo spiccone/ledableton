@@ -4,6 +4,7 @@
   export let items : {key : string, label : string}[] = [];
   export let selectedItem : {key : string, label : string} | undefined | null = undefined;
   export let selectedIndex : number | null = 0;
+  export let label : string | null = null;
   export let id = "";
   export let showArrow = true;
   export let arrowRight = true;
@@ -41,28 +42,35 @@
   }
 </script>
 
-<div id={id} class="Select {open ? 'open' : 'closed'}
-                   {showArrow ? 'has-arrow' : ''}
-                   {arrowRight ? 'arrow-right' : ''}">
-  <div class="item-spacer-list">
-    {#each items as item, i (id + "_spacer_" + i)}
-      <div class="item-spacer">
-        {item.label}
-      </div>
-    {/each}
-  </div>
-  <div class="select-list">
-    <!-- svelte-ignore a11y-click-events-have-key-events -->
-    <div class="selected-list-item {id}" 
-         on:click={toggleSelect}>
-      {selectedLabel}
+<div class="Select">
+  {#if label}
+    <div class="label">
+      {label}
     </div>
-    {#each items as item, i (id + "_select_" + i)}
+  {/if}
+  <div id={id} class="select-box {open ? 'open' : 'closed'}
+                    {showArrow ? 'has-arrow' : ''}
+                    {arrowRight ? 'arrow-right' : ''}">
+    <div class="item-spacer-list">
+      {#each items as item, i (id + "_spacer_" + i)}
+        <div class="item-spacer">
+          {item.label}
+        </div>
+      {/each}
+    </div>
+    <div class="select-list">
       <!-- svelte-ignore a11y-click-events-have-key-events -->
-      <div class="select-list-item" on:click={() => selectItem(i)}>
-        {item.label}
+      <div class="selected-list-item {id}" 
+          on:click={toggleSelect}>
+        {selectedLabel}
       </div>
-    {/each}
+      {#each items as item, i (id + "_select_" + i)}
+        <!-- svelte-ignore a11y-click-events-have-key-events -->
+        <div class="select-list-item" on:click={() => selectItem(i)}>
+          {item.label}
+        </div>
+      {/each}
+    </div>
   </div>
   <!-- svelte-ignore a11y-click-events-have-key-events -->
   <div class="cover" on:click={closeSelect}></div>
@@ -74,6 +82,15 @@
     font-size: var(--select-font-size, 14px);
     margin: var(--select-margin, 0);
     width: 100%;
+  }
+  
+  .select-box {
+    position: relative;
+  }
+
+  .label {
+    font-size: 12px;
+    margin: 0 0 4px 4px;
   }
 
   .select-list {

@@ -2,21 +2,34 @@
   import {onMount} from 'svelte';
   import {DeviceType, Field, DeviceFieldValue as FieldValue, SavedDevice} from '$lib/types';
   import Modal from '../Modal.svelte';
+  import Select from '../Select.svelte';
   import Icon from '@iconify/svelte';
   import roundPlus from '@iconify/icons-ic/round-plus';
+  import roundArrowBackIos from '@iconify/icons-ic/round-arrow-back-ios';
   import protobuf from 'protobufjs';
   import {nameFormat} from "../../helper-functions";
 	import SelectDevice from './SelectDevice.svelte';
+	import CreateDevice from './CreateDevice.svelte';
 
-  let devices : SavedDevice[] = [new SavedDevice("test", "test", [])];
+  let savedDevices : SavedDevice[] = [new SavedDevice("test", "test", [])];
   let deviceTypes : DeviceType[] = [];
   let deviceTypesNoBuckets : DeviceType[] = [];
   let units : {key: string, label: string}[] = [];
 
   let selectedDevice : SavedDevice | DeviceType;
-  let selectedDeviceBucket : SavedDevice | DeviceType;
-  let selectedItemOptions : FieldValue[] | null;
+
+  let selectedSavedDevice : SavedDevice;
+
+  let selectedDeviceType : DeviceType;
+  let selectedTypeFields : FieldValue[] | null;
+  let selectedDeviceBucket : DeviceType;
+  let selectedDeviceBucketFields : FieldValue[] | null;
+
   
+  let createDevice = savedDevices.length == 0;
+
+  let deviceName = "";
+
   onMount(() => {
     protobuf.load("src/protos/device.proto").then(function(root) {
       if (!root) {
@@ -62,12 +75,20 @@
     });
   });
 
-  let deviceName = "";
+  function createNewDevice() {
+    createDevice = true;
+    selectedDevice = selectedDeviceType;
+  }
+
+  function addDevice() {
+    createDevice = false;
+    selectedDevice = selectedSavedDevice;
+  }
 
   function handleSubmit() {
     console.log(selectedDevice);
     console.log(selectedDeviceBucket);
-    console.log(selectedItemOptions);
+    console.log(selectedTypeFields);
 	}
 </script>
 
@@ -78,31 +99,50 @@
       <Icon icon={roundPlus} />
     </div>
   </div>
-  <div slot="header">
-    <h1>
-      <input class="device-name" bind:value={deviceName} placeholder="Unnamed device"/>
-    </h1>
+  <div class="header" slot="header">
+    {#if createDevice}
+    <button class="back-button" on:click={addDevice}>
+      <Icon icon={roundArrowBackIos} />
+    </button>
+      <h1>Create New Device</h1>
+    {:else}
+      <h1>Add Device</h1>
+    {/if}
   </div>
   <div class="content" slot="content">
-    <form id="add-device" class="form" >
-      <div class="outer-section">
-        <SelectDevice bind:selectedItem={selectedDevice} 
-                      bind:selectedItemOptions={selectedItemOptions}
-                      savedDevices={devices} 
+    <div class="outer-section">
+      {#if createDevice}
+        <div class="device-name-container">
+          <input type="text" 
+                 class="device-name" 
+                 bind:value={deviceName}
+                 placeholder="New device" />
+        </div>
+        <CreateDevice bind:selectedItem={selectedDeviceType} 
+                      bind:selectedItemOptions={selectedTypeFields}
                       deviceTypes={deviceTypes}
                       units={units}>
           <div class="inner-section" slot="type-field">
-              <SelectDevice bind:selectedItem={selectedDeviceBucket} 
-                            savedDevices={devices}
-                            deviceTypes={deviceTypes}
-                            units={units}
-                            savedDeviceLabel="Bucket device"
-                            deviceTypeLabel="Bucket device type"/>
-             
+            <CreateDevice bind:selectedItem={selectedDeviceBucket} 
+                          bind:selectedItemOptions={selectedDeviceBucketFields}
+                          deviceTypes={deviceTypesNoBuckets}
+                          units={units} />
           </div>
-        </SelectDevice>
-      </div>
-    </form>
+        </CreateDevice>
+      {:else}
+        <div class="saved-device-container">
+          <div class="saved-select">
+            <Select id="devices" 
+                    items={savedDevices} 
+                    bind:selectedItem={selectedSavedDevice} />
+          </div>
+          <button class="add-button" on:click={createNewDevice}>
+            Create new device
+            <div class="add-button-icon"><Icon icon={roundPlus} /></div>
+          </button>
+        </div>
+      {/if}
+    </div>
   </div>
   <div class="footer" slot="footer">
     <button class="submit" on:click={handleSubmit}>
@@ -136,18 +176,87 @@
     opacity: 60%;
   }
 
+  .header {
+    align-items: center;
+    display: flex;
+    flex-direction: row;
+    font-size: 26px;
+  }
+  .header h1 {
+    margin-top: 18px;
+    margin-left: 8px;
+  }
+
+  .back-button {
+    background: none;
+    border: none;
+    box-sizing: content-box;
+    height: 1em;
+    padding: 6px;
+    width: 1em;
+  }
+
   .content {
     position: relative;
     height: 100%;
     width: 100%;
   }
 
+  .saved-device-container {
+    display: flex;
+    gap: 8px;
+  }
+
+  .saved-select {
+    --select-width: 100%;
+    flex: 1 0 auto;
+    gap: 8px;
+  }
+
+  .add-button {
+    align-items: center;
+    display: flex;
+    flex: 0 0 auto;
+    font-size: 12px;
+    padding: 9px 12px 7px;
+  }
+  .add-button-icon {
+    display: inline-block;
+    height: 24px;
+    margin: -5px -3px -3px 6px;
+    width: 18px;
+  }
+  
+  .outer-section,
+  .inner-section {
+    border: 1px dashed var(--color-border);
+    border-radius: var(--border-radius-input);
+  }
+  .outer-section {
+    display: flex;
+    flex-direction: column;
+    padding: 8px;
+  }
+  .inner-section {
+    margin-top: 12px;
+    padding: 8px;
+    width: 100%;
+  }
+
+  .device-name-container {
+    margin: -4px -4px 12px -4px;
+    display: flex;
+  }
+
   .device-name {
     background: none;
     border: 0 solid var(--color-border);
     border-radius: var(--border-radius-input);
+    color: var(--color-text, #ccc);
+    font-size: 18px;
     margin: 2px;
-    padding: 4px 6px 2px;
+    padding: 7px 6px 6px;
+    width: 100%;
   }
   .device-name:hover {
     border-width: 1px;
@@ -158,28 +267,9 @@
     margin: 0;
   }
 
-  .form {
-    display: flex;
-    flex-direction: column;
-  }
-
-  .outer-section,
-  .inner-section {
-    border: 1px dashed var(--color-border);
-    border-radius: var(--border-radius-input);
-  }
-  .outer-section {
-    margin-bottom: 12px;
-    padding: 8px;
-  }
-  .inner-section {
-    margin-top: 12px;
-    padding: 8px;
-    width: 100%;
-  }
-
   .footer {
     display: flex;
     justify-content: flex-end;
+    margin-top: 6px;
   }
 </style>

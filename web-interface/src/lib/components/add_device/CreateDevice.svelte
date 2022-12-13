@@ -8,64 +8,37 @@
 	import FieldDisplay from './FieldDisplay.svelte';
 	import BucketedVariableColumns from './BucketedVariableColumns.svelte';
 
-  export let savedDevices : SavedDevice[] = [];
   export let deviceTypes : DeviceType[] = [];
   export let selectedItem : SavedDevice|DeviceType|null;
   export let selectedItemOptions : FieldValue[]|null = null;
   export let units : {key: string, label: string}[] = [];
-  export let savedDeviceLabel = "Saved device";
   export let deviceTypeLabel = "Device type";
 
   let typesOptions : FieldValue[][] = [];
 
-  let newDevice = savedDevices.length == 0;
-
-  let selectedSavedIndex = 0;
   let selectedTypeIndex = 0;
 
-  onMount(() => {
-    for (let types of deviceTypes) {
-      const options = [];
-      for (let field of types.fields) {
-        const fieldValue = new FieldValue(field.key, field.type === "Dimension" ? 0 : null);
-        if (field.type === "VariableColumn") {
-          fieldValue.addToRepeatedValue([]);
-        }
-        options.push(fieldValue);
+  for (let types of deviceTypes) {
+    const options = [];
+    for (let field of types.fields) {
+      const fieldValue = new FieldValue(field.key, field.type === "Dimension" ? 0 : null);
+      if (field.type === "VariableColumn") {
+        fieldValue.addToRepeatedValue([]);
       }
-      typesOptions.push(options);
+      options.push(fieldValue);
     }
-  });
-
-  function addNewDevice() {
-    newDevice = true;
-    selectedItem = deviceTypes.length > 0 ? deviceTypes[selectedTypeIndex] : null;
+    typesOptions.push(options);
   }
 
-  function backToDevices() {
-    newDevice = false;
-    selectedItem = savedDevices.length > 0 ? savedDevices[selectedSavedIndex] : null; 
-  }
+
 
   function handleDeviceSelect(e: CustomEvent) {
     selectedItemOptions = typesOptions[e.detail.selectedIndex];
   }
 </script>
 
-<div class="DeviceSelect">
-  {#if savedDevices.length > 0 && !newDevice}
-    <label class="label" for="devices">{savedDeviceLabel}</label>
-    <div class="device-select">
-      <Select id="devices" 
-              items={savedDevices} 
-              bind:selectedItem={selectedItem}
-              bind:selectedIndex={selectedSavedIndex} />
-      <!-- svelte-ignore a11y-click-events-have-key-events -->
-      <button class="add" on:click={addNewDevice}>
-        <Icon icon={roundPlus} />
-      </button>
-    </div>
-  {:else}
+<div class="CreateDevice">
+  {#if deviceTypes.length > 0}
     <label class="label" for="deviceTypes">{deviceTypeLabel}</label>
     <div class="device-select" style="z-index: 2">
       <Select id="deviceTypes" 
@@ -73,12 +46,6 @@
               bind:selectedItem={selectedItem}
               bind:selectedIndex={selectedTypeIndex}
               on:select={handleDeviceSelect}/>
-      {#if savedDevices.length > 0}
-        <!-- svelte-ignore a11y-click-events-have-key-events -->
-        <button class="back" on:click={backToDevices}>
-          <Icon icon={folderOpenOutlineRounded} />
-        </button>
-      {/if}
     </div>
     {#if selectedTypeIndex < deviceTypes.length}
       <div class="device-fields" style="z-index: 1">
@@ -109,7 +76,7 @@
 </div>
 
 <style>
-  .DeviceSelect {
+  .CreateDevice {
     display: flex;
     flex-direction: column;
   }
@@ -119,15 +86,6 @@
     margin: 0 0 4px 4px;
   }
 
-  .add,
-  .back {
-    box-sizing: border-box;
-    flex: 0 0 auto;
-    height: 36px;
-    margin-left: 8px;
-    padding: 6px;
-    width: 36px;
-  }
   .device-select {
     --select-width: 100%;
     --select-color-bg: var(--color-form-bg);

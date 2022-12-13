@@ -4,9 +4,11 @@
   import roundPlus from '@iconify/icons-ic/round-plus';
   import roundMinus from '@iconify/icons-ic/round-minus';
 	import Checkbox from "../basic/Checkbox.svelte";
+	import FieldDisplay from "./FieldDisplay.svelte";
 
   export let fields : Field[];
   export let fieldValues : DeviceFieldValue[];
+  export let units: {key: string, label: string}[] = [];
 
   let columnField : Field;
   let rowField : Field;
@@ -72,50 +74,61 @@
 </script>
 
 <div class="BucketedVariableColumns">
-  <Checkbox bind:value={alignTop} on:change={handleAlignTop}>
-    Align top
-  </Checkbox>
-  <div class="variable-columns{alignTop ? ' align-top' : ''}">
-    {#each columnFieldValue.nestedRepeatedValue as value, i (i)}
-      <div class="column">
-        <div class="first-bucket"></div>
-        {#each columnFieldValue.nestedRepeatedValue[i] as value, j (j)}
-          {#if !alignTop || j > 0}
-            <div class="entry"></div>
-              <div class="column-input-container">
-                <input class="column-input" 
-                      type="text"
-                      bind:value={columnFieldValue.nestedRepeatedValue[i][j]} />
-              </div>
-              <div class="bucket"></div>
-          {/if}
-        {/each}
-        <button class="add" on:click|preventDefault={() => addColumn(i)}>
+  <div class="options">
+    <FieldDisplay inputId=field_bvc_unit
+                  field={unitField}
+                  fieldValue={unitFieldValue}
+                  units={units}
+                  zIndex={20} />
+  </div>
+  <div class="column-container">
+    <div class="variable-columns{alignTop ? ' align-top' : ''}">
+      {#each columnFieldValue.nestedRepeatedValue as value, i (i)}
+        <div class="column">
+          <div class="first-bucket"></div>
+          {#each columnFieldValue.nestedRepeatedValue[i] as value, j (j)}
+            {#if !alignTop || j > 0}
+              <div class="entry"></div>
+                <div class="column-input-container">
+                  <input class="column-input" 
+                        type="text"
+                        bind:value={columnFieldValue.nestedRepeatedValue[i][j]} />
+                </div>
+                <div class="bucket"></div>
+            {/if}
+          {/each}
+          <button class="add" on:click|preventDefault={() => addColumn(i)}>
+            <Icon icon={roundPlus} />
+          </button>
+          <button class="subtract"
+                  disabled={columnFieldValue.nestedRepeatedValue[i].length < 2}
+                  on:click|preventDefault={() => subtractColumn(i)}>
+            <Icon icon={roundMinus} />
+          </button>
+        </div>
+        {#if rowFieldValue.repeatedValue.length > i}
+          <div class="row-input-container">
+            <input class="row-input" 
+                  type="text" 
+                  bind:value={rowFieldValue.repeatedValue[i]} />
+          </div>
+        {/if}
+      {/each}
+      <div class="row-buttons">
+        <button class="add" on:click|preventDefault={() => addRow()}>
           <Icon icon={roundPlus} />
         </button>
-        <button class="subtract"
-                disabled={columnFieldValue.nestedRepeatedValue[i].length < 2}
-                on:click|preventDefault={() => subtractColumn(i)}>
+        <button class="subtract" 
+                disabled={columnFieldValue.nestedRepeatedValue.length < 2}
+                on:click|preventDefault={() => subtractRow()}>
           <Icon icon={roundMinus} />
         </button>
       </div>
-      {#if rowFieldValue.repeatedValue.length > i}
-        <div class="row-input-container">
-          <input class="row-input" 
-                type="text" 
-                bind:value={rowFieldValue.repeatedValue[i]} />
-        </div>
-      {/if}
-    {/each}
-    <div class="row-buttons">
-      <button class="add" on:click|preventDefault={() => addRow()}>
-        <Icon icon={roundPlus} />
-      </button>
-      <button class="subtract" 
-              disabled={columnFieldValue.nestedRepeatedValue.length < 2}
-              on:click|preventDefault={() => subtractRow()}>
-        <Icon icon={roundMinus} />
-      </button>
+    </div>
+    <div class="align-top-container">
+      <Checkbox bind:value={alignTop} on:change={handleAlignTop}>
+        Align top
+      </Checkbox>
     </div>
   </div>
 </div>
@@ -126,16 +139,25 @@
     width: 100%;
   }
 
-  .variable-columns {
+  .options {
+    align-items: flex-end;
     display: flex;
+    flex-direction: row;
+  }
+  .column-container{
     border: 1px dashed var(--color-border);
     border-radius: 12px;
     box-sizing: border-box;
-    flex-direction: row;
     margin-top: 6px;
-    overflow: scroll;
-    padding: 12px;
+    position: relative;
     width: 100%;
+  }
+
+  .variable-columns {
+    display: flex;
+    flex-direction: row;
+    overflow: scroll;
+    padding: 12px 12px 32px;
   }
 
   .column {
@@ -153,7 +175,7 @@
     box-sizing: border-box;
     flex: 0 0 auto;
     height: 11px;
-    margin-left: 7px;
+    margin-left: 6px;
     width: 11px;
   }
   .variable-columns:not(.align-top) .first-bucket {
@@ -167,13 +189,14 @@
     display: flex;
     flex: 0 0 auto;
     height: 30px;
-    margin-left: 12px;
+    margin-left: 11px;
     width: 50px;
   }
   .row-input-container {
     border-bottom: 1px solid var(--color-border);
+    flex: 0 0 auto;
     height: fit-content;
-    margin: 0 -7px 0 -42px;
+    margin: 0 -7px 0 -43px;
     padding: 0 3px 3px 3px;
     width: 40px;
   }
@@ -201,25 +224,24 @@
     flex: 0 0 auto;
     flex-direction: column;
     justify-content: center;
+    margin-left: -12px;
   }
 
   .add,
   .subtract {
+    display: flex;
     box-sizing: content-box;
     border-radius: 50%;
-    height: 14px;
+    height: 13px;
     margin-top: 8px;
-    padding: 5px;
-    width: 14px;
+    padding: 4px;
+    width: 13px;
   }
 
-  .checkbox {
-    align-items: baseline;
-    cursor: pointer;
-    display: grid;
-    font-size: 12px;
-    grid-template-columns: 1em auto;
-    gap: 12px;
+  .align-top-container {
+    bottom: 12px;
+    position: absolute;
+    right: 16px;
   }
 </style>
 

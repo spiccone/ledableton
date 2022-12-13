@@ -25,10 +25,8 @@
                   field={field.oneofs[fieldValue.oneofKey]} />
     </div>
   {:else if field.type === "Unit"}
-    <label class="label" for={inputId}>
-      {field.label}
-    </label>
     <Select id={inputId}
+            label={field.label}
             items={units}
             bind:selectedIndex={fieldValue.oneofKey} />
   {:else if field.type === "bool"}
