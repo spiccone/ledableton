@@ -37,7 +37,14 @@
     }
   }
 
-  addColumn(0);
+  initColumn();
+
+  function initColumn() {
+    if (columnFieldValue.nestedRepeatedValue.length > 0 &&
+      columnFieldValue.nestedRepeatedValue[0].length == 0) {
+      addColumn(0);
+    }
+  }
 
   function addRow() {
     const numRows = columnFieldValue.nestedRepeatedValue.length;

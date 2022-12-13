@@ -6,6 +6,7 @@
   import Icon from '@iconify/svelte';
   import roundPlus from '@iconify/icons-ic/round-plus';
   import editOutlineRounded from '@iconify/icons-material-symbols/edit-outline-rounded';
+  import roundCopyAll from '@iconify/icons-ic/round-copy-all';
   import deleteOutlineRounded from '@iconify/icons-material-symbols/delete-outline-rounded';
   import roundArrowBackIos from '@iconify/icons-ic/round-arrow-back-ios';
   import protobuf from 'protobufjs';
@@ -27,7 +28,6 @@
   let createDevice = savedDevices.length == 0;
 
   let deviceName = "";
-  
   let deviceKeyIndex = 0;
 
   let edit = false;
@@ -79,6 +79,9 @@
   });
 
   function openCreateNewDevice() {
+    selectedTypeFields = null;
+    selectedDeviceBucket = null;
+    selectedDeviceBucketFields = null;
     createDevice = true;
   }
 
@@ -87,19 +90,24 @@
       createDevice = false;
       selectedSavedDevice = savedDevices[0];
     }
+    edit = false;
   }
 
   function editDevice() {
+    edit = true;
+    deviceName = selectedSavedDevice.label;
+    copyDevice();
+  }
+
+  function copyDevice() {
     if (!selectedSavedDevice || !selectedSavedDevice.type) {
       return;
     }
-    deviceName = selectedSavedDevice.label;
     selectedDeviceType = selectedSavedDevice.type;
     selectedTypeFields = selectedSavedDevice.fields;
     selectedDeviceBucket = selectedSavedDevice.bucketType;
     selectedDeviceBucketFields = selectedSavedDevice.bucketFields;
-    edit = true;
-    openCreateNewDevice();
+    createDevice = true;
   }
 
   function deleteDevice() {
@@ -115,6 +123,7 @@
       selectedSavedDevice = savedDevices[index - 1];
     }
     savedDevices = savedDevices;
+    deviceName = "";
   }
 
   function handleSave() {
@@ -123,6 +132,7 @@
         selectedSavedDevice :
         new SavedDevice(deviceKey, deviceName);
     device.type = selectedDeviceType;
+    device.label = deviceName;
     device.fields = selectedTypeFields;
     if (selectedDeviceBucket) {
       device.bucketType = selectedDeviceBucket;
@@ -154,7 +164,7 @@
           <Icon icon={roundArrowBackIos} />
         </button>
       {/if}
-      <h1>{edit ? "Edit" : "Create"} New Device</h1>
+      <h1>{edit ? "Edit" : "Create"} Device</h1>
     {:else}
       <h1>Add Device</h1>
     {/if}
@@ -187,14 +197,17 @@
                     items={savedDevices} 
                     bind:selectedItem={selectedSavedDevice} />
           </div>
-          <button class="edit-button" on:click={editDevice}>
+          <button class="icon-button" on:click={editDevice}>
             <Icon icon={editOutlineRounded} />
           </button>
-          <button class="delete-button" on:click={deleteDevice}>
+          <button class="icon-button" on:click={copyDevice}>
+            <Icon icon={roundCopyAll} />
+          </button>
+          <button class="icon-button" on:click={deleteDevice}>
             <Icon icon={deleteOutlineRounded} />
           </button>
           <button class="add-button" on:click={openCreateNewDevice}>
-            Create device
+            New
             <div class="add-button-icon"><Icon icon={roundPlus} /></div>
           </button>
         </div>
@@ -287,8 +300,7 @@
     width: 18px;
   }
 
-  .edit-button,
-  .delete-button {
+  .icon-button {
     height: 36px;
     flex: 0 0 auto;
     padding: 7px;

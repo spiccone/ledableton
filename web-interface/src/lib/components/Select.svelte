@@ -154,7 +154,7 @@
         </div>
       {/each}
     </div>
-    <div class="select-list"
+    <div class="select-list-container"
          role="button"
          on:keydown={keydown}
          tabindex=0>
@@ -164,18 +164,20 @@
           {selectedItem?.label}
         </div>
       </div>
-      {#each items as item, i (item.key)}
-        <!-- svelte-ignore a11y-mouse-events-have-key-events -->
-        <div class="select-list-item" 
-             bind:this={itemElements[i]}
-             on:mousedown={() => selectItem(i)}
-             on:mouseover={() => mouseoverItem(i)}
-             on:mouseleave={() => mouseleaveItem(i)}>
-          <div class="item-label">
-            {item.label}
+      <div class="select-list">
+        {#each items as item, i (item.key)}
+          <!-- svelte-ignore a11y-mouse-events-have-key-events -->
+          <div class="select-list-item" 
+              bind:this={itemElements[i]}
+              on:mousedown={() => selectItem(i)}
+              on:mouseover={() => mouseoverItem(i)}
+              on:mouseleave={() => mouseleaveItem(i)}>
+            <div class="item-label">
+              {item.label}
+            </div>
           </div>
-        </div>
-      {/each}
+        {/each}
+      </div>
     </div>
   </div>
   <!-- svelte-ignore a11y-click-events-have-key-events -->
@@ -189,6 +191,9 @@
     margin: var(--select-margin, 0);
     width: 100%;
   }
+  .Select:focus-within {
+    z-index: 20;
+  }
   
   .select-box {
     position: relative;
@@ -199,7 +204,7 @@
     margin: 0 0 4px 4px;
   }
 
-  .select-list,
+  .select-list-container,
   .item-spacer-list {
     border-style: solid;
     border-width: var(--select-border-width, 1px);
@@ -207,8 +212,10 @@
     box-sizing: border-box;
     width: var(--select-width, auto);
   }
-  .select-list {
+  .select-list-container {
     border-color: var(--select-border-color, var(--color-form-bg-hover));
+    display: flex;
+    flex-direction: column;
     overflow: hidden;
     position: absolute;
     max-height: var(--select-height, 36px);
@@ -222,13 +229,18 @@
     height: var(--select-height, 36px); 
     visibility: hidden;
   }
-  .open .select-list {
+  .open .select-list-container {
     border-radius: var(--select-border-radius-open, 12px);
     max-height: 400px;
-    overflow-y: scroll;
     transition: max-height 0.25s ease-in;
     z-index: 3;
   }
+
+  .select-list {
+    height: 100%;
+    overflow-y: scroll;
+  }
+
   .select-list-item,
   .selected-list-item,
   .item-spacer {
@@ -239,7 +251,7 @@
     display: flex;
     min-height: var(--select-height, 36px);
     overflow: hidden;
-    padding: 0 12px;
+    padding: var(--select-padding, 0 12px);
     text-overflow: ellipsis;
     white-space: nowrap;
   }
@@ -255,7 +267,7 @@
   .selected-list-item:hover,
   .select-list-item.hover,
   .select-list-item.focused {
-    background: var(--color-form-bg-hover);
+    background: var(--select-color-bg-hover, var(--color-form-bg-hover));
   }
 
   .selected-list-item {
