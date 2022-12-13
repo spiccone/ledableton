@@ -147,8 +147,10 @@
   <div id={id} class="select-box">
     <div class="item-spacer-list">
       {#each items as item, i (id + "_spacer_" + i)}
-        <div class="item-label">
-          {item.label}
+        <div class="item-spacer">
+          <div class="item-label">
+            {item.label}
+          </div>
         </div>
       {/each}
     </div>
