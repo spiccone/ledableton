@@ -1,2 +1,2 @@
 // Needed for AudioContext
-export const ssr = false;
+export const ssr = true;

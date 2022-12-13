@@ -1,7 +1,7 @@
 <script lang="ts">
   import {Device, LayoutDirection as Layout} from "../types";
 	import DeviceTimeline from './DeviceTimeline.svelte';
-  import AudioDisplay from './AudioDisplay.svelte';
+  //import AudioDisplay from './AudioDisplay.svelte';
 
   export let layoutDirection: Layout = Layout.column;
   export let devices: Array<Device> = [];
@@ -18,7 +18,7 @@
   </div>
   <div class="audio-area">
     <!-- <Waveform /> -->
-   <AudioDisplay minimapId={audioMinimapId} vertical={verticalAudio} />
+   <!-- <AudioDisplay minimapId={audioMinimapId} vertical={verticalAudio} /> -->
   </div>
 </div>
 

@@ -36,6 +36,10 @@
     border-right: none;
   }
 
+  .field-input:focus-visible {
+    z-index: 2;
+  }
+
   .dimension-select {
     --select-border-radius: 0 12px 12px 0;
     --select-border-radius-open: 0 12px 12px 12px;

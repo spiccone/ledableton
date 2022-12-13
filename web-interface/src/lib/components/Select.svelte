@@ -10,6 +10,10 @@
   export let arrowRight = true;
 
   let open = false;
+  let itemElements : HTMLElement[] = Array(items.length);
+  let activeIndex : number | null = null;
+
+  const dispatch = createEventDispatcher();
 
   onMount(() => {
     if (!selectedIndex && !selectedItem && items.length > 0) {
@@ -21,34 +25,126 @@
   });
 
   function toggleSelect() {
-    open = !open;
+    if (open) {
+      closeSelect();
+    } else {
+      openSelect();
+    }
+  }
+
+  function openSelect() {
+    open = true;
   }
 
   function closeSelect() {
+    if (activeIndex !== null) {
+      itemElements[activeIndex].classList.remove("focused");
+      activeIndex = null;
+    }
     open = false;
   }
-  
-  const dispatch = createEventDispatcher();
 
   function selectItem(index : number) {
     selectedIndex = index;
     selectedItem = items[index];
-    open = false;
+    closeSelect();
     dispatch('select', {
 			selectedIndex: selectedIndex
 		});
   }
+
+  function mouseoverItem(index : number) {
+    itemElements[index].classList.add("hover");
+  }
+
+  function mouseleaveItem(index : number) {
+    itemElements[index].classList.remove("hover");
+  }
+
+  function keydown(e : KeyboardEvent) {
+    if (open || e.key !== "Tab") {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    if (itemElements.length == 0) {
+      return;
+    }
+
+    if (e.shiftKey && e.key === "Tab" && activeIndex != null) {
+      onArrowUp(false);
+      return;
+    }
+    switch (e.key) {
+      case ("ArrowDown"):
+        onArrowDown(true);
+        break;
+      case ("Tab"):
+        onArrowDown(false);
+        break;
+      case ("ArrowUp"):
+        onArrowUp(true);
+        break;
+      case ("Enter"):
+        onEnter();
+        break;
+      case ("Escape"):
+        closeSelect();
+        break;
+      case (" "):
+        if (open === false) {
+          onArrowDown(true);
+        }
+    }
+  }
+
+  function onEnter() {
+    if (!open) {
+      onArrowDown(true);
+    } else if (activeIndex != null) {
+      selectItem(activeIndex);
+    }
+  }
+
+  function onArrowDown(open : boolean) {
+    if (open) {
+      openSelect();
+    }
+    if (activeIndex === null) {
+      activeIndex = 0;
+    } else {
+      itemElements[activeIndex].classList.remove("focused");
+      if (++activeIndex >= itemElements.length) {
+        activeIndex = itemElements.length - 1;
+      }
+    }
+    itemElements[activeIndex].classList.add("focused");
+  }
+
+  function onArrowUp(open : boolean) {
+    if (open) {
+      openSelect();
+    }
+    if (activeIndex === null) {
+      activeIndex = itemElements.length - 1;
+    } else {
+      itemElements[activeIndex].classList.remove("focused");
+      if (--activeIndex < 0) {
+        activeIndex = 0;
+      }
+    }
+    itemElements[activeIndex].classList.add("focused");
+  }
 </script>
 
-<div class="Select">
+<div class="Select {open ? 'open' : 'closed'}
+                   {showArrow ? 'has-arrow' : ''}
+                   {arrowRight ? 'arrow-right' : ''}">
   {#if label}
     <div class="label">
       {label}
     </div>
   {/if}
-  <div id={id} class="select-box {open ? 'open' : 'closed'}
-                    {showArrow ? 'has-arrow' : ''}
-                    {arrowRight ? 'arrow-right' : ''}">
+  <div id={id} class="select-box">
     <div class="item-spacer-list">
       {#each items as item, i (id + "_spacer_" + i)}
         <div class="item-spacer">
@@ -56,15 +152,21 @@
         </div>
       {/each}
     </div>
-    <div class="select-list">
-      <!-- svelte-ignore a11y-click-events-have-key-events -->
-      <div class="selected-list-item {id}" 
-          on:click={toggleSelect}>
+    <div class="select-list"
+         role="button"
+         on:keydown={keydown}
+         tabindex=0>
+      <div class="selected-list-item {id}"
+           on:mousedown={toggleSelect} >
         {selectedItem?.label}
       </div>
-      {#each items as item, i (id + "_select_" + i)}
-        <!-- svelte-ignore a11y-click-events-have-key-events -->
-        <div class="select-list-item" on:click={() => selectItem(i)}>
+      {#each items as item, i (item.key)}
+        <!-- svelte-ignore a11y-mouse-events-have-key-events -->
+        <div class="select-list-item" 
+             bind:this={itemElements[i]}
+             on:mousedown={() => selectItem(i)}
+             on:mouseover={() => mouseoverItem(i)}
+             on:mouseleave={() => mouseleaveItem(i)}>
           {item.label}
         </div>
       {/each}
@@ -146,7 +248,8 @@
   .select-list-item {
     color: #ccc;
   }
-  .select-list-item:hover {
+  .select-list-item.hover,
+  .select-list-item.focused {
     background: var(--color-form-bg-hover);
   }
 
