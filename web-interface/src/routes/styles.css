@@ -1,6 +1,7 @@
 @import '@fontsource/fira-mono';
 
 :root {
+  --border-radius-input-single: 12px;
   --border-radius-input: 12px;
   --color-bg-main: #333;
 	--color-bg-preview: #FFF;
@@ -8,8 +9,12 @@
 	--color-text: #CCC;
   --color-form-bg: #222;
   --color-form-bg-hover: #444;
+  --color-form-bg-active: #555;
   --color-form-text: #aaa;
   --color-form-text-hover: #eee;
+  --color-form-text-hover-active: #fff;
+  --input-height: 36px;
+  --grid-gap: 12px 8px;
   --font-body: 'Comfortaa', 'Segoe UI', Roboto, Oxygen, Ubuntu,
   Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
   --font-mono: 'Fira Mono', monospace;
@@ -48,18 +53,25 @@ pre {
 input,
 button {
   background: var(--color-form-bg);
-  border: 1px solid var(--color-form-bg-hover);;
+  border: 1px solid var(--color-form-bg-hover);
   border-radius: var(--border-radius-input);
+  box-sizing: border-box;
   color: var(--color-form-text);
   cursor: pointer;
   font-size: inherit;
 	font-family: inherit;
+  height: var(--input-height, 36px);
   padding: 8px 12px;
 }
 input:enabled:hover,
 button:enabled:hover {
   background: var(--color-form-bg-hover);
   color: var(--color-form-text-hover);
+}
+input:enabled:active,
+button:enabled:active {
+  background: var(--color-form-bg-active);
+  color: var(--color-form-text-active);
 }
 input:disabled,
 button:disabled {

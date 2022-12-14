@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type {Field,  DeviceFieldValue as FieldValue } from "$lib/types";
 	import Checkbox from "../basic/Checkbox.svelte";
+	import Labeled from "../basic/Labeled.svelte";
 	import Select from "../Select.svelte";
   import FieldInput from './FieldInput.svelte';
 
@@ -13,67 +14,47 @@
 
 <div class="field" style="z-index: {zIndex}">
   {#if field.oneofs.length > 0}
-    <div class="label">
-      <Select items={field.oneofs} 
-              bind:selectedIndex={fieldValue.oneofKey}
-              arrowRight={false} />
-    </div>
-    <div class="field-input-container">
-      <FieldInput id={inputId}
-                  typeOption={fieldValue}
-                  units={units}
-                  field={field.oneofs[fieldValue.oneofKey]} />
-    </div>
+    <FieldInput id={inputId}
+                typeOption={fieldValue}
+                units={units}
+                field={field.oneofs[fieldValue.oneofKey]}>
+      <span slot="label">
+        <Select items={field.oneofs} 
+            bind:selectedIndex={fieldValue.oneofKey}
+            arrowRight={false} />
+      </span>
+    </FieldInput>
   {:else if field.type === "Unit"}
-    <Select id={inputId}
-            label={field.label}
-            items={units}
-            bind:selectedIndex={fieldValue.oneofKey} />
+    <Labeled inputId={inputId}>
+      <span slot="label">{field.label}</span>
+      <span slot="content">
+        <Select id={inputId}
+            
+        items={units}
+        bind:selectedIndex={fieldValue.oneofKey} />
+      </span>
+    </Labeled>
   {:else if field.type === "bool"}
     <Checkbox bind:value={fieldValue.booleanValue}>
       {field.label}
     </Checkbox>
   {:else if field.repeated === false}
-    <label class="label" for="{inputId}">
-      {field.label}
-    </label>
-    <div class="field-input-container">
-      <FieldInput id={inputId}
-                  typeOption={fieldValue}
-                  units={units}
-                  field={field} />
-    </div>
+     <FieldInput id={inputId}
+                typeOption={fieldValue}
+                units={units}
+                field={field}>
+      <span slot="label">
+        {field.label}
+      </span>
+    </FieldInput>
   {/if}
 </div>
 
 <style>
-  .label {
-    --select-arrow-size: 4px;
-    --select-arrow-gap: 4px;
-    --select-arrow-margin: -2px 10px 0;
-    --select-border-width: 0;
-    --select-color: var(--color-text);
-    --select-color-hover: #fff;
-    --select-color-bg: var(--color-bg-main);
-    --select-color-bg-hover: #555;
-    --select-font-size: 12px;
-    --select-height: 20px;
-    --select-padding: 0 8px;
-    --select-margin: -3px 0 -3px -8px;
-    --select-width: auto;
-    font-size: 12px;
-    margin: 0 0 4px 4px;
-  }
-
   .field {
     display: flex;
     flex: 1 0 40px;
     flex-direction: column;
     max-width: 127px;
-  }
-
-  .field-input-container {
-    display: flex;
-    flex-direction: row;
   }
 </style>

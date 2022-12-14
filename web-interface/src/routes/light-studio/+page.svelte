@@ -52,7 +52,7 @@
 <svelte:window bind:innerHeight={windowHeight}/>
 
 <svelte:head>
-	<title>Letabledon</title>
+	<title>Ledabledon</title>
 	<meta name="description" content="Ledableton" />
 </svelte:head>
 

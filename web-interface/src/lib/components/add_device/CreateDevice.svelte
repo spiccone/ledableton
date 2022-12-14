@@ -104,7 +104,7 @@
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
-    gap: 12px 8px;
+    gap: var(--grid-gap, 12px 8px);
     margin-top: 10px;
   }
 </style>

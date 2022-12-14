@@ -1,5 +1,6 @@
 <script lang="ts">
-	import type {Field,  DeviceFieldValue as FieldValue, SimpleField } from "$lib/types";
+	import type {DeviceFieldValue as FieldValue, SimpleField } from "$lib/types";
+	import Labeled from "../basic/Labeled.svelte";
 	import Select from "../Select.svelte";
 
 
@@ -10,21 +11,30 @@
 
 </script>
 
-<input id={id} 
-        class="field-input{field.type === 'Dimension' ? ' has-select' : ''}"
-        type="number"
-        bind:value= {typeOption.value}
-        size=10 />
-{#if field.type === "Dimension"}
-  <div class="dimension-select">
-    <Select id={id + "_units"} 
-            items={units} 
-            bind:selectedIndex={typeOption.unitKey}
-            showArrow={false} />
-  </div>
-{/if}
+<Labeled inputId={id}>
+  <span slot="label"><slot name="label"></slot></span>
+  <span class="field-input-container" slot="content">
+    <input id={id} 
+            class="field-input{field.type === 'Dimension' ? ' has-select' : ''}"
+            type="number"
+            bind:value= {typeOption.value}
+            size=10 />
+    {#if field.type === "Dimension"}
+      <div class="dimension-select">
+        <Select id={id + "_units"} 
+                items={units} 
+                bind:selectedIndex={typeOption.unitKey}
+                showArrow={false} />
+      </div>
+    {/if}
+  </span>
+</Labeled>
 
 <style>
+  .field-input-container {
+    display: flex;
+    flex-direction: row;
+  }
   .field-input {
     flex: 1 1 0;
     min-width: 40px;

@@ -1,10 +1,13 @@
 <script lang="ts">
 	import type { DeviceFieldValue, DeviceType, Field } from "$lib/types";
   import Icon from '@iconify/svelte';
+  import autoAwesomeMotionOutlineRounded from '@iconify/icons-material-symbols/auto-awesome-motion-outline-rounded';
   import roundPlus from '@iconify/icons-ic/round-plus';
   import roundMinus from '@iconify/icons-ic/round-minus';
 	import Checkbox from "../basic/Checkbox.svelte";
 	import FieldDisplay from "./FieldDisplay.svelte";
+  import Labeled from "../basic/Labeled.svelte";
+	import SplitInput from "../basic/SplitInput.svelte";
 
   export let fields : Field[];
   export let fieldValues : DeviceFieldValue[];
@@ -18,7 +21,10 @@
   let rowFieldValue : DeviceFieldValue;
   let unitFieldValue : DeviceFieldValue;
 
-  let alignTop = false;
+  let alignTop = true;
+
+  let columnAutoFill = 20;
+  let rowAutoFill = 30;
 
   for (let [index, field] of fields.entries()) {
     switch (field.key) {
@@ -48,7 +54,7 @@
 
   function addRow() {
     const numRows = columnFieldValue.nestedRepeatedValue.length;
-    if (numRows > 0) {rowFieldValue.addToRepeatedValue(0);}
+    if (numRows > 0) {rowFieldValue.addToRepeatedValue(rowAutoFill);}
     columnFieldValue.addToRepeatedValue([0]);
     columnFieldValue = columnFieldValue;
   }
@@ -60,7 +66,7 @@
   }
 
   function addColumn(index: number) {
-    columnFieldValue.addToNestedRepeatedValue(index, 0);
+    columnFieldValue.addToNestedRepeatedValue(index, columnAutoFill);
     columnFieldValue = columnFieldValue;
   }
 
@@ -76,17 +82,72 @@
       for (let columnList of columnFieldValue.nestedRepeatedValue) {
         columnList[0] = 0;
       }
+    } 
+  }
+
+  function fillColumns() {
+    for (let columnList of columnFieldValue.nestedRepeatedValue) {
+      for (let i=0; i<columnList.length; i++) {
+        columnList[i] = columnAutoFill;
+      } 
     }
+    columnFieldValue = columnFieldValue;
+  }
+
+  function fillRows() {
+    const rowList = rowFieldValue.repeatedValue;
+    for (let i=0; i<rowList.length; i++) {
+      rowList[i]= rowAutoFill;
+    }
+    rowFieldValue = rowFieldValue;
   }
 </script>
 
 <div class="BucketedVariableColumns">
   <div class="options">
-    <FieldDisplay inputId=field_bvc_unit
-                  field={unitField}
-                  fieldValue={unitFieldValue}
-                  units={units}
-                  zIndex={20} />
+    <div class="option-item">
+      <FieldDisplay inputId="field_bvc_unit"
+                    field={unitField}
+                    fieldValue={unitFieldValue}
+                    units={units}
+                    zIndex={20} />
+    </div>
+    <div class="option-item">
+      <Labeled inputId="field_bvc_rowFill">
+        <span slot="label">Fill rows</span>
+        <span slot="content">
+          <SplitInput>
+            <input slot="first" 
+                   id="field_bvc_rowFill" 
+                   class="option-input"
+                   type="number" 
+                   bind:value={rowAutoFill} />
+            <button slot="second"
+                    on:click={fillRows}>
+              <Icon icon={autoAwesomeMotionOutlineRounded} />
+            </button>
+          </SplitInput>
+        </span>
+      </Labeled>
+    </div>
+    <div class="option-item">
+      <Labeled inputId="field_bvc_columnFill">
+        <span slot="label">Fill columns</span>
+        <span slot="content">
+          <SplitInput>
+            <input slot="first" 
+                   id="field_bvc_columnFill" 
+                   class="option-input"
+                   type="number" 
+                   bind:value={columnAutoFill} />
+            <button slot="second"
+                    on:click={fillColumns}>
+              <Icon icon={autoAwesomeMotionOutlineRounded} />
+            </button>
+          </SplitInput>
+        </span>
+      </Labeled>
+    </div>
   </div>
   <div class="column-container">
     <div class="variable-columns{alignTop ? ' align-top' : ''}">
@@ -150,7 +211,17 @@
     align-items: flex-end;
     display: flex;
     flex-direction: row;
+    gap: var(--grid-gap, 12px 8px);
   }
+
+  .option-item {
+    flex: 0 1 auto;
+  }
+
+  .option-input {
+    max-width: 80px;
+  }
+
   .column-container{
     border: 1px dashed var(--color-border);
     border-radius: 12px;
@@ -216,6 +287,7 @@
     border-radius: 4px;
     box-sizing: border-box;
     font-size: 12px;
+    height: auto;
     padding: 4px 6px 2px 6px;
     width: 100%;
   }

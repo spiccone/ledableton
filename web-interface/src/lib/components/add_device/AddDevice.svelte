@@ -20,7 +20,7 @@
 
   let selectedSavedDevice : SavedDevice;
 
-  let selectedDeviceType : DeviceType;
+  let selectedDeviceType : DeviceType | null;
   let selectedTypeFields : FieldValue[] | null;
   let selectedDeviceBucket : DeviceType | null;
   let selectedDeviceBucketFields : FieldValue[] | null;
@@ -79,6 +79,7 @@
   });
 
   function openCreateNewDevice() {
+    selectedDeviceType = null;
     selectedTypeFields = null;
     selectedDeviceBucket = null;
     selectedDeviceBucketFields = null;
@@ -127,7 +128,7 @@
   }
 
   function handleSave() {
-    const deviceKey = selectedDeviceType.key + '_' + deviceKeyIndex++;
+    const deviceKey = selectedDeviceType?.key + '_' + deviceKeyIndex++;
     const device = edit ?
         selectedSavedDevice :
         new SavedDevice(deviceKey, deviceName);
@@ -332,8 +333,10 @@
     background: none;
     border: 0 solid var(--color-border);
     border-radius: var(--border-radius-input);
+    box-sizing: content-box;
     color: var(--color-text, #ccc);
     font-size: 18px;
+    height: fit-content;
     margin: 2px;
     padding: 7px 6px 6px;
     width: 100%;

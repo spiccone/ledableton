@@ -4,7 +4,6 @@
   export let items : {key : string, label : string}[] = [];
   export let selectedItem : {key : string, label : string} | undefined | null = undefined;
   export let selectedIndex : number | null = 0;
-  export let label : string | null = null;
   export let id = "";
   export let showArrow = true;
   export let arrowRight = true;
@@ -140,14 +139,9 @@
 <div class="Select {open ? 'open' : 'closed'}
                    {showArrow ? 'has-arrow' : ''}
                    {arrowRight ? 'arrow-right' : ''}">
-  {#if label}
-    <div class="label">
-      {label}
-    </div>
-  {/if}
-  <div id={id} class="select-box">
+  <div class="select-box">
     <div class="item-spacer-list">
-      {#each items as item, i (id + "_spacer_" + i)}
+      {#each items as item, i ("spacer_" + i)}
         <div class="item-spacer">
           <div class="item-label">
             {item.label}
@@ -161,7 +155,7 @@
          on:keydown={keydown}
          tabindex=0>
       <!-- svelte-ignore a11y-click-events-have-key-events -->
-      <div class="selected-list-item {id}"
+      <div class="selected-list-item"
            on:click={toggleSelect}>
         <div class="item-label">
           {selectedItem?.label}
@@ -169,8 +163,9 @@
       </div>
       <div class="select-list">
         {#each items as item, i (item.key)}
+          <!-- If this id is removed focus highlight doesn't work - no clue why -->
           <!-- svelte-ignore a11y-click-events-have-key-events -->
-          <div class="select-list-item" 
+          <div class="select-list-item {id}" 
               bind:this={itemElements[i]}
               on:click={() => selectItem(i)}>
             <div class="item-label">
@@ -181,8 +176,6 @@
       </div>
     </div>
   </div>
-  <!-- svelte-ignore a11y-click-events-have-key-events -->
-  <div class="cover" on:click={closeSelect}></div>
 </div>
 
 <style>
@@ -198,11 +191,6 @@
   
   .select-box {
     position: relative;
-  }
-
-  .label {
-    font-size: 12px;
-    margin: 0 0 4px 4px;
   }
 
   .select-list-container,
