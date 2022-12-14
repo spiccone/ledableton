@@ -27,6 +27,7 @@
 
   let createDevice = savedDevices.length == 0;
 
+  let error = false;
   let deviceName = "";
   let deviceKeyIndex = 0;
 
@@ -127,6 +128,14 @@
     deviceName = "";
   }
 
+  function mouseOverSave() {
+    error = true;
+  }
+
+  function mouseLeaveSave() {
+    error = false;
+  }
+
   function handleSave() {
     const deviceKey = selectedDeviceType?.key + '_' + deviceKeyIndex++;
     const device = edit ?
@@ -175,7 +184,8 @@
       {#if createDevice || savedDevices.length == 0}
       <!-- createDevice should be true when savedDevices is empty -->
         <div class="device-name-container">
-          <input type="text" 
+          <input class:error
+                 type="text" 
                  class="device-name" 
                  bind:value={deviceName}
                  placeholder="New device" />
@@ -216,11 +226,19 @@
     </div>
   </div>
   <div class="footer" slot="footer">
-    {#if createDevice}
-      <button class="submit" on:click={handleSave} disabled={deviceName === ''}>Save Device</button>
-    {:else}
-      <button class="submit" on:click={handleAdd}>Add Device</button>
-    {/if}
+    <!-- svelte-ignore a11y-mouse-events-have-key-events -->
+    <div class="submit-container"
+         on:mouseover={mouseOverSave}
+         on:mouseleave={mouseLeaveSave}>
+      {#if createDevice}
+        <button on:click={handleSave}
+                disabled={deviceName === ''}>
+          Save Device
+        </button>
+      {:else}
+        <button on:click={handleAdd}>Add Device</button>
+      {/if}
+    </div>
   </div>
 </Modal>
 
@@ -311,20 +329,21 @@
   .outer-section,
   .inner-section {
     border: 1px dashed var(--color-border);
-    border-radius: var(--corner-input);
   }
   .outer-section {
+    border-radius: 18px;
     display: flex;
     flex-direction: column;
     padding: 8px;
   }
   .inner-section {
-    margin-top: 12px;
+    border-radius: 12px;
     padding: 8px;
     width: 100%;
   }
 
   .device-name-container {
+    /* This is so the text is aligned instead of the focus border. */
     margin: -4px -4px 12px -4px;
     display: flex;
   }
@@ -347,6 +366,11 @@
   }
   .device-name:focus {
     border-width: 2px;
+    margin: 0;
+  }
+  .device-name.error {
+    border-width: 2px;
+    border-color: var(--color-error);
     margin: 0;
   }
 

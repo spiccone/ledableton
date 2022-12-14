@@ -19,12 +19,12 @@
     --select-color-hover: #fff;
     --select-color-bg: var(--color-bg-main);
     --select-color-bg-hover: #444;
-    --select-font-size: 12px;
+    --select-font-size: var(--font-size-label, 12px);
     --select-height: 20px;
     --select-padding: 0 8px;
     --select-margin: -3px 0 -3px -8px;
     --select-width: auto;
-    font-size: 12px;
+    font-size: var(--font-size-label, 12px);
     margin: 0 0 4px 4px;
     width: fit-content;
   }
