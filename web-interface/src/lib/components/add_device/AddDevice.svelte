@@ -129,7 +129,9 @@
   }
 
   function mouseOverSave() {
-    error = true;
+    if (deviceName === '') {
+      error = true;
+    }
   }
 
   function mouseLeaveSave() {
@@ -204,8 +206,7 @@
       {:else}
         <div class="saved-device-container">
           <div class="saved-select">
-            <Select id="devices" 
-                    items={savedDevices} 
+            <Select items={savedDevices} 
                     bind:selectedItem={selectedSavedDevice} />
           </div>
           <button class="icon-button" on:click={editDevice}>
