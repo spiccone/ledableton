@@ -1,7 +1,7 @@
 <script lang="ts">
   import {onMount} from 'svelte';
   import {DeviceFieldValue as FieldValue, DeviceType, type SavedDevice} from '$lib/types';
-  import Select from '../Select.svelte';
+  import Select from '../basic/Select.svelte';
   import Icon from '@iconify/svelte';
   import roundPlus from '@iconify/icons-ic/round-plus';
   import folderOpenOutlineRounded from '@iconify/icons-material-symbols/folder-open-outline-rounded';

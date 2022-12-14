@@ -2,7 +2,7 @@
 	import type {Field,  DeviceFieldValue as FieldValue } from "$lib/types";
 	import Checkbox from "../basic/Checkbox.svelte";
 	import Labeled from "../basic/Labeled.svelte";
-	import Select from "../Select.svelte";
+	import Select from "../basic/Select.svelte";
   import FieldInput from './FieldInput.svelte';
 
   export let field: Field;
@@ -29,9 +29,8 @@
       <span slot="label">{field.label}</span>
       <span slot="content">
         <Select id={inputId}
-            
-        items={units}
-        bind:selectedIndex={fieldValue.oneofKey} />
+                items={units}
+                bind:selectedIndex={fieldValue.oneofKey} />
       </span>
     </Labeled>
   {:else if field.type === "bool"}

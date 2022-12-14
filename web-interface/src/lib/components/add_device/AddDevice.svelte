@@ -2,7 +2,7 @@
   import {onMount} from 'svelte';
   import {DeviceType, Field, DeviceFieldValue as FieldValue, SavedDevice} from '$lib/types';
   import Modal from '../Modal.svelte';
-  import Select from '../Select.svelte';
+  import Select from '../basic/Select.svelte';
   import Icon from '@iconify/svelte';
   import roundPlus from '@iconify/icons-ic/round-plus';
   import editOutlineRounded from '@iconify/icons-material-symbols/edit-outline-rounded';

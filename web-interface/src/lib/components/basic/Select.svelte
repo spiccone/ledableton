@@ -4,14 +4,13 @@
   export let items : {key : string, label : string}[] = [];
   export let selectedItem : {key : string, label : string} | undefined | null = undefined;
   export let selectedIndex : number | null = 0;
-  export let id = "";
   export let showArrow = true;
   export let arrowRight = true;
 
   let open = false;
-  let listElement : HTMLElement;
-  let itemElements : HTMLElement[] = Array(items.length);
   let activeIndex : number | null = null;
+
+  let focusedElements: boolean[] = Array(items.length);
 
   const dispatch = createEventDispatcher();
 
@@ -44,7 +43,7 @@
 
   function closeSelect() {
     if (activeIndex !== null) {
-      itemElements[activeIndex].classList.remove("focused");
+      focusedElements[activeIndex] = false;
       activeIndex = null;
     }
     open = false;
@@ -64,7 +63,7 @@
       e.preventDefault();
       e.stopPropagation();
     }
-    if (itemElements.length == 0) {
+    if (items.length == 0) {
       return;
     }
 
@@ -110,12 +109,12 @@
     if (activeIndex === null) {
       activeIndex = 0;
     } else {
-      itemElements[activeIndex].classList.remove("focused");
-      if (++activeIndex >= itemElements.length) {
-        activeIndex = itemElements.length - 1;
+      focusedElements[activeIndex] = false;
+      if (++activeIndex >= items.length) {
+        activeIndex = items.length - 1;
       }
     }
-    itemElements[activeIndex].classList.add("focused");
+    focusedElements[activeIndex] = true;
   }
 
   function onArrowUp(open : boolean) {
@@ -123,14 +122,14 @@
       openSelect();
     }
     if (activeIndex === null) {
-      activeIndex = itemElements.length - 1;
+      activeIndex = items.length - 1;
     } else {
-      itemElements[activeIndex].classList.remove("focused");
+      focusedElements[activeIndex] = false;
       if (--activeIndex < 0) {
         activeIndex = 0;
       }
     }
-    itemElements[activeIndex].classList.add("focused");
+    focusedElements[activeIndex] = true;
   }
 </script>
 
@@ -150,7 +149,6 @@
       {/each}
     </div>
     <div class="select-list-container"
-         bind:this={listElement}
          role="button"
          on:keydown={keydown}
          tabindex=0>
@@ -165,9 +163,9 @@
         {#each items as item, i (item.key)}
           <!-- If this id is removed focus highlight doesn't work - no clue why -->
           <!-- svelte-ignore a11y-click-events-have-key-events -->
-          <div class="select-list-item {id}" 
-              bind:this={itemElements[i]}
-              on:click={() => selectItem(i)}>
+          <div class="select-list-item" 
+               class:focused={focusedElements[i]}
+               on:click={() => selectItem(i)}>
             <div class="item-label">
               {item.label}
             </div>
