@@ -20,16 +20,15 @@
                 field={field.oneofs[fieldValue.oneofKey]}>
       <span slot="label">
         <Select items={field.oneofs} 
-            bind:selectedIndex={fieldValue.oneofKey}
-            arrowRight={false} />
+                bind:selectedIndex={fieldValue.oneofKey}
+                arrowRight={false} />
       </span>
     </FieldInput>
   {:else if field.type === "Unit"}
     <Labeled inputId={inputId}>
       <span slot="label">{field.label}</span>
       <span slot="content">
-        <Select id={inputId}
-                items={units}
+        <Select items={units}
                 bind:selectedIndex={fieldValue.oneofKey} />
       </span>
     </Labeled>

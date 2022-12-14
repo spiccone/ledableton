@@ -21,8 +21,7 @@
             size=10 />
     {#if field.type === "Dimension"}
       <div class="dimension-select">
-        <Select id={id + "_units"} 
-                items={units} 
+        <Select items={units} 
                 bind:selectedIndex={typeOption.unitKey}
                 showArrow={false} />
       </div>

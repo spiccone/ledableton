@@ -47,8 +47,7 @@
   {#if deviceTypes.length > 0}
     <label class="label" for="deviceTypes">{deviceTypeLabel}</label>
     <div class="device-select" style="z-index: 2">
-      <Select id="deviceTypes" 
-              items={deviceTypes} 
+      <Select items={deviceTypes} 
               bind:selectedItem={selectedItem}
               bind:selectedIndex={selectedTypeIndex}
               on:select={handleDeviceSelect}/>
