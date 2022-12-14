@@ -174,6 +174,7 @@
       </div>
     </div>
   </div>
+  <!-- Not using cover so it scrolls. Downside is you can click other items while open. -->
   <!-- <div class="cover"></div> -->
 </div>
 
