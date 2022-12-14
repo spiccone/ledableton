@@ -57,13 +57,12 @@
   <div class="Modal" use:modalAction tabindex="0">
     <!-- svelte-ignore a11y-click-events-have-key-events -->
     <div class="backdrop" on:click={close} />
-    <!-- svelte-ignore a11y-click-events-have-key-events -->
     <div class="content-wrapper">
       <div class="header">
         <slot name="header" {store}/>
-        <div class="close" on:click={close}>
+        <button class="close" on:click={close} tabindex=0>
           <Icon icon={roundClose} />
-        </div>
+        </button>
       </div>
       <div class="content">
         <slot name="content" {store}/>
@@ -129,9 +128,13 @@
   }
 
   .close {
+    background: none;
+    border: none;
+    border-radius: 12px;
     color: var(--color-form-text);
     cursor: pointer;
     flex: 0 0 auto;
+    padding: 0px;
     height: 36px;
     width: 36px;
   }

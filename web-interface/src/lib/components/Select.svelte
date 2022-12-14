@@ -10,6 +10,7 @@
   export let arrowRight = true;
 
   let open = false;
+  let listElement : HTMLElement;
   let itemElements : HTMLElement[] = Array(items.length);
   let activeIndex : number | null = null;
 
@@ -36,6 +37,12 @@
     open = true;
   }
 
+  function handleWindowClick() {
+    if (open) {
+      closeSelect();
+    }
+  }
+
   function closeSelect() {
     if (activeIndex !== null) {
       itemElements[activeIndex].classList.remove("focused");
@@ -51,14 +58,6 @@
     dispatch('select', {
 			selectedIndex: selectedIndex
 		});
-  }
-
-  function mouseoverItem(index : number) {
-    itemElements[index].classList.add("hover");
-  }
-
-  function mouseleaveItem(index : number) {
-    itemElements[index].classList.remove("hover");
   }
 
   function keydown(e : KeyboardEvent) {
@@ -136,6 +135,8 @@
   }
 </script>
 
+<svelte:window on:mouseup={handleWindowClick}/>
+
 <div class="Select {open ? 'open' : 'closed'}
                    {showArrow ? 'has-arrow' : ''}
                    {arrowRight ? 'arrow-right' : ''}">
@@ -155,23 +156,23 @@
       {/each}
     </div>
     <div class="select-list-container"
+         bind:this={listElement}
          role="button"
          on:keydown={keydown}
          tabindex=0>
+      <!-- svelte-ignore a11y-click-events-have-key-events -->
       <div class="selected-list-item {id}"
-           on:mousedown={toggleSelect}>
+           on:click={toggleSelect}>
         <div class="item-label">
           {selectedItem?.label}
         </div>
       </div>
       <div class="select-list">
         {#each items as item, i (item.key)}
-          <!-- svelte-ignore a11y-mouse-events-have-key-events -->
+          <!-- svelte-ignore a11y-click-events-have-key-events -->
           <div class="select-list-item" 
               bind:this={itemElements[i]}
-              on:mousedown={() => selectItem(i)}
-              on:mouseover={() => mouseoverItem(i)}
-              on:mouseleave={() => mouseleaveItem(i)}>
+              on:click={() => selectItem(i)}>
             <div class="item-label">
               {item.label}
             </div>
@@ -265,7 +266,7 @@
   }
 
   .selected-list-item:hover,
-  .select-list-item.hover,
+  .select-list-item:hover,
   .select-list-item.focused {
     background: var(--select-color-bg-hover, var(--color-form-bg-hover));
   }
@@ -282,20 +283,6 @@
     overflow: hidden;
     text-overflow: ellipsis;
   }
-
-  .cover {
-    display: none;
-    position: fixed;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    z-index: 2;
-  }
-  .open .cover {
-    display: block;
-  }
-
   .has-arrow .selected-list-item::after {
     border: 2px solid #999;;
     border-radius: 1px;
