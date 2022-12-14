@@ -18,7 +18,7 @@
     --select-color: var(--color-text);
     --select-color-hover: #fff;
     --select-color-bg: var(--color-bg-main);
-    --select-color-bg-hover: #555;
+    --select-color-bg-hover: #444;
     --select-font-size: 12px;
     --select-height: 20px;
     --select-padding: 0 8px;

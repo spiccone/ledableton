@@ -1,18 +1,17 @@
 @import '@fontsource/fira-mono';
 
 :root {
-  --border-radius-input-single: 12px;
-  --border-radius-input: 12px;
   --color-bg-main: #333;
 	--color-bg-preview: #FFF;
   --color-border: #555;
 	--color-text: #CCC;
-  --color-form-bg: #222;
-  --color-form-bg-hover: #444;
-  --color-form-bg-active: #555;
-  --color-form-text: #aaa;
-  --color-form-text-hover: #eee;
-  --color-form-text-hover-active: #fff;
+  --color-input-bg: #222;
+  --color-input-bg-hover: #444;
+  --color-input-bg-active: #555;
+  --color-input-text: #aaa;
+  --color-input-text-hover: #eee;
+  --color-input-text-hover-active: #fff;
+  --corner-input: 12px;
   --input-height: 36px;
   --grid-gap: 12px 8px;
   --font-body: 'Comfortaa', 'Segoe UI', Roboto, Oxygen, Ubuntu,
@@ -52,12 +51,11 @@ pre {
 
 input,
 button {
-  background: var(--color-form-bg);
-  border: 1px solid var(--color-form-bg-hover);
-  border-radius: var(--border-radius-input);
+  background: var(--color-input-bg);
+  border: 1px solid var(--color-input-bg-hover);
+  border-radius: var(--corner-input);
   box-sizing: border-box;
-  color: var(--color-form-text);
-  cursor: pointer;
+  color: var(--color-input-text);
   font-size: inherit;
 	font-family: inherit;
   height: var(--input-height, 36px);
@@ -65,13 +63,13 @@ button {
 }
 input:enabled:hover,
 button:enabled:hover {
-  background: var(--color-form-bg-hover);
-  color: var(--color-form-text-hover);
+  background: var(--color-input-bg-hover);
+  color: var(--color-input-text-hover);
 }
 input:enabled:active,
 button:enabled:active {
-  background: var(--color-form-bg-active);
-  color: var(--color-form-text-active);
+  background: var(--color-input-bg-active);
+  color: var(--color-input-text-active);
 }
 input:disabled,
 button:disabled {
@@ -83,17 +81,19 @@ button:focus:not(:focus-visible) {
 	outline: none;
 }
 
-input[type="text"],
-input[type="number"] {
+input {
   cursor: text;
+}
+button,
+input[type="checkbox"],
+input[type="radio"],
+input[type="buttons"] {
+  cursor: pointer;
 }
 
 input[type="checkbox"] {
   appearance: none;
-  background: var(--color-form-bg, #222);
-  border: 1px solid var(--color-border);
   border-radius: 6px;
-  cursor: pointer;
   display: grid;
   height: 18px;
   margin: 0;
@@ -103,7 +103,7 @@ input[type="checkbox"] {
 }
 input[type="checkbox"]::before {
   content: "";
-  background: var(--color-form-text);
+  background: currentColor;
   border-radius: 2px;
   clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%);
   height: 8px;
@@ -113,12 +113,6 @@ input[type="checkbox"]::before {
 }
 input[type="checkbox"]:checked::before {
   transform: scale(1);
-}
-input[type="checkbox"]:hover {
-  background-color: var(--color-form-bg-hover, #444);
-}
-input[type="checkbox"]:hover:checked::before {
-  background-color: var(--color-form-text-hover, #444);
 }
 input[type=number]::-webkit-inner-spin-button {
   -webkit-appearance: none;

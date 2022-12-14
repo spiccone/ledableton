@@ -2,6 +2,7 @@ syntax = "proto3";
 package devicepackage;
 
 message Device {
+  string id = 0;
   string name = 1;
   Type type = 2;
 }
@@ -62,6 +63,6 @@ message BucketedVariableColumns {
   }
   repeated uint32 row_spacing = 2;
   repeated VariableColumn columns = 3;
-  Unit unit = 4;
+  Unit units = 4;
   Type bucket_type = 5;
 }

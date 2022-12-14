@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { DeviceFieldValue, DeviceType, Field } from "$lib/types";
+	import type { DeviceFieldValue, Field } from "$lib/types";
   import Icon from '@iconify/svelte';
   import autoAwesomeMotionOutlineRounded from '@iconify/icons-material-symbols/auto-awesome-motion-outline-rounded';
   import roundPlus from '@iconify/icons-ic/round-plus';
@@ -36,7 +36,7 @@
         rowField = field;
         rowFieldValue = fieldValues[index];
         break;
-      case "unit":
+      case "units":
         unitField = field;
         unitFieldValue = fieldValues[index];
         break;
@@ -87,7 +87,7 @@
 
   function fillColumns() {
     for (let columnList of columnFieldValue.nestedRepeatedValue) {
-      for (let i=0; i<columnList.length; i++) {
+      for (let i=1; i<columnList.length; i++) {
         columnList[i] = columnAutoFill;
       } 
     }

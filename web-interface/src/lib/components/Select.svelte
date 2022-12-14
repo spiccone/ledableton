@@ -36,7 +36,7 @@
     open = true;
   }
 
-  function handleWindowClick() {
+  function handleWindowClick(e : MouseEvent) {
     if (open) {
       closeSelect();
     }
@@ -134,7 +134,7 @@
   }
 </script>
 
-<svelte:window on:mouseup={handleWindowClick}/>
+<svelte:window on:mouseup={handleWindowClick} />
 
 <div class="Select {open ? 'open' : 'closed'}
                    {showArrow ? 'has-arrow' : ''}
@@ -176,6 +176,7 @@
       </div>
     </div>
   </div>
+  <!-- <div class="cover"></div> -->
 </div>
 
 <style>
@@ -199,10 +200,10 @@
     border-width: var(--select-border-width, 1px);
     border-radius: var(--select-border-radius, 12px);
     box-sizing: border-box;
-    width: var(--select-width, auto);
+    width: var(--select-width, 100%);
   }
   .select-list-container {
-    border-color: var(--select-border-color, var(--color-form-bg-hover));
+    border-color: var(--select-border-color, var(--color-input-bg-hover));
     display: flex;
     flex-direction: column;
     overflow: hidden;
@@ -256,14 +257,19 @@
   .selected-list-item:hover,
   .select-list-item:hover,
   .select-list-item.focused {
-    background: var(--select-color-bg-hover, var(--color-form-bg-hover));
+    background: var(--select-color-bg-hover, var(--color-input-bg-hover));
+  }
+
+  .selected-list-item:active,
+  .select-list-item:active {
+    background: var(--select-color-bg-active, var(--color-input-bg-active));
   }
 
   .selected-list-item {
-    color: var(--select-color, var(--color-form-text));
+    color: var(--select-color, var(--color-input-text));
   }
   .closed .selected-list-item:hover {
-    color: var(--select-color-hover, var(--color-form-text-hover));
+    color: var(--select-color-hover, var(--color-input-text-hover));
   }
 
   .item-label {
@@ -299,5 +305,18 @@
   .has-arrow.open .selected-list-item::after {
     -webkit-transform: rotate(135deg);
     transform: rotate(135deg);
+  }
+
+  .cover {
+    display: none;
+    position: fixed;
+    bottom: 0;
+    top: 0;
+    left: 0;
+    right: 0;
+  }
+
+  .open .cover {
+    display: block;
   }
 </style>

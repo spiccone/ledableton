@@ -131,7 +131,7 @@
     background: none;
     border: none;
     border-radius: 12px;
-    color: var(--color-form-text);
+    color: var(--color-input-text);
     cursor: pointer;
     flex: 0 0 auto;
     padding: 0px;
@@ -139,6 +139,6 @@
     width: 36px;
   }
   .close:hover {
-    color: var(--color-form-text-hover);
+    color: var(--color-input-text-hover);
   }
 </style>

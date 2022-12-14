@@ -94,7 +94,7 @@
 
   .device-select {
     --select-width: 100%;
-    --select-color-bg: var(--color-form-bg);
+    --select-color-bg: var(--color-input-bg);
     display: flex;
     flex-direction: row;
     width: 100%;

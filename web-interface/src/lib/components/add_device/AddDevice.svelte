@@ -311,7 +311,7 @@
   .outer-section,
   .inner-section {
     border: 1px dashed var(--color-border);
-    border-radius: var(--border-radius-input);
+    border-radius: var(--corner-input);
   }
   .outer-section {
     display: flex;
@@ -332,7 +332,7 @@
   .device-name {
     background: none;
     border: 0 solid var(--color-border);
-    border-radius: var(--border-radius-input);
+    border-radius: var(--corner-input);
     box-sizing: content-box;
     color: var(--color-text, #ccc);
     font-size: 18px;

@@ -2,6 +2,10 @@
   import {createEventDispatcher} from 'svelte';
   export let value: boolean;
 
+  function toggleSelect() {
+    value = !value;
+  }
+  
   const dispatch = createEventDispatcher();
   function onChange() {
     dispatch('change', {});
@@ -11,7 +15,8 @@
 <label class="checkbox">
   <input type="checkbox" 
           bind:checked={value}
-          on:change={onChange} />
+          on:change={onChange}
+          on:keypress={toggleSelect} />
   <slot></slot>
 </label>
 
