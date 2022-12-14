@@ -58,60 +58,89 @@ export class Field {
   }
 }
 
+/* The repated values are listed separately and not null so we can bind to them. */
 export class DeviceFieldValue {
   key: string;
-  value: number;
-  repeatedValue: number[];
-  nestedRepeatedValue: number[][];
+  type: string;
+  value: number | number[] | number[][] = 0;
   unitKey: number | null;
-  oneofKey: number;
-  booleanValue : boolean;
+  oneofKey: number = 0;
+  oneOfKeys: string[] = [];
 
-  constructor(key: string, unitKey: number | null) {
+  repeated: boolean = false;
+  nestedRepeated: boolean = true;
+
+  constructor(key: string, type: string, unitKey?: number|null) {
     this.key = key;
-    this.value = 0;
-    this.unitKey = unitKey;
-    this.oneofKey = 0;
-    this.repeatedValue = [];
-    this.nestedRepeatedValue = [];
-    this.booleanValue = false;
+    this.type = type;
+    this.unitKey = unitKey ? unitKey : null;
   }
 
-  addToRepeatedValue(value: number[] | number) {
-    if (typeof value === "number") {
-      this.repeatedValue.push(value);
-    } else {
-      this.nestedRepeatedValue.push(value);
+  getKey() {
+    if (this.oneOfKeys.length > 0) {
+      return this.oneOfKeys[this.oneofKey];
+    }
+    return this.key;
+  }
+
+  getValue() {
+    if (this.unitKey !== null && !Array.isArray(this.value)) {
+      return {unit: this.unitKey, dimension: this.value};
+    }
+    return this.value;
+  }
+
+  addToValue(value: number | number[]) {}
+  addToNestedValue(index: number, value: number) {}
+  removeFromValue() {}
+  removeFromNestedValue(index: number) {}
+}
+
+export class RepeatedDeviceFieldValue extends DeviceFieldValue {
+  value: number[] = [];
+
+  addToValue(value: number) {
+    this.value.push(value);
+  }
+  removeFromValue() {
+    this.value.pop();
+  }
+}
+
+export class NestedRepeatedDeviceFieldValue extends DeviceFieldValue {
+  value: number[][] = [];
+
+  addToValue(value: number[]) {
+    this.value.push(value);
+  }
+  addToNestedValue(index: number, value: number) {
+    if (index < this.value.length) {
+      this.value[index].push(value);
     }
   }
-
-  removeFromRepeatedValue() {
-    this.repeatedValue.pop();
-    this.nestedRepeatedValue.pop();
+  removeFromValue() {
+    this.value.pop();
   }
-
-  addToNestedRepeatedValue(index: number, value: number) {
-    if (index < this.nestedRepeatedValue.length) {
-      this.nestedRepeatedValue[index].push(value);
-    }
-  }
-  removeFromNestedRepeatedValue(index: number) {
-    if (index < this.nestedRepeatedValue.length) {
-      this.nestedRepeatedValue[index].pop();
+  removeFromNestedValue(index: number) {
+    if (index < this.value.length) {
+      this.value[index].pop();
     }
   }
 }
 
-export class DeviceType {
-  key: string;
-  label: string;
-  fields: Field[];
+export type Dimension = {
+  unit:number, dimension:number
+}
 
-  constructor(key: string, label: string, fields: Field[]) {
-    this.key = key;
-    this.label = label;
-    this.fields = fields;
-  }
+export type DeviceMessageObject = {
+  [key: string]: number|number[]|number[][]|DeviceMessageObject;
+}
+
+export class DeviceType {
+  key: string = "";
+  type: string = "";
+  label: string = "";
+  fields: Field[] = [];
 }
 
 export class SavedDevice {

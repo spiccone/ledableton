@@ -1,20 +1,16 @@
 <script lang="ts">
-  import {onMount} from 'svelte';
-  import {DeviceFieldValue as FieldValue, DeviceType, type SavedDevice} from '$lib/types';
+  import {DeviceFieldValue, DeviceType, NestedRepeatedDeviceFieldValue, RepeatedDeviceFieldValue, type SavedDevice} from '$lib/types';
   import Select from '../basic/Select.svelte';
-  import Icon from '@iconify/svelte';
-  import roundPlus from '@iconify/icons-ic/round-plus';
-  import folderOpenOutlineRounded from '@iconify/icons-material-symbols/folder-open-outline-rounded';
 	import FieldDisplay from './FieldDisplay.svelte';
 	import BucketedVariableColumns from './BucketedVariableColumns.svelte';
 
   export let deviceTypes : DeviceType[] = [];
   export let selectedItem : DeviceType|null;
-  export let selectedItemOptions : FieldValue[]|null = null;
+  export let selectedItemOptions : DeviceFieldValue[]|null = null;
   export let units : {key: string, label: string}[] = [];
   export let deviceTypeLabel = "Device type";
 
-  let typesOptions : FieldValue[][] = [];
+  let typesOptions : DeviceFieldValue[][] = [];
 
   let selectedTypeIndex = 0;
 
@@ -26,9 +22,19 @@
     } else {
       const options = [];
       for (let field of types.fields) {
-        const fieldValue = new FieldValue(field.key, field.type === "Dimension" ? 0 : null);
-        if (field.type === "VariableColumn") {
-          fieldValue.addToRepeatedValue([]);
+        let fieldValue;
+        if (field.type === "RepeatedNumber") {
+          fieldValue = new NestedRepeatedDeviceFieldValue(field.key, field.type);
+          fieldValue.addToValue([]);
+        } else if (field.repeated) {
+          fieldValue = new RepeatedDeviceFieldValue(field.key, field.type)
+        }
+        else {
+          fieldValue = 
+            new DeviceFieldValue(field.key, field.type, field.type === "Dimension" ? 0 : null);
+        }
+        for (const oneof of field.oneofs) {
+          fieldValue.oneOfKeys.push(oneof.key);
         }
         options.push(fieldValue);
       }

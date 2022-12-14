@@ -1,6 +1,6 @@
 <script lang="ts">
   import {onMount} from 'svelte';
-  import {DeviceType, Field, DeviceFieldValue as FieldValue, SavedDevice} from '$lib/types';
+  import {DeviceType, Field, DeviceFieldValue as FieldValue, SavedDevice, type DeviceMessageObject} from '$lib/types';
   import Modal from '../Modal.svelte';
   import Select from '../basic/Select.svelte';
   import Icon from '@iconify/svelte';
@@ -32,12 +32,15 @@
   let deviceKeyIndex = 0;
 
   let edit = false;
+  
+  let deviceProto : protobuf.Root;
 
   onMount(() => {
     protobuf.load("src/protos/device.proto").then(function(root) {
       if (!root) {
         throw "Error loading device.proto in AddDevice.";
       }
+      deviceProto = root;
 
       let unitMessage = root.lookupEnum("devicepackage.Unit");
       for (const [key, value] of Object.entries(unitMessage.valuesById)) {
@@ -47,7 +50,7 @@
       let TypeMessage = root.lookupType("devicepackage.Type");
       for (const [key, value] of Object.entries(TypeMessage.fields)) {
         const valueTypeMessage = root.lookupType("devicepackage." + value.type);
-        const fieldMessage =  valueTypeMessage.fields;
+        const fieldMessage = valueTypeMessage.fields;
         const fields = [];
         let isBucket = false;
         for (const [key, value] of Object.entries(fieldMessage)) {
@@ -69,11 +72,17 @@
             fields.push(newField);
           }
         }
-        
         if (!isBucket) {
-          deviceTypesNoBuckets.push(new DeviceType(key, nameFormat(key), fields));
+          deviceTypesNoBuckets.push({key: key, 
+                                     label: nameFormat(key), 
+                                     type: value.type, 
+                                     fields:fields});
+            
         }
-        deviceTypes.push(new DeviceType(key, nameFormat(key), fields));
+        deviceTypes.push({key: key, 
+                          label: nameFormat(key), 
+                          type: value.type, 
+                          fields:fields});
       }
     });
     deviceKeyIndex = savedDevices.length;
@@ -139,6 +148,43 @@
   }
 
   function handleSave() {
+    if(!selectedTypeFields) {
+      // TODO: Some error thing
+      return;
+    }
+    const TypeMessage = deviceProto.lookupType("devicepackage." + selectedDeviceType?.type);
+
+    const typeObject : DeviceMessageObject = {};
+    for (const field of selectedTypeFields) {
+      const bucketObject : DeviceMessageObject = {};
+      if (field.type === "Type" && selectedDeviceBucketFields) {
+        for (const bucketField of selectedDeviceBucketFields) {
+          bucketObject[bucketField.getKey()] = bucketField.getValue();
+        }
+        typeObject[field.getKey()] = bucketObject;
+      } else {
+        typeObject[field.getKey()] = field.getValue();
+      }
+    }
+
+    const errorMessage = TypeMessage.verify(typeObject);
+    if (errorMessage) {
+      throw errorMessage;
+    }
+
+    const DeviceMessage = deviceProto.lookupType("devicepackage.Device");
+    const deviceObject = {
+      name: deviceName,
+      type: typeObject,
+    };
+
+    const errorMessage2 = DeviceMessage.verify(deviceObject);
+    if (errorMessage2) {
+      throw errorMessage2;
+    }
+
+    console.log(deviceObject);
+
     const deviceKey = selectedDeviceType?.key + '_' + deviceKeyIndex++;
     const device = edit ?
         selectedSavedDevice :

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { DeviceFieldValue, Field } from "$lib/types";
+	import type { DeviceFieldValue, Field, NestedRepeatedDeviceFieldValue, RepeatedDeviceFieldValue } from "$lib/types";
   import Icon from '@iconify/svelte';
   import autoAwesomeMotionOutlineRounded from '@iconify/icons-material-symbols/auto-awesome-motion-outline-rounded';
   import roundPlus from '@iconify/icons-ic/round-plus';
@@ -17,8 +17,8 @@
   let rowField : Field;
   let unitField : Field;
 
-  let columnFieldValue : DeviceFieldValue;
-  let rowFieldValue : DeviceFieldValue;
+  let columnFieldValue : NestedRepeatedDeviceFieldValue;
+  let rowFieldValue : RepeatedDeviceFieldValue;
   let unitFieldValue : DeviceFieldValue;
 
   let alignTop = true;
@@ -30,11 +30,11 @@
     switch (field.key) {
       case "columns":
         columnField = field;
-        columnFieldValue = fieldValues[index];
+        columnFieldValue = fieldValues[index] as NestedRepeatedDeviceFieldValue;
         break;
       case "rowSpacing":
         rowField = field;
-        rowFieldValue = fieldValues[index];
+        rowFieldValue = fieldValues[index] as RepeatedDeviceFieldValue;
         break;
       case "units":
         unitField = field;
@@ -46,47 +46,47 @@
   initColumn();
 
   function initColumn() {
-    if (columnFieldValue.nestedRepeatedValue.length > 0 &&
-      columnFieldValue.nestedRepeatedValue[0].length == 0) {
+    if (columnFieldValue.value.length > 0 &&
+      columnFieldValue.value[0].length == 0) {
       addColumn(0);
     }
   }
 
   function addRow() {
-    const numRows = columnFieldValue.nestedRepeatedValue.length;
-    if (numRows > 0) {rowFieldValue.addToRepeatedValue(rowAutoFill);}
-    columnFieldValue.addToRepeatedValue([0]);
+    const numRows = columnFieldValue.value.length;
+    if (numRows > 0) {rowFieldValue.addToValue(rowAutoFill);}
+    columnFieldValue.addToValue([0]);
     columnFieldValue = columnFieldValue;
   }
 
   function subtractRow() {
-    rowFieldValue.removeFromRepeatedValue();
-    columnFieldValue.removeFromRepeatedValue();
+    rowFieldValue.removeFromValue();
+    columnFieldValue.removeFromValue();
     columnFieldValue = columnFieldValue;
   }
 
   function addColumn(index: number) {
-    columnFieldValue.addToNestedRepeatedValue(index, columnAutoFill);
+    columnFieldValue.addToNestedValue(index, columnAutoFill);
     columnFieldValue = columnFieldValue;
   }
 
   function subtractColumn(index: number) {
-    if (columnFieldValue.nestedRepeatedValue[index].length > 1) {
-      columnFieldValue.removeFromNestedRepeatedValue(index);
+    if (columnFieldValue.value[index].length > 1) {
+      columnFieldValue.removeFromNestedValue(index);
       columnFieldValue = columnFieldValue;
     }
   }
 
   function handleAlignTop() {
     if (alignTop) {
-      for (let columnList of columnFieldValue.nestedRepeatedValue) {
+      for (let columnList of columnFieldValue.value) {
         columnList[0] = 0;
       }
     } 
   }
 
   function fillColumns() {
-    for (let columnList of columnFieldValue.nestedRepeatedValue) {
+    for (let columnList of columnFieldValue.value) {
       for (let i=1; i<columnList.length; i++) {
         columnList[i] = columnAutoFill;
       } 
@@ -95,7 +95,7 @@
   }
 
   function fillRows() {
-    const rowList = rowFieldValue.repeatedValue;
+    const rowList = rowFieldValue.value;
     for (let i=0; i<rowList.length; i++) {
       rowList[i]= rowAutoFill;
     }
@@ -151,16 +151,16 @@
   </div>
   <div class="column-container">
     <div class="variable-columns{alignTop ? ' align-top' : ''}">
-      {#each columnFieldValue.nestedRepeatedValue as value, i (i)}
+      {#each columnFieldValue.value as value, i (i)}
         <div class="column">
           <div class="first-bucket"></div>
-          {#each columnFieldValue.nestedRepeatedValue[i] as value, j (j)}
+          {#each columnFieldValue.value[i] as value, j (j)}
             {#if !alignTop || j > 0}
               <div class="entry"></div>
                 <div class="column-input-container">
                   <input class="column-input" 
                         type="text"
-                        bind:value={columnFieldValue.nestedRepeatedValue[i][j]} />
+                        bind:value={columnFieldValue.value[i][j]} />
                 </div>
                 <div class="bucket"></div>
             {/if}
@@ -169,16 +169,16 @@
             <Icon icon={roundPlus} />
           </button>
           <button class="subtract"
-                  disabled={columnFieldValue.nestedRepeatedValue[i].length < 2}
+                  disabled={columnFieldValue.value[i].length < 2}
                   on:click|preventDefault={() => subtractColumn(i)}>
             <Icon icon={roundMinus} />
           </button>
         </div>
-        {#if rowFieldValue.repeatedValue.length > i}
+        {#if rowFieldValue.value.length > i}
           <div class="row-input-container">
             <input class="row-input" 
                   type="text" 
-                  bind:value={rowFieldValue.repeatedValue[i]} />
+                  bind:value={rowFieldValue.value[i]} />
           </div>
         {/if}
       {/each}
@@ -187,7 +187,7 @@
           <Icon icon={roundPlus} />
         </button>
         <button class="subtract" 
-                disabled={columnFieldValue.nestedRepeatedValue.length < 2}
+                disabled={columnFieldValue.value.length < 2}
                 on:click|preventDefault={() => subtractRow()}>
           <Icon icon={roundMinus} />
         </button>
