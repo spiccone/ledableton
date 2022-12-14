@@ -41,7 +41,7 @@
   }
 
   .field-input.has-select {
-    border-radius: var(--corner-input, 12px) 0 0 var(--corner-input, 12px);
+    border-radius: var(--corner-input-single, 12px) 0 0 var(--corner-input-single, 12px);
     border-right: none;
   }
 
@@ -50,8 +50,11 @@
   }
 
   .dimension-select {
-    --select-border-radius: 0 var(--corner-input, 12px) var(--corner-input, 12px) 0;
-    --select-border-radius-open: 0 var(--corner-input, 12px) var(--corner-input, 12px) var(--corner-input, 12px);
+    --select-border-radius: 0 var(--corner-input-single, 12px) var(--corner-input-single, 12px) 0;
+    --select-border-radius-open: 0 
+                                 var(--corner-input-single, 12px)
+                                 var(--corner-input-single, 12px)
+                                 var(--corner-input-single, 12px);
     --select-font-size: 10px;
     width: fit-content;
   }

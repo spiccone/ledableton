@@ -17,13 +17,13 @@
     height: var(--input-height, 36px);
   }
   .first  {
-    --corner-input: var(--corner-input, 12px) 0 0 var(--corner-input, 12px);
+    --corner-input: var(--corner-input-single, 12px) 0 0 var(--corner-input-single, 12px);
   }
   .first:focus-within {
     z-index: 2;
   }
   .second {
-    --corner-input: 0 var(--corner-input, 12px) var(--corner-input, 12px) 0;
+    --corner-input: 0 var(--corner-input-single, 12px) var(--corner-input-single, 12px) 0;
     margin: 0 -1px;
   }
 </style>
