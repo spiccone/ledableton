@@ -1,13 +1,13 @@
 syntax = "proto3";
 package devicepackage;
 
-message Device {
+message SavedDevice {
   string name = 1;
-  Type type = 2;
+  Device device = 2;
 }
 
-message Type {
-  oneof type {
+message Device {
+  oneof device {
     Strip strip = 1;
     Arc arc = 2;
     Grid grid = 3;
@@ -53,14 +53,14 @@ message BucketedGrid {
   int32 columns = 2;
   Dimension row_spacing = 3;
   Dimension column_spacing = 4;
-  Type bucket_type = 5;
+  Device bucket_type = 5;
 }
 
 message BucketedVariableColumns {
   repeated uint32 row_spacing = 2;
   repeated RepeatedNumber columns = 3;
   Unit units = 4;
-  Type bucket_type = 5;
+  Device bucket_type = 5;
 }
 
 message RepeatedNumber {

@@ -70,7 +70,7 @@
           </BucketedVariableColumns>
         {:else}
           {#each deviceTypes[selectedTypeIndex].fields as field, i (field.key)}
-            {#if field.type === "Type"}
+            {#if field.type === "Device"}
               <slot name="type-field"/>
             {:else}
               <FieldDisplay inputId={"field_" + selectedTypeIndex + "_" + field.key}

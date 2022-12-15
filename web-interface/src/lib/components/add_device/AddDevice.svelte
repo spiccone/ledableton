@@ -47,7 +47,7 @@
         units.push({key: key, label: value});
       }
 
-      let TypeMessage = root.lookupType("devicepackage.Type");
+      let TypeMessage = root.lookupType("devicepackage.Device");
       for (const [key, value] of Object.entries(TypeMessage.fields)) {
         const valueTypeMessage = root.lookupType("devicepackage." + value.type);
         const fieldMessage = valueTypeMessage.fields;
@@ -56,7 +56,7 @@
         for (const [key, value] of Object.entries(fieldMessage)) {
           if (!value.partOf) {
             fields.push(new Field(key, nameFormat(key), value.type, value.repeated));
-            isBucket = isBucket || value.type == "Type";
+            isBucket = isBucket || value.type == "Device";
           }
         }
         const oneofs = valueTypeMessage.oneofs;
@@ -85,6 +85,7 @@
                           fields:fields});
       }
     });
+    console.log(deviceTypes);
     deviceKeyIndex = savedDevices.length;
   });
 
