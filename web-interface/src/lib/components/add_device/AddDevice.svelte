@@ -1,6 +1,6 @@
 <script lang="ts">
   import {onMount} from 'svelte';
-  import {DeviceType, Field, DeviceFieldValue as FieldValue, SavedDevice, type DeviceMessageObject} from '$lib/types';
+  import {DeviceType, Field, DeviceFieldValue as FieldValue, SavedDevice, type DeviceMessageObject, type SavedDeviceMessage} from '$lib/types';
   import Modal from '../Modal.svelte';
   import Select from '../basic/Select.svelte';
   import Icon from '@iconify/svelte';
@@ -24,6 +24,8 @@
   let selectedTypeFields : FieldValue[] | null;
   let selectedDeviceBucket : DeviceType | null;
   let selectedDeviceBucketFields : FieldValue[] | null;
+
+  let savedDeviceMessages : DeviceMessageObject[] = [];
 
   let createDevice = savedDevices.length == 0;
 
@@ -148,43 +150,59 @@
     error = false;
   }
 
-  function handleSave() {
-    if(!selectedTypeFields) {
-      // TODO: Some error thing
-      return;
-    }
-    const TypeMessage = deviceProto.lookupType("devicepackage." + selectedDeviceType?.type);
-
-    const typeObject : DeviceMessageObject = {};
-    for (const field of selectedTypeFields) {
-      const bucketObject : DeviceMessageObject = {};
-      if (field.type === "Type" && selectedDeviceBucketFields) {
-        for (const bucketField of selectedDeviceBucketFields) {
-          bucketObject[bucketField.getKey()] = bucketField.getValue();
+  function selectDevice(deviceMessage : DeviceMessageObject) {
+    for (const[key, value] of Object.entries(deviceMessage)) {
+      if (key === "name" && typeof value === "string" ) {
+        deviceName = value;
+      } else {
+        for (const device of deviceTypes){
+          if (device.key === key) {
+            selectedDeviceType = device;
+            selectedTypeFields = deviceMessageToFields(value as DeviceMessageObject, device);
+          }
         }
-        typeObject[field.getKey()] = bucketObject;
+      }
+    }
+
+  }
+
+  function deviceMessageToFields(deviceMessage: DeviceMessageObject, type: DeviceType) : FieldValue[] {
+    console.log(type);
+    console.log(deviceMessage);
+    console.log(selectedTypeFields);
+  }
+
+  function createDeviceObject(fields : FieldValue[]) : DeviceMessageObject {
+    const typeObject : DeviceMessageObject = {};
+    for (const field of fields) {
+      if (field.type === "Device" && selectedDeviceBucketFields) {
+        typeObject[field.getKey()] = createDeviceObject(selectedDeviceBucketFields);
       } else {
         typeObject[field.getKey()] = field.getValue();
       }
     }
+    return typeObject;
+  }
 
-    const errorMessage = TypeMessage.verify(typeObject);
+  function handleSave() {
+    if(!selectedTypeFields || !selectedDeviceType) {
+      // TODO: Some error thing
+      return;
+    }
+
+    const deviceObject: DeviceMessageObject = {};
+    deviceObject[selectedDeviceType.key] = createDeviceObject(selectedTypeFields);
+    deviceObject["name"] = deviceName;
+
+    const DeviceMessage = deviceProto.lookupType("devicepackage.SavedDevice");
+    const errorMessage = DeviceMessage.verify(deviceObject);
     if (errorMessage) {
       throw errorMessage;
     }
 
-    const DeviceMessage = deviceProto.lookupType("devicepackage.Device");
-    const deviceObject = {
-      name: deviceName,
-      type: typeObject,
-    };
+    savedDeviceMessages.push(deviceObject);
 
-    const errorMessage2 = DeviceMessage.verify(deviceObject);
-    if (errorMessage2) {
-      throw errorMessage2;
-    }
-
-    console.log(deviceObject);
+    selectDevice(deviceObject);
 
     const deviceKey = selectedDeviceType?.key + '_' + deviceKeyIndex++;
     const device = edit ?

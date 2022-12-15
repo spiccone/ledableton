@@ -67,9 +67,6 @@ export class DeviceFieldValue {
   oneofKey: number = 0;
   oneOfKeys: string[] = [];
 
-  repeated: boolean = false;
-  nestedRepeated: boolean = true;
-
   constructor(key: string, type: string, unitKey?: number|null) {
     this.key = key;
     this.type = type;
@@ -133,7 +130,7 @@ export type Dimension = {
 }
 
 export type DeviceMessageObject = {
-  [key: string]: number|number[]|number[][]|DeviceMessageObject;
+  [key: string]: string|number|number[]|number[][]|DeviceMessageObject;
 }
 
 export class DeviceType {
