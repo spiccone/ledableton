@@ -128,14 +128,6 @@ export class NestedRepeatedDeviceFieldValue extends DeviceFieldValue {
   }
 }
 
-export type Dimension = {
-  unit:number, dimension:number
-}
-
-export type DeviceMessageObject = {
-  [key: string]: number|number[]|number[][]|DeviceMessageObject;
-}
-
 export class DeviceType {
   key: string = "";
   type: string = "";
@@ -155,4 +147,25 @@ export class SavedDevice {
     this.key = key;
     this.label = label;
   }
+}
+
+export type Dimension = {
+  unit: number, 
+  dimension: number
+}
+
+export type FieldValue = number|string|boolean|Dimension|DeviceMessageObject|FieldValue[]|oneOf;
+
+export type DeviceMessageObject = {
+  [key: string]: FieldValue;
+}
+
+export type DeviceObject = {
+  name: string,
+  device: DeviceMessageObject,
+}
+
+export type oneOf = {
+  selectedIndex: number,
+  oneOf: DeviceMessageObject[]
 }

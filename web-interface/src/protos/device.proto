@@ -3,17 +3,18 @@ package devicepackage;
 
 message Device {
   string name = 1;
-  Type type = 2;
+
+  oneof device {
+    Strip strip = 2;
+    Arc arc = 3;
+    Grid grid = 4;
+    BucketedGrid bucketed_grid = 5;
+    BucketedVariableColumns bucketed_variable_columns = 6;
+  }
 }
 
-message Type {
-  oneof type {
-    Strip strip = 1;
-    Arc arc = 2;
-    Grid grid = 3;
-    BucketedGrid bucketed_grid = 4;
-    BucketedVariableColumns bucketed_variable_columns = 5;
-  }
+message RepeatedNumber {
+  repeated int32 repeated_number = 1;
 }
 
 enum Unit {
@@ -36,7 +37,7 @@ message Arc {
   Dimension radius = 2;
   oneof dimension {
     Dimension arc_length = 3;
-    uint32 angle = 4;
+    int32 angle = 4;
     Dimension chord_length = 5;
   }
 }
@@ -53,16 +54,12 @@ message BucketedGrid {
   int32 columns = 2;
   Dimension row_spacing = 3;
   Dimension column_spacing = 4;
-  Type bucket_type = 5;
+  Device bucket = 5;
 }
 
 message BucketedVariableColumns {
   repeated uint32 row_spacing = 2;
-  repeated RepeatedNumber columns = 3;
+  repeated RepeatedNumber column_spacing = 3;
   Unit units = 4;
-  Type bucket_type = 5;
-}
-
-message RepeatedNumber {
-  repeated uint32 repeated_number = 1;
+  Device bucket = 5;
 }

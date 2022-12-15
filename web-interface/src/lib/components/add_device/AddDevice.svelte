@@ -1,6 +1,6 @@
 <script lang="ts">
   import {onMount} from 'svelte';
-  import {DeviceType, Field, DeviceFieldValue as FieldValue, SavedDevice, type DeviceMessageObject} from '$lib/types';
+  import {DeviceType, Field, DeviceFieldValue as FieldValue, SavedDevice, type DeviceMessageObject, type DeviceObject, type oneOf} from '$lib/types';
   import Modal from '../Modal.svelte';
   import Select from '../basic/Select.svelte';
   import Icon from '@iconify/svelte';
@@ -20,6 +20,8 @@
 
   let selectedSavedDevice : SavedDevice;
 
+  let createdDevices : DeviceObject[] = [];
+
   let selectedDeviceType : DeviceType | null;
   let selectedTypeFields : FieldValue[] | null;
   let selectedDeviceBucket : DeviceType | null;
@@ -35,6 +37,44 @@
   
   let deviceProto : protobuf.Root;
 
+  function createObjectFromMessage(message : protobuf.Type) : DeviceMessageObject {
+    const object : DeviceMessageObject = {};
+    for (const [key, value] of Object.entries(message.fields)) {
+      if (value.partOf) {
+        if (!object[value.partOf.name]) {
+          object[value.partOf.name] = {selectedIndex: 0, oneOf: []};
+        }
+        const x : DeviceMessageObject = {};
+        x[key] = objectValueFromFieldValue(value);
+        const oneOfObject = object[value.partOf.name] as oneOf;
+        oneOfObject.oneOf.push(x);
+      } else {
+        object[key] = objectValueFromFieldValue(value);
+      }
+    }
+    return object;
+  }
+
+  function objectValueFromFieldValue(value: protobuf.Field) {
+    if (value.repeated) {
+     return [];
+    } 
+    switch (value.type) {
+      case "string":
+        return '';
+      case "boolean":
+        return false;
+      case "int32":
+      case "Unit":
+      case "float":
+        return 0;
+      case "Device":
+        return {};
+      default:
+        return createObjectFromMessage(deviceProto.lookupType("devicepackage." + value.type));
+    }
+  }
+
   onMount(() => {
     protobuf.load("src/protos/device.proto").then(function(root) {
       if (!root) {
@@ -47,16 +87,24 @@
         units.push({key: key, label: value});
       }
 
-      let TypeMessage = root.lookupType("devicepackage.Type");
+      let TypeMessage = root.lookupType("devicepackage.Device");
+
+      let otest = createObjectFromMessage(TypeMessage);
+      console.log(otest);
+
       for (const [key, value] of Object.entries(TypeMessage.fields)) {
+        if (value.type === "string") {
+          continue;
+        }
         const valueTypeMessage = root.lookupType("devicepackage." + value.type);
+
         const fieldMessage = valueTypeMessage.fields;
         const fields = [];
         let isBucket = false;
         for (const [key, value] of Object.entries(fieldMessage)) {
           if (!value.partOf) {
             fields.push(new Field(key, nameFormat(key), value.type, value.repeated));
-            isBucket = isBucket || value.type == "Type";
+            isBucket = isBucket || value.type == "Device";
           }
         }
         const oneofs = valueTypeMessage.oneofs;
@@ -147,6 +195,18 @@
     error = false;
   }
 
+  function createDeviceObject(fields : FieldValue[]) : DeviceObject {
+    const typeObject : DeviceMessageObject = {};
+    for (const field of fields) {
+      if (field.type === "Device" && selectedDeviceBucketFields) {
+        typeObject[field.getKey()] = createDeviceObject(selectedDeviceBucketFields);
+      } else {
+        typeObject[field.getKey()] = field.getValue();
+      }
+    }
+    return typeObject;
+  }
+
   function handleSave() {
     if(!selectedTypeFields) {
       // TODO: Some error thing
@@ -154,18 +214,7 @@
     }
     const TypeMessage = deviceProto.lookupType("devicepackage." + selectedDeviceType?.type);
 
-    const typeObject : DeviceMessageObject = {};
-    for (const field of selectedTypeFields) {
-      const bucketObject : DeviceMessageObject = {};
-      if (field.type === "Type" && selectedDeviceBucketFields) {
-        for (const bucketField of selectedDeviceBucketFields) {
-          bucketObject[bucketField.getKey()] = bucketField.getValue();
-        }
-        typeObject[field.getKey()] = bucketObject;
-      } else {
-        typeObject[field.getKey()] = field.getValue();
-      }
-    }
+    const typeObject = createDeviceObject(selectedTypeFields);
 
     const errorMessage = TypeMessage.verify(typeObject);
     if (errorMessage) {
