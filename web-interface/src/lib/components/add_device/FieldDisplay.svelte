@@ -32,10 +32,6 @@
                 bind:selectedIndex={fieldValue.oneofKey} />
       </span>
     </Labeled>
-  {:else if field.type === "bool"}
-    <Checkbox bind:value={fieldValue.booleanValue}>
-      {field.label}
-    </Checkbox>
   {:else if field.repeated === false}
      <FieldInput id={inputId}
                 typeOption={fieldValue}

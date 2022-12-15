@@ -1,6 +1,6 @@
 <script lang="ts">
   import {onMount} from 'svelte';
-  import {DeviceType, Field, DeviceFieldValue as FieldValue, SavedDevice, type DeviceMessageObject, type DeviceObject, type oneOf} from '$lib/types';
+  import {DeviceType, Field, DeviceFieldValue as FieldValue, SavedDevice, type DeviceMessageObject, type DeviceObject, type OneOf} from '$lib/types';
   import Modal from '../Modal.svelte';
   import Select from '../basic/Select.svelte';
   import Icon from '@iconify/svelte';
@@ -12,6 +12,7 @@
   import protobuf from 'protobufjs';
   import {nameFormat} from "../../helper-functions";
 	import CreateDevice from './CreateDevice.svelte';
+	import CreateDeviceObject from './CreateDeviceObject.svelte';
 
   let savedDevices : SavedDevice[] = [];
   let deviceTypes : DeviceType[] = [];
@@ -26,6 +27,8 @@
   let selectedTypeFields : FieldValue[] | null;
   let selectedDeviceBucket : DeviceType | null;
   let selectedDeviceBucketFields : FieldValue[] | null;
+
+  let deviceList : DeviceMessageObject[] = [];
 
   let createDevice = savedDevices.length == 0;
 
@@ -46,7 +49,7 @@
         }
         const x : DeviceMessageObject = {};
         x[key] = objectValueFromFieldValue(value);
-        const oneOfObject = object[value.partOf.name] as oneOf;
+        const oneOfObject = object[value.partOf.name] as OneOf;
         oneOfObject.oneOf.push(x);
       } else {
         object[key] = objectValueFromFieldValue(value);
@@ -75,6 +78,8 @@
     }
   }
 
+
+
   onMount(() => {
     protobuf.load("src/protos/device.proto").then(function(root) {
       if (!root) {
@@ -89,8 +94,9 @@
 
       let TypeMessage = root.lookupType("devicepackage.Device");
 
-      let otest = createObjectFromMessage(TypeMessage);
-      console.log(otest);
+      for (const device of (createObjectFromMessage(TypeMessage).device as oneOf).oneOf) {
+        deviceList.push(device);
+      }
 
       for (const [key, value] of Object.entries(TypeMessage.fields)) {
         if (value.type === "string") {
@@ -195,7 +201,7 @@
     error = false;
   }
 
-  function createDeviceObject(fields : FieldValue[]) : DeviceObject {
+  function createDeviceObject(fields : FieldValue[]) : DeviceMessageObject {
     const typeObject : DeviceMessageObject = {};
     for (const field of fields) {
       if (field.type === "Device" && selectedDeviceBucketFields) {
@@ -231,8 +237,6 @@
     if (errorMessage2) {
       throw errorMessage2;
     }
-
-    console.log(deviceObject);
 
     const deviceKey = selectedDeviceType?.key + '_' + deviceKeyIndex++;
     const device = edit ?
@@ -287,7 +291,9 @@
                  bind:value={deviceName}
                  placeholder="New device" />
         </div>
-        <CreateDevice bind:selectedItem={selectedDeviceType} 
+        <CreateDeviceObject deviceTypes={deviceList} units={units} />
+
+        <!-- <CreateDevice bind:selectedItem={selectedDeviceType} 
                       bind:selectedItemOptions={selectedTypeFields}
                       deviceTypes={deviceTypes}
                       units={units}>
@@ -297,7 +303,7 @@
                           deviceTypes={deviceTypesNoBuckets}
                           units={units} />
           </div>
-        </CreateDevice>
+        </CreateDevice> -->
       {:else}
         <div class="saved-device-container">
           <div class="saved-select">

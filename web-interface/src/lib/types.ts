@@ -154,7 +154,7 @@ export type Dimension = {
   dimension: number
 }
 
-export type FieldValue = number|string|boolean|Dimension|DeviceMessageObject|FieldValue[]|oneOf;
+export type FieldValue = number|string|boolean|Dimension|DeviceMessageObject|FieldValue[]|OneOf;
 
 export type DeviceMessageObject = {
   [key: string]: FieldValue;
@@ -165,7 +165,7 @@ export type DeviceObject = {
   device: DeviceMessageObject,
 }
 
-export type oneOf = {
+export type OneOf = {
   selectedIndex: number,
   oneOf: DeviceMessageObject[]
 }
