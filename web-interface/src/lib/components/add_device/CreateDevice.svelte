@@ -1,88 +1,63 @@
 <script lang="ts">
-  import {DeviceFieldValue, DeviceType, NestedRepeatedDeviceFieldValue, RepeatedDeviceFieldValue, type SavedDevice} from '$lib/types';
   import Select from '../basic/Select.svelte';
-	import FieldDisplay from './FieldDisplay.svelte';
 	import BucketedVariableColumns from './BucketedVariableColumns.svelte';
+	import type {DeviceMessageObject} from '$lib/device';
+	import {nameFormat} from '$lib/helper-functions';
+	import FieldDisplay from './FieldDisplay.svelte';
+  import Bucket from './Bucket.svelte';
 
-  export let deviceTypes : DeviceType[] = [];
-  export let selectedItem : DeviceType|null;
-  export let selectedItemOptions : DeviceFieldValue[]|null = null;
+  export let deviceTypes : DeviceMessageObject[];
+  export let selectedTypeIndex = 0;
   export let units : {key: string, label: string}[] = [];
-  export let deviceTypeLabel = "Device type";
+  export let allowableBuckets = 3;
 
-  let typesOptions : DeviceFieldValue[][] = [];
-
-  let selectedTypeIndex = 0;
-
-  for (let i=0; i<deviceTypes.length; i++) {
-    const types = deviceTypes[i];
-    if (selectedItem === types && selectedItemOptions) {
-     typesOptions.push(selectedItemOptions);
-     selectedTypeIndex = i;
-    } else {
-      const options = [];
-      for (let field of types.fields) {
-        let fieldValue;
-        if (field.type === "RepeatedNumber") {
-          fieldValue = new NestedRepeatedDeviceFieldValue(field.key, field.type);
-          fieldValue.addToValue([]);
-        } else if (field.repeated) {
-          fieldValue = new RepeatedDeviceFieldValue(field.key, field.type)
-        }
-        else {
-          fieldValue = 
-            new DeviceFieldValue(field.key, field.type, field.type === "Dimension" ? 0 : null);
-        }
-        for (const oneof of field.oneofs) {
-          fieldValue.oneOfKeys.push(oneof.key);
-        }
-        options.push(fieldValue);
-      }
-      typesOptions.push(options);
-    }
+  let deviceTypeList : {key : string, label : string}[] = [];
+  let deviceFieldList : DeviceMessageObject[] = [];
+  for (const deviceType of deviceTypes) {
+    const key = Object.keys(deviceType)[0];
+    deviceTypeList.push({key: key, label: nameFormat(key)});
+    deviceFieldList.push(Object.values(deviceType)[0] as DeviceMessageObject);
   }
 
+  function handleDeviceSelect() {
 
-
-  function handleDeviceSelect(e: CustomEvent) {
-    selectedItemOptions = typesOptions[e.detail.selectedIndex];
   }
+
 </script>
 
 <div class="CreateDevice">
   {#if deviceTypes.length > 0}
-    <label class="label" for="deviceTypes">{deviceTypeLabel}</label>
-    <div class="device-select" style="z-index: 2">
-      <Select items={deviceTypes} 
-              bind:selectedItem={selectedItem}
+    <label class="label" for="deviceTypes">Device type</label>
+    <div class="device-select" style="z-index: {allowableBuckets * 3}">
+      <Select items={deviceTypeList} 
               bind:selectedIndex={selectedTypeIndex}
               on:select={handleDeviceSelect}/>
     </div>
-    {#if selectedTypeIndex < deviceTypes.length}
-      <div class="device-fields" style="z-index: 1">
-        {#if deviceTypes[selectedTypeIndex].key === "bucketedVariableColumns"} 
-          <BucketedVariableColumns fields={deviceTypes[selectedTypeIndex].fields}
-                                   fieldValues={typesOptions[selectedTypeIndex]}
-                                   units={units}>
-            <div class="device-select" slot="type-field">
-              <slot name="type-field"/>
-            </div>
-          </BucketedVariableColumns>
-        {:else}
-          {#each deviceTypes[selectedTypeIndex].fields as field, i (field.key)}
-            {#if field.type === "Device"}
-              <slot name="type-field"/>
-            {:else}
-              <FieldDisplay inputId={"field_" + selectedTypeIndex + "_" + field.key}
-                            field={field}
-                            fieldValue={typesOptions[selectedTypeIndex][i]}
-                            units={units}
-                            zIndex={100-i} />
-            {/if}
-          {/each}
-        {/if}
-      </div>
-    {/if}
+  {/if}
+  {#if selectedTypeIndex < deviceTypes.length}
+    <div class="device-fields" style="z-index: {allowableBuckets * 3 - 1}">
+      {#if deviceTypeList[selectedTypeIndex].key === "bucketedVariableColumns"}
+        <BucketedVariableColumns fields={deviceFieldList[selectedTypeIndex]}
+                                 deviceTypes={deviceTypes}
+                                 units={units}
+                                 allowableBuckets={allowableBuckets-1} />
+      {:else}
+        {#each Object.entries(deviceFieldList[selectedTypeIndex]) as [key, value], i (key)}
+          {#if key === "bucket"}   
+            <Bucket deviceTypes={deviceTypes}
+                    key={key}
+                    fields={deviceFieldList[selectedTypeIndex]}
+                    units={units} 
+                    allowableBuckets={allowableBuckets-1} />
+          {:else}
+            <FieldDisplay key={key} 
+                                bind:fields={deviceFieldList[selectedTypeIndex]}
+                                units={units}
+                                zIndex={10-i} />
+          {/if}
+        {/each}
+      {/if}
+    </div>
   {/if}
 </div>
 
@@ -90,6 +65,7 @@
   .CreateDevice {
     display: flex;
     flex-direction: column;
+    position: relative;
   }
 
   .label {

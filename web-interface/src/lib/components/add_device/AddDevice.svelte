@@ -1,6 +1,6 @@
 <script lang="ts">
   import {onMount} from 'svelte';
-  import {DeviceType, Field, DeviceFieldValue as FieldValue, SavedDevice, type DeviceMessageObject, type SavedDeviceMessage} from '$lib/types';
+  import type {DeviceMessageObject, OneOf, SavedDevice} from '$lib/device';
   import Modal from '../Modal.svelte';
   import Select from '../basic/Select.svelte';
   import Icon from '@iconify/svelte';
@@ -10,32 +10,75 @@
   import deleteOutlineRounded from '@iconify/icons-material-symbols/delete-outline-rounded';
   import roundArrowBackIos from '@iconify/icons-ic/round-arrow-back-ios';
   import protobuf from 'protobufjs';
-  import {nameFormat} from "../../helper-functions";
 	import CreateDevice from './CreateDevice.svelte';
-
-  let savedDevices : SavedDevice[] = [];
-  let deviceTypes : DeviceType[] = [];
-  let deviceTypesNoBuckets : DeviceType[] = [];
+ 
   let units : {key: string, label: string}[] = [];
 
-  let selectedSavedDevice : SavedDevice;
+  let deviceList : DeviceMessageObject[] = [];
+  let savedDevices : SavedDevice[] = [];
+  let createDeviceIndex = 0;
+  let savedDeviceIndex = 0;
 
-  let selectedDeviceType : DeviceType | null;
-  let selectedTypeFields : FieldValue[] | null;
-  let selectedDeviceBucket : DeviceType | null;
-  let selectedDeviceBucketFields : FieldValue[] | null;
+  let defaultDeviceList : DeviceMessageObject[] = [];
 
-  let savedDeviceMessages : DeviceMessageObject[] = [];
+  let savedIndex = 0;
 
-  let createDevice = savedDevices.length == 0;
+  let savedDeviceNames : {key: string, label: string}[] = [];
+
+  let createDevice = true;
 
   let error = false;
   let deviceName = "";
-  let deviceKeyIndex = 0;
 
   let edit = false;
   
   let deviceProto : protobuf.Root;
+
+  function createObjectFromMessage(message : protobuf.Type) : DeviceMessageObject {
+    const object : DeviceMessageObject = {};
+    for (const [key, value] of Object.entries(message.fields)) {
+      if (value.partOf) {
+        if (!object[value.partOf.name]) {
+          object[value.partOf.name] = {selectedIndex: 0, oneOf: []};
+        }
+        const x : DeviceMessageObject = {};
+        x[key] = objectValueFromFieldValue(value);
+        const oneOfObject = object[value.partOf.name] as OneOf;
+        oneOfObject.oneOf.push(x);
+      } else {
+        object[key] = objectValueFromFieldValue(value);
+      }
+    }
+    return object;
+  }
+
+  function objectValueFromFieldValue(value: protobuf.Field) {
+    let field = getValueFromField(value);
+    if (value.repeated) {
+     return [field];
+    } 
+    return field;
+  }
+
+  function getValueFromField(value: protobuf.Field) {
+    switch (value.type) {
+      case "string":
+        return '';
+      case "boolean":
+        return false;
+      case "uint32":
+      case "int32":
+        return 0;
+      case "float":
+        return 0.1;
+      case "Unit":
+        return {selectedUnit: 0};
+      case "Device":
+        return "GENERATE_DEVICE";
+      default:
+        return createObjectFromMessage(deviceProto.lookupType("devicepackage." + value.type));
+    }
+  }
 
   onMount(() => {
     protobuf.load("src/protos/device.proto").then(function(root) {
@@ -50,181 +93,82 @@
       }
 
       let TypeMessage = root.lookupType("devicepackage.Device");
-      for (const [key, value] of Object.entries(TypeMessage.fields)) {
-        const valueTypeMessage = root.lookupType("devicepackage." + value.type);
-        const fieldMessage = valueTypeMessage.fields;
-        const fields = [];
-        let isBucket = false;
-        for (const [key, value] of Object.entries(fieldMessage)) {
-          if (!value.partOf) {
-            fields.push(new Field(key, nameFormat(key), value.type, value.repeated));
-            isBucket = isBucket || value.type == "Device";
-          }
-        }
-        const oneofs = valueTypeMessage.oneofs;
-        if (oneofs) {
-          for (const [name, oneof] of Object.entries(oneofs)) {
-            const oneofFields : Field[] = [];
-            for (const [key, value] of Object.entries(oneof.fieldsArray)) {
-              oneofFields.push(
-                new Field(value.name, nameFormat(value.name), value.type, value.repeated));
-            }
-            const newField = new Field(name, nameFormat(key), value.type, value.repeated);
-            newField.addOneofList(oneofFields);
-            fields.push(newField);
-          }
-        }
-        if (!isBucket) {
-          deviceTypesNoBuckets.push({key: key, 
-                                     label: nameFormat(key), 
-                                     type: value.type, 
-                                     fields:fields});
-            
-        }
-        deviceTypes.push({key: key, 
-                          label: nameFormat(key), 
-                          type: value.type, 
-                          fields:fields});
+      for (const device of (createObjectFromMessage(TypeMessage).device as OneOf).oneOf) {
+        defaultDeviceList.push(device);
       }
+      deviceList = JSON.parse(JSON.stringify(defaultDeviceList));
     });
-    console.log(deviceTypes);
-    deviceKeyIndex = savedDevices.length;
   });
 
+  function updateSavedDeviceNames() {
+    savedDeviceNames.length = 0;
+    for (const device of savedDevices) {
+      savedDeviceNames.push({
+        key: "device_" + savedIndex++,
+        label: device.name
+      })
+    }
+  }
+
   function openCreateNewDevice() {
-    selectedDeviceType = null;
-    selectedTypeFields = null;
-    selectedDeviceBucket = null;
-    selectedDeviceBucketFields = null;
+    deviceList.length = 0;
+    deviceList = JSON.parse(JSON.stringify(defaultDeviceList));
+    createDeviceIndex = 0;
     createDevice = true;
   }
 
   function openAddDevice() {
-    if (savedDevices.length > 0) { // should always be true
-      createDevice = false;
-      selectedSavedDevice = savedDevices[0];
-    }
+    createDevice = false;
     edit = false;
   }
 
   function editDevice() {
+    deviceName = savedDevices[savedDeviceIndex].name;
     edit = true;
-    deviceName = selectedSavedDevice.label;
     copyDevice();
   }
 
   function copyDevice() {
-    if (!selectedSavedDevice || !selectedSavedDevice.type) {
-      return;
-    }
-    selectedDeviceType = selectedSavedDevice.type;
-    selectedTypeFields = selectedSavedDevice.fields;
-    selectedDeviceBucket = selectedSavedDevice.bucketType;
-    selectedDeviceBucketFields = selectedSavedDevice.bucketFields;
+    createDevice = true;
     createDevice = true;
   }
 
   function deleteDevice() {
-    const index = savedDevices.indexOf(selectedSavedDevice);
-    if (index > -1) {
-      savedDevices.splice(index, 1);
-    }
-    if (savedDevices.length == 0) {
-      createDevice = true;
-    } else if (index == 0) {
-      selectedSavedDevice = savedDevices[0]
-    } else {
-      selectedSavedDevice = savedDevices[index - 1];
-    }
+    savedDevices.splice(savedDeviceIndex, 1);
     savedDevices = savedDevices;
-    deviceName = "";
+    updateSavedDeviceNames();
+    createDevice = savedDevices.length === 0;
   }
+
+  function handleSave() {
+    if (!edit) {
+      savedDevices.push({
+        name: deviceName,
+        settings: deviceList[createDeviceIndex]});
+    } else if(savedDeviceIndex < savedDevices.length) {
+      savedDevices[savedDeviceIndex].name = deviceName;
+      savedDevices[savedDeviceIndex].settings = deviceList[createDeviceIndex];
+    } else {
+      throw "Could not edit device";
+    }
+    console.log(savedDevices);
+    updateSavedDeviceNames();
+    deviceName = "";
+    openAddDevice();
+  }
+
+  function handleAdd() {
+
+	}
 
   function mouseOverSave() {
     if (deviceName === '') {
       error = true;
     }
   }
-
   function mouseLeaveSave() {
     error = false;
   }
-
-  function selectDevice(deviceMessage : DeviceMessageObject) {
-    for (const[key, value] of Object.entries(deviceMessage)) {
-      if (key === "name" && typeof value === "string" ) {
-        deviceName = value;
-      } else {
-        for (const device of deviceTypes){
-          if (device.key === key) {
-            selectedDeviceType = device;
-            selectedTypeFields = deviceMessageToFields(value as DeviceMessageObject, device);
-          }
-        }
-      }
-    }
-
-  }
-
-  function deviceMessageToFields(deviceMessage: DeviceMessageObject, type: DeviceType) : FieldValue[] {
-    console.log(type);
-    console.log(deviceMessage);
-    console.log(selectedTypeFields);
-  }
-
-  function createDeviceObject(fields : FieldValue[]) : DeviceMessageObject {
-    const typeObject : DeviceMessageObject = {};
-    for (const field of fields) {
-      if (field.type === "Device" && selectedDeviceBucketFields) {
-        typeObject[field.getKey()] = createDeviceObject(selectedDeviceBucketFields);
-      } else {
-        typeObject[field.getKey()] = field.getValue();
-      }
-    }
-    return typeObject;
-  }
-
-  function handleSave() {
-    if(!selectedTypeFields || !selectedDeviceType) {
-      // TODO: Some error thing
-      return;
-    }
-
-    const deviceObject: DeviceMessageObject = {};
-    deviceObject[selectedDeviceType.key] = createDeviceObject(selectedTypeFields);
-    deviceObject["name"] = deviceName;
-
-    const DeviceMessage = deviceProto.lookupType("devicepackage.SavedDevice");
-    const errorMessage = DeviceMessage.verify(deviceObject);
-    if (errorMessage) {
-      throw errorMessage;
-    }
-
-    savedDeviceMessages.push(deviceObject);
-
-    selectDevice(deviceObject);
-
-    const deviceKey = selectedDeviceType?.key + '_' + deviceKeyIndex++;
-    const device = edit ?
-        selectedSavedDevice :
-        new SavedDevice(deviceKey, deviceName);
-    device.type = selectedDeviceType;
-    device.label = deviceName;
-    device.fields = selectedTypeFields;
-    if (selectedDeviceBucket) {
-      device.bucketType = selectedDeviceBucket;
-      device.bucketFields = selectedDeviceBucketFields;
-    }
-    if (!edit) {
-      savedDevices.push(device);
-    }
-    deviceName = "";
-    openAddDevice();
-  }
-
-  function handleAdd() {
-    console.log(selectedSavedDevice);
-	}
 </script>
 
 <Modal>
@@ -248,7 +192,7 @@
   </div>
   <div class="content" slot="content">
     <div class="outer-section">
-      {#if createDevice || savedDevices.length == 0}
+      {#if createDevice}
       <!-- createDevice should be true when savedDevices is empty -->
         <div class="device-name-container">
           <input class:error
@@ -257,22 +201,14 @@
                  bind:value={deviceName}
                  placeholder="New device" />
         </div>
-        <CreateDevice bind:selectedItem={selectedDeviceType} 
-                      bind:selectedItemOptions={selectedTypeFields}
-                      deviceTypes={deviceTypes}
-                      units={units}>
-          <div class="inner-section" slot="type-field">
-            <CreateDevice bind:selectedItem={selectedDeviceBucket} 
-                          bind:selectedItemOptions={selectedDeviceBucketFields}
-                          deviceTypes={deviceTypesNoBuckets}
-                          units={units} />
-          </div>
-        </CreateDevice>
+        <CreateDevice bind:deviceTypes={deviceList} 
+                      bind:selectedTypeIndex={createDeviceIndex}
+                      units={units} />
       {:else}
         <div class="saved-device-container">
           <div class="saved-select">
-            <Select items={savedDevices} 
-                    bind:selectedItem={selectedSavedDevice} />
+            <Select items={savedDeviceNames} 
+                    bind:selectedIndex={savedDeviceIndex} />
           </div>
           <button class="icon-button" on:click={editDevice}>
             <Icon icon={editOutlineRounded} />

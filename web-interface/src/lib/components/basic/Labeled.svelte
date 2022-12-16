@@ -26,6 +26,7 @@
     --select-width: auto;
     font-size: var(--font-size-label, 12px);
     margin: 0 0 4px 4px;
+    white-space: nowrap;
     width: fit-content;
   }
 

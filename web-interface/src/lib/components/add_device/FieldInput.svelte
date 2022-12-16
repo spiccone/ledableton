@@ -1,30 +1,61 @@
 <script lang="ts">
-	import type {DeviceFieldValue as FieldValue, SimpleField } from "$lib/types";
+	import type {Dimension, FieldValue, Unit} from "$lib/device";
 	import Labeled from "../basic/Labeled.svelte";
 	import Select from "../basic/Select.svelte";
 
-
   export let id = "";
-  export let typeOption : FieldValue;
+  export let fieldValue : FieldValue;
   export let units : {key: string, label: string}[] = [];
-  export let field : SimpleField;
+
+  let dimension : Dimension | null = null;
+  let unit : Unit | null = null;
+
+  checkTypes();
+  
+  $: fieldValue, checkTypes();
+
+  function checkTypes() {
+    if (typeof (fieldValue) === "object") {
+      dimension = fieldValue as Dimension;
+      if (dimension?.dimension !== undefined && dimension.unit?.selectedUnit !== undefined) {
+        unit = dimension.unit;
+        return;
+      }
+      dimension = null;
+      unit = fieldValue as Unit;
+      if (unit?.selectedUnit !== undefined) {
+        return;
+      }
+    }
+    dimension = null;
+    unit = null;
+  }
 
 </script>
 
 <Labeled inputId={id}>
   <span slot="label"><slot name="label"></slot></span>
   <span class="field-input-container" slot="content">
-    <input id={id} 
-            class="field-input{field.type === 'Dimension' ? ' has-select' : ''}"
-            type="number"
-            bind:value= {typeOption.value}
-            size=10 />
-    {#if field.type === "Dimension"}
+    {#if dimension && unit}
+      <input id={id} 
+          class="field-input has-select"
+          type="number"
+          bind:value={dimension.dimension}
+          size=10 />
       <div class="dimension-select">
         <Select items={units} 
-                bind:selectedIndex={typeOption.unitKey}
+                bind:selectedIndex={unit.selectedUnit}
                 showArrow={false} />
       </div>
+    {:else if unit}
+      <Select items={units} 
+              bind:selectedIndex={unit.selectedUnit} />
+    {:else}
+     <input id={id} 
+          class="field-input"
+          type="number"
+          bind:value={fieldValue}
+          size=10 />
     {/if}
   </span>
 </Labeled>
