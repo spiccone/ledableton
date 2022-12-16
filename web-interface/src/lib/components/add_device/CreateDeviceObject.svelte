@@ -7,6 +7,7 @@
   import Bucket from './Bucket.svelte';
 
   export let deviceTypes : DeviceMessageObject[];
+  export let selectedTypeIndex = 0;
   export let units : {key: string, label: string}[] = [];
   export let allowableBuckets = 3;
 
@@ -17,7 +18,6 @@
     deviceTypeList.push({key: key, label: nameFormat(key)});
     deviceFieldList.push(Object.values(deviceType)[0] as DeviceMessageObject);
   }
-  let selectedTypeIndex = 0;
 
   function handleDeviceSelect() {
 
@@ -48,8 +48,7 @@
                     key={key}
                     fields={deviceFieldList[selectedTypeIndex]}
                     units={units} 
-                    allowableBuckets={allowableBuckets-1}
-                    generate={deviceFieldList[selectedTypeIndex]["bucket"] === "GENERATE_DEVICE"} />
+                    allowableBuckets={allowableBuckets-1} />
           {:else}
             <FieldDisplayObject key={key} 
                                 bind:fields={deviceFieldList[selectedTypeIndex]}

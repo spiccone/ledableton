@@ -162,11 +162,16 @@ export type RepeatedNumber = {
   repeatedNumber: number[];
 }
 
-
-export type FieldValue = number|string|boolean|Dimension|DeviceMessageObject|FieldValue[]|OneOf;
+export type FieldValue = number|string|boolean|BucketMessageObject|Dimension|DeviceMessageObject|FieldValue[]|OneOf;
 
 export type DeviceMessageObject = {
   [key: string]: FieldValue;
+}
+
+export type BucketMessageObject = {
+  devices: DeviceMessageObject[];
+  selectedDevice: number
+
 }
 
 export type DeviceObject = {

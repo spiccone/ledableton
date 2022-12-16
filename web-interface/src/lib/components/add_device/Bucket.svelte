@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { DeviceMessageObject, FieldValue } from "$lib/types";
+	import type { BucketMessageObject, DeviceMessageObject, FieldValue } from "$lib/types";
 	import { onMount } from "svelte";
 	import CreateDeviceObject from "./CreateDeviceObject.svelte";
 
@@ -11,10 +11,13 @@
 
   const generate = fields.bucket === "GENERATE_DEVICE";
   if (generate && allowableBuckets > 0) {
-    fields[key] = (JSON.parse(JSON.stringify(deviceTypes))).filter(hasBucket)
+    fields[key] = {
+      selectedDevice: 0,
+      devices: (JSON.parse(JSON.stringify(deviceTypes))).filter(hasBucket)
+    };
   }
 
-  let deviceField = fields[key] as DeviceMessageObject[];
+  let deviceField = fields[key] as BucketMessageObject;
 
   function hasBucket(element : DeviceMessageObject) {
     return allowableBuckets > 1 || 
@@ -24,7 +27,8 @@
 
 {#if allowableBuckets > 0}
   <div class="section">
-    <CreateDeviceObject deviceTypes={deviceField} 
+    <CreateDeviceObject deviceTypes={deviceField.devices} 
+                        bind:selectedTypeIndex={deviceField.selectedDevice}
                         units={units} 
                         allowableBuckets={allowableBuckets} />
   </div>
