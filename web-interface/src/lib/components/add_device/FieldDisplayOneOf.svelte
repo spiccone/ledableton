@@ -1,8 +1,8 @@
 <script lang="ts">
-	import { nameFormat } from "$lib/helper-functions";
-  import type {FieldValue, OneOf } from "$lib/types";
+	import {nameFormat} from "$lib/helper-functions";
+  import type {FieldValue, OneOf} from "$lib/device";
 	import Select from "../basic/Select.svelte";
-  import FieldInputObject from './FieldInputObject.svelte';
+  import FieldInput from './FieldInput.svelte';
 
   export let fieldValue: OneOf;
 
@@ -26,11 +26,11 @@
   }
 </script>
 
-<FieldInputObject bind:fieldValue={fieldValueEntries[selectedIndex]} units={units}>
+<FieldInput bind:fieldValue={fieldValueEntries[selectedIndex]} units={units}>
   <span slot="label">
     <Select items={oneOfList} 
     bind:selectedIndex={selectedIndex}
     arrowRight={false}
     on:select={handleSelect} />
   </span>
-</FieldInputObject>
+</FieldInput>

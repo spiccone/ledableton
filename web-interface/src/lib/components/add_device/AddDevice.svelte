@@ -1,6 +1,6 @@
 <script lang="ts">
   import {onMount} from 'svelte';
-  import type {DeviceMessageObject, OneOf} from '$lib/types';
+  import type {DeviceMessageObject, OneOf, SavedDevice} from '$lib/device';
   import Modal from '../Modal.svelte';
   import Select from '../basic/Select.svelte';
   import Icon from '@iconify/svelte';
@@ -10,19 +10,25 @@
   import deleteOutlineRounded from '@iconify/icons-material-symbols/delete-outline-rounded';
   import roundArrowBackIos from '@iconify/icons-ic/round-arrow-back-ios';
   import protobuf from 'protobufjs';
-  import {nameFormat} from "../../helper-functions";
-	import CreateDeviceObject from './CreateDeviceObject.svelte';
-
+	import CreateDevice from './CreateDevice.svelte';
  
   let units : {key: string, label: string}[] = [];
 
   let deviceList : DeviceMessageObject[] = [];
+  let savedDevices : SavedDevice[] = [];
+  let createDeviceIndex = 0;
+  let savedDeviceIndex = 0;
+
+  let defaultDeviceList : DeviceMessageObject[] = [];
+
+  let savedIndex = 0;
+
+  let savedDeviceNames : {key: string, label: string}[] = [];
 
   let createDevice = true;
 
   let error = false;
   let deviceName = "";
-  let deviceKeyIndex = 0;
 
   let edit = false;
   
@@ -87,53 +93,78 @@
       }
 
       let TypeMessage = root.lookupType("devicepackage.Device");
-
       for (const device of (createObjectFromMessage(TypeMessage).device as OneOf).oneOf) {
-        deviceList.push(device);
+        defaultDeviceList.push(device);
       }
-
-      console.log(deviceList);
+      deviceList = JSON.parse(JSON.stringify(defaultDeviceList));
     });
   });
+
+  function updateSavedDeviceNames() {
+    savedDeviceNames.length = 0;
+    for (const device of savedDevices) {
+      savedDeviceNames.push({
+        key: "device_" + savedIndex++,
+        label: device.name
+      })
+    }
+  }
 
   function openCreateNewDevice() {
     createDevice = true;
   }
 
   function openAddDevice() {
+    createDevice = false;
     edit = false;
   }
 
   function editDevice() {
+    deviceName = savedDevices[savedDeviceIndex].name;
     edit = true;
     copyDevice();
   }
 
   function copyDevice() {
     createDevice = true;
+    openCreateNewDevice();
   }
 
   function deleteDevice() {
-    deviceName = "";
+    savedDevices.splice(savedDeviceIndex, 1);
+    savedDevices = savedDevices;
+    updateSavedDeviceNames();
   }
+
+  function handleSave() {
+    if (!edit) {
+      savedDevices.push({
+        name: deviceName,
+        settings: deviceList[createDeviceIndex]});
+    } else if(savedDeviceIndex < savedDevices.length) {
+      savedDevices[savedDeviceIndex].name = deviceName;
+      savedDevices[savedDeviceIndex].settings = deviceList[createDeviceIndex];
+    } else {
+      throw "Could not edit device";
+    }
+    console.log(savedDevices);
+    updateSavedDeviceNames();
+    deviceName = "";
+    openAddDevice();
+  }
+
+  function handleAdd() {
+
+	}
 
   function mouseOverSave() {
     if (deviceName === '') {
       error = true;
     }
   }
-
   function mouseLeaveSave() {
     error = false;
   }
-
-  function handleSave() {
-    console.log(deviceList);
-  }
-
-  function handleAdd() {
-
-	}
 </script>
 
 <Modal>
@@ -145,11 +176,11 @@
   </div>
   <div class="header" slot="header">
     {#if createDevice}
-      <!-- {#if savedDevices.length > 0}
+      {#if savedDevices.length > 0}
         <button class="back-button" on:click={openAddDevice}>
           <Icon icon={roundArrowBackIos} />
         </button>
-      {/if} -->
+      {/if}
       <h1>{edit ? "Edit" : "Create"} Device</h1>
     {:else}
       <h1>Add Device</h1>
@@ -166,13 +197,14 @@
                  bind:value={deviceName}
                  placeholder="New device" />
         </div>
-        <CreateDeviceObject deviceTypes={deviceList} 
-                            units={units} />
+        <CreateDevice bind:deviceTypes={deviceList} 
+                      bind:selectedTypeIndex={createDeviceIndex}
+                      units={units} />
       {:else}
-        <!-- <div class="saved-device-container">
+        <div class="saved-device-container">
           <div class="saved-select">
-            <Select items={savedDevices} 
-                    bind:selectedItem={selectedSavedDevice} />
+            <Select items={savedDeviceNames} 
+                    bind:selectedIndex={savedDeviceIndex} />
           </div>
           <button class="icon-button" on:click={editDevice}>
             <Icon icon={editOutlineRounded} />
@@ -187,7 +219,7 @@
             New
             <div class="add-button-icon"><Icon icon={roundPlus} /></div>
           </button>
-        </div> -->
+        </div>
       {/if}
     </div>
   </div>

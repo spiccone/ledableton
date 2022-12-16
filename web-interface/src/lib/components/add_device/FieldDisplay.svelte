@@ -1,8 +1,8 @@
 <script lang="ts">
-	import { nameFormat } from "$lib/helper-functions";
-	import type {DeviceMessageObject, FieldValue, OneOf } from "$lib/types";
+	import {nameFormat} from "$lib/helper-functions";
+	import type {DeviceMessageObject, OneOf} from "$lib/device";
 	import FieldDisplayOneOf from "./FieldDisplayOneOf.svelte";
-	import FieldInputObject from "./FieldInputObject.svelte";
+	import FieldInput from "./FieldInput.svelte";
 
   export let key: string;
   export let fields: DeviceMessageObject;
@@ -33,11 +33,11 @@
   {#if fieldOneOf}
     <FieldDisplayOneOf bind:fieldValue={fieldOneOf} units={units} />
   {:else}
-    <FieldInputObject bind:fieldValue={fields[key]} units={units}>
+    <FieldInput bind:fieldValue={fields[key]} units={units}>
       <span slot="label">
         {label}
       <span>
-    </FieldInputObject>
+    </FieldInput>
   {/if}
 </div>
 

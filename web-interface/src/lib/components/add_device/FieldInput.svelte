@@ -1,8 +1,7 @@
 <script lang="ts">
-	import type {Dimension, FieldValue, DeviceMessageObject, Unit } from "$lib/types";
+	import type {Dimension, FieldValue, Unit} from "$lib/device";
 	import Labeled from "../basic/Labeled.svelte";
 	import Select from "../basic/Select.svelte";
-
 
   export let id = "";
   export let fieldValue : FieldValue;

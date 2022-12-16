@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type {DeviceMessageObject, FieldValue, RepeatedNumber } from "$lib/types";
+	import type {DeviceMessageObject, RepeatedNumber} from "$lib/device";
   import Icon from '@iconify/svelte';
   import autoAwesomeMotionOutlineRounded from '@iconify/icons-material-symbols/auto-awesome-motion-outline-rounded';
   import roundPlus from '@iconify/icons-ic/round-plus';
@@ -7,7 +7,7 @@
 	import Checkbox from "../basic/Checkbox.svelte"
   import Labeled from "../basic/Labeled.svelte";
 	import SplitInput from "../basic/SplitInput.svelte";
-	import FieldDisplayObject from "./FieldDisplayObject.svelte";
+	import FieldDisplay from "./FieldDisplay.svelte";
 	import Bucket from "./Bucket.svelte";
 
   export let fields : DeviceMessageObject;
@@ -97,7 +97,7 @@
 <div class="BucketedVariableColumns">
   <div class="options">
     <div class="option-item">
-      <FieldDisplayObject key="units"
+      <FieldDisplay key="units"
                           bind:fields={fields}
                           units={units} />
     </div>

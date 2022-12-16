@@ -1,9 +1,9 @@
 <script lang="ts">
   import Select from '../basic/Select.svelte';
 	import BucketedVariableColumns from './BucketedVariableColumns.svelte';
-	import type { DeviceMessageObject, FieldValue,} from '$lib/types';
-	import { nameFormat } from '$lib/helper-functions';
-	import FieldDisplayObject from './FieldDisplayObject.svelte';
+	import type {DeviceMessageObject} from '$lib/device';
+	import {nameFormat} from '$lib/helper-functions';
+	import FieldDisplay from './FieldDisplay.svelte';
   import Bucket from './Bucket.svelte';
 
   export let deviceTypes : DeviceMessageObject[];
@@ -50,7 +50,7 @@
                     units={units} 
                     allowableBuckets={allowableBuckets-1} />
           {:else}
-            <FieldDisplayObject key={key} 
+            <FieldDisplay key={key} 
                                 bind:fields={deviceFieldList[selectedTypeIndex]}
                                 units={units}
                                 zIndex={10-i} />

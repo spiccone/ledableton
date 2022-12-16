@@ -1,7 +1,6 @@
 <script lang="ts">
-	import type { BucketMessageObject, DeviceMessageObject, FieldValue } from "$lib/types";
-	import { onMount } from "svelte";
-	import CreateDeviceObject from "./CreateDeviceObject.svelte";
+	import type {BucketMessageObject, DeviceMessageObject} from "$lib/device";
+	import CreateDevice from "./CreateDevice.svelte";
 
   export let deviceTypes : DeviceMessageObject[];
   export let key : string;
@@ -27,7 +26,7 @@
 
 {#if allowableBuckets > 0}
   <div class="section">
-    <CreateDeviceObject deviceTypes={deviceField.devices} 
+    <CreateDevice deviceTypes={deviceField.devices} 
                         bind:selectedTypeIndex={deviceField.selectedDevice}
                         units={units} 
                         allowableBuckets={allowableBuckets} />
