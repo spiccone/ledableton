@@ -1,116 +1,105 @@
 <script lang="ts">
-	import type { DeviceFieldValue, Field, NestedRepeatedDeviceFieldValue, RepeatedDeviceFieldValue } from "$lib/types";
+	import type {DeviceMessageObject, FieldValue, RepeatedNumber } from "$lib/types";
   import Icon from '@iconify/svelte';
   import autoAwesomeMotionOutlineRounded from '@iconify/icons-material-symbols/auto-awesome-motion-outline-rounded';
   import roundPlus from '@iconify/icons-ic/round-plus';
   import roundMinus from '@iconify/icons-ic/round-minus';
-	import Checkbox from "../basic/Checkbox.svelte";
-	import FieldDisplay from "./FieldDisplay.svelte";
+	import Checkbox from "../basic/Checkbox.svelte"
   import Labeled from "../basic/Labeled.svelte";
 	import SplitInput from "../basic/SplitInput.svelte";
+	import FieldDisplayObject from "./FieldDisplayObject.svelte";
+	import Bucket from "./Bucket.svelte";
 
-  export let fields : Field[];
-  export let fieldValues : DeviceFieldValue[];
-  export let units: {key: string, label: string}[] = [];
+  export let fields : DeviceMessageObject;
+  export let deviceTypes : DeviceMessageObject[];
+  export let units : {key: string, label: string}[] = [];
+  export let allowableBuckets = 2;
 
-  let columnField : Field;
-  let rowField : Field;
-  let unitField : Field;
+  if (!('columnSpacing' in fields)) {
+    throw "BucketedVariableColumns does not have columnSpacing field";
+  }
+  if (!('rowSpacing' in fields)) {
+    throw "BucketedVariableColumns does not have rowSpacing field";
+  }
+  if (!('units' in fields)) {
+    throw "BucketedVariableColumns does not have units field";
+  }
+  if (!('bucket' in fields)) {
+    throw "BucketedVariableColumns does not have bucket field";
+  }
 
-  let columnFieldValue : NestedRepeatedDeviceFieldValue;
-  let rowFieldValue : RepeatedDeviceFieldValue;
-  let unitFieldValue : DeviceFieldValue;
+  let columnSpacing = fields.columnSpacing as RepeatedNumber[];
+  let rowSpacing = fields.rowSpacing as number[];
 
   let alignTop = true;
 
   let columnAutoFill = 20;
   let rowAutoFill = 30;
 
-  for (let [index, field] of fields.entries()) {
-    switch (field.key) {
-      case "columns":
-        columnField = field;
-        columnFieldValue = fieldValues[index] as NestedRepeatedDeviceFieldValue;
-        break;
-      case "rowSpacing":
-        rowField = field;
-        rowFieldValue = fieldValues[index] as RepeatedDeviceFieldValue;
-        break;
-      case "units":
-        unitField = field;
-        unitFieldValue = fieldValues[index];
-        break;
-    }
+  initalize();
+
+  function initalize() {
+    rowSpacing.pop();
   }
 
-  initColumn();
+  function addColumn(index: number) {
+    if(index < columnSpacing.length) {
+      columnSpacing[index].repeatedNumber.push(columnAutoFill);
+    }
+    columnSpacing = columnSpacing;
+  }
 
-  function initColumn() {
-    if (columnFieldValue.value.length > 0 &&
-      columnFieldValue.value[0].length == 0) {
-      addColumn(0);
+  function subtractColumn(index: number) {
+    if (columnSpacing[index]?.repeatedNumber.length > 1) {
+      columnSpacing[index].repeatedNumber.pop();
+      columnSpacing = columnSpacing;
     }
   }
 
   function addRow() {
-    const numRows = columnFieldValue.value.length;
-    if (numRows > 0) {rowFieldValue.addToValue(rowAutoFill);}
-    columnFieldValue.addToValue([0]);
-    columnFieldValue = columnFieldValue;
+    rowSpacing.push(rowAutoFill);
+    columnSpacing.push({repeatedNumber: [0]});
+    columnSpacing = columnSpacing;
   }
 
   function subtractRow() {
-    rowFieldValue.removeFromValue();
-    columnFieldValue.removeFromValue();
-    columnFieldValue = columnFieldValue;
+    rowSpacing.pop();
+    columnSpacing.pop();
+    columnSpacing = columnSpacing;
   }
 
-  function addColumn(index: number) {
-    columnFieldValue.addToNestedValue(index, columnAutoFill);
-    columnFieldValue = columnFieldValue;
-  }
-
-  function subtractColumn(index: number) {
-    if (columnFieldValue.value[index].length > 1) {
-      columnFieldValue.removeFromNestedValue(index);
-      columnFieldValue = columnFieldValue;
-    }
-  }
 
   function handleAlignTop() {
     if (alignTop) {
-      for (let columnList of columnFieldValue.value) {
-        columnList[0] = 0;
+      for (let columnList of columnSpacing) {
+        columnList.repeatedNumber[0] = 0;
       }
     } 
   }
 
   function fillColumns() {
-    for (let columnList of columnFieldValue.value) {
-      for (let i=1; i<columnList.length; i++) {
-        columnList[i] = columnAutoFill;
+    for (let columnList of columnSpacing) {
+      for (let i=alignTop ? 1 : 0; i<columnList.repeatedNumber.length; i++) {
+        columnList.repeatedNumber[i] = columnAutoFill;
       } 
     }
-    columnFieldValue = columnFieldValue;
+    columnSpacing = columnSpacing;
   }
 
   function fillRows() {
-    const rowList = rowFieldValue.value;
-    for (let i=0; i<rowList.length; i++) {
-      rowList[i]= rowAutoFill;
+    for (let i=0; i<rowSpacing.length; i++) {
+      rowSpacing[i]= rowAutoFill;
     }
-    rowFieldValue = rowFieldValue;
+    rowSpacing = rowSpacing;
   }
 </script>
 
 <div class="BucketedVariableColumns">
   <div class="options">
     <div class="option-item">
-      <FieldDisplay inputId="field_bvc_unit"
-                    field={unitField}
-                    fieldValue={unitFieldValue}
-                    units={units}
-                    zIndex={20} />
+      <FieldDisplayObject key="units"
+                          bind:fields={fields}
+                          units={units} />
     </div>
     <div class="option-item">
       <Labeled inputId="field_bvc_rowFill">
@@ -151,16 +140,16 @@
   </div>
   <div class="column-container">
     <div class="variable-columns{alignTop ? ' align-top' : ''}">
-      {#each columnFieldValue.value as value, i (i)}
+      {#each columnSpacing as value, i (i)}
         <div class="column">
           <div class="first-bucket"></div>
-          {#each columnFieldValue.value[i] as value, j (j)}
+          {#each columnSpacing[i].repeatedNumber as value, j (j)}
             {#if !alignTop || j > 0}
               <div class="entry"></div>
                 <div class="column-input-container">
                   <input class="column-input" 
                         type="text"
-                        bind:value={columnFieldValue.value[i][j]} />
+                        bind:value={columnSpacing[i].repeatedNumber[j]} />
                 </div>
                 <div class="bucket"></div>
             {/if}
@@ -169,16 +158,16 @@
             <Icon icon={roundPlus} />
           </button>
           <button class="subtract"
-                  disabled={columnFieldValue.value[i].length < 2}
+                  disabled={columnSpacing[i].repeatedNumber.length < 2}
                   on:click|preventDefault={() => subtractColumn(i)}>
             <Icon icon={roundMinus} />
           </button>
         </div>
-        {#if rowFieldValue.value.length > i}
+        {#if i < rowSpacing.length}
           <div class="row-input-container">
             <input class="row-input" 
                   type="text" 
-                  bind:value={rowFieldValue.value[i]} />
+                  bind:value={rowSpacing[i]} />
           </div>
         {/if}
       {/each}
@@ -187,7 +176,7 @@
           <Icon icon={roundPlus} />
         </button>
         <button class="subtract" 
-                disabled={columnFieldValue.value.length < 2}
+                disabled={columnSpacing.length < 2}
                 on:click|preventDefault={() => subtractRow()}>
           <Icon icon={roundMinus} />
         </button>
@@ -200,7 +189,13 @@
     </div>
   </div>
 </div>
-<slot name="type-field"/>
+<div class="bucket-selection">
+  <Bucket deviceTypes={deviceTypes}
+          key="bucket"
+          fields={fields}
+          units={units} 
+          allowableBuckets={allowableBuckets-1} />
+</div>
 
 <style>
   .BucketedVariableColumns {
@@ -321,6 +316,13 @@
     bottom: 12px;
     position: absolute;
     right: 16px;
+  }
+
+  .bucket-selection {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    width: 100%;
   }
 </style>
 

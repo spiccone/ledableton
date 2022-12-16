@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type {Dimension, FieldValue, DeviceMessageObject } from "$lib/types";
+	import type {Dimension, FieldValue, DeviceMessageObject, Unit } from "$lib/types";
 	import Labeled from "../basic/Labeled.svelte";
 	import Select from "../basic/Select.svelte";
 
@@ -8,12 +8,28 @@
   export let fieldValue : FieldValue;
   export let units : {key: string, label: string}[] = [];
 
-  // This doesn't work because for oneof, fieldvalue might change
   let dimension : Dimension | null = null;
+  let unit : Unit | null = null;
 
-  if ((fieldValue as Dimension).unit != null) {
-    dimension = fieldValue as Dimension;
-  } else if (typeof fieldValue === "object") {
+  checkTypes();
+  
+  $: fieldValue, checkTypes();
+
+  function checkTypes() {
+    if (typeof (fieldValue) === "object") {
+      dimension = fieldValue as Dimension;
+      if (dimension?.dimension !== undefined && dimension.unit?.selectedUnit !== undefined) {
+        unit = dimension.unit;
+        return;
+      }
+      dimension = null;
+      unit = fieldValue as Unit;
+      if (unit?.selectedUnit !== undefined) {
+        return;
+      }
+    }
+    dimension = null;
+    unit = null;
   }
 
 </script>
@@ -21,7 +37,7 @@
 <Labeled inputId={id}>
   <span slot="label"><slot name="label"></slot></span>
   <span class="field-input-container" slot="content">
-    {#if dimension}
+    {#if dimension && unit}
       <input id={id} 
           class="field-input has-select"
           type="number"
@@ -29,9 +45,12 @@
           size=10 />
       <div class="dimension-select">
         <Select items={units} 
-                bind:selectedIndex={dimension.unit}
+                bind:selectedIndex={unit.selectedUnit}
                 showArrow={false} />
       </div>
+    {:else if unit}
+      <Select items={units} 
+              bind:selectedIndex={unit.selectedUnit} />
     {:else}
      <input id={id} 
           class="field-input"

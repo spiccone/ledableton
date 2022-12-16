@@ -1,6 +1,6 @@
 <script lang="ts">
   import {onMount} from 'svelte';
-  import {DeviceType, Field, DeviceFieldValue as FieldValue, SavedDevice, type DeviceMessageObject, type DeviceObject, type OneOf} from '$lib/types';
+  import type {DeviceMessageObject, OneOf} from '$lib/types';
   import Modal from '../Modal.svelte';
   import Select from '../basic/Select.svelte';
   import Icon from '@iconify/svelte';
@@ -11,26 +11,14 @@
   import roundArrowBackIos from '@iconify/icons-ic/round-arrow-back-ios';
   import protobuf from 'protobufjs';
   import {nameFormat} from "../../helper-functions";
-	import CreateDevice from './CreateDevice.svelte';
 	import CreateDeviceObject from './CreateDeviceObject.svelte';
 
-  let savedDevices : SavedDevice[] = [];
-  let deviceTypes : DeviceType[] = [];
-  let deviceTypesNoBuckets : DeviceType[] = [];
+ 
   let units : {key: string, label: string}[] = [];
-
-  let selectedSavedDevice : SavedDevice;
-
-  let createdDevices : DeviceObject[] = [];
-
-  let selectedDeviceType : DeviceType | null;
-  let selectedTypeFields : FieldValue[] | null;
-  let selectedDeviceBucket : DeviceType | null;
-  let selectedDeviceBucketFields : FieldValue[] | null;
 
   let deviceList : DeviceMessageObject[] = [];
 
-  let createDevice = savedDevices.length == 0;
+  let createDevice = true;
 
   let error = false;
   let deviceName = "";
@@ -59,26 +47,32 @@
   }
 
   function objectValueFromFieldValue(value: protobuf.Field) {
+    let field = getValueFromField(value);
     if (value.repeated) {
-     return [];
+     return [field];
     } 
+    return field;
+  }
+
+  function getValueFromField(value: protobuf.Field) {
     switch (value.type) {
       case "string":
         return '';
       case "boolean":
         return false;
+      case "uint32":
       case "int32":
-      case "Unit":
-      case "float":
         return 0;
+      case "float":
+        return 0.1;
+      case "Unit":
+        return {selectedUnit: 0};
       case "Device":
-        return {};
+        return "GENERATE_DEVICE";
       default:
         return createObjectFromMessage(deviceProto.lookupType("devicepackage." + value.type));
     }
   }
-
-
 
   onMount(() => {
     protobuf.load("src/protos/device.proto").then(function(root) {
@@ -94,100 +88,32 @@
 
       let TypeMessage = root.lookupType("devicepackage.Device");
 
-      for (const device of (createObjectFromMessage(TypeMessage).device as oneOf).oneOf) {
+      for (const device of (createObjectFromMessage(TypeMessage).device as OneOf).oneOf) {
         deviceList.push(device);
       }
 
-      for (const [key, value] of Object.entries(TypeMessage.fields)) {
-        if (value.type === "string") {
-          continue;
-        }
-        const valueTypeMessage = root.lookupType("devicepackage." + value.type);
-
-        const fieldMessage = valueTypeMessage.fields;
-        const fields = [];
-        let isBucket = false;
-        for (const [key, value] of Object.entries(fieldMessage)) {
-          if (!value.partOf) {
-            fields.push(new Field(key, nameFormat(key), value.type, value.repeated));
-            isBucket = isBucket || value.type == "Device";
-          }
-        }
-        const oneofs = valueTypeMessage.oneofs;
-        if (oneofs) {
-          for (const [name, oneof] of Object.entries(oneofs)) {
-            const oneofFields : Field[] = [];
-            for (const [key, value] of Object.entries(oneof.fieldsArray)) {
-              oneofFields.push(
-                new Field(value.name, nameFormat(value.name), value.type, value.repeated));
-            }
-            const newField = new Field(name, nameFormat(key), value.type, value.repeated);
-            newField.addOneofList(oneofFields);
-            fields.push(newField);
-          }
-        }
-        if (!isBucket) {
-          deviceTypesNoBuckets.push({key: key, 
-                                     label: nameFormat(key), 
-                                     type: value.type, 
-                                     fields:fields});
-            
-        }
-        deviceTypes.push({key: key, 
-                          label: nameFormat(key), 
-                          type: value.type, 
-                          fields:fields});
-      }
+      console.log(deviceList);
     });
-    deviceKeyIndex = savedDevices.length;
   });
 
   function openCreateNewDevice() {
-    selectedDeviceType = null;
-    selectedTypeFields = null;
-    selectedDeviceBucket = null;
-    selectedDeviceBucketFields = null;
     createDevice = true;
   }
 
   function openAddDevice() {
-    if (savedDevices.length > 0) { // should always be true
-      createDevice = false;
-      selectedSavedDevice = savedDevices[0];
-    }
     edit = false;
   }
 
   function editDevice() {
     edit = true;
-    deviceName = selectedSavedDevice.label;
     copyDevice();
   }
 
   function copyDevice() {
-    if (!selectedSavedDevice || !selectedSavedDevice.type) {
-      return;
-    }
-    selectedDeviceType = selectedSavedDevice.type;
-    selectedTypeFields = selectedSavedDevice.fields;
-    selectedDeviceBucket = selectedSavedDevice.bucketType;
-    selectedDeviceBucketFields = selectedSavedDevice.bucketFields;
     createDevice = true;
   }
 
   function deleteDevice() {
-    const index = savedDevices.indexOf(selectedSavedDevice);
-    if (index > -1) {
-      savedDevices.splice(index, 1);
-    }
-    if (savedDevices.length == 0) {
-      createDevice = true;
-    } else if (index == 0) {
-      selectedSavedDevice = savedDevices[0]
-    } else {
-      selectedSavedDevice = savedDevices[index - 1];
-    }
-    savedDevices = savedDevices;
     deviceName = "";
   }
 
@@ -201,63 +127,12 @@
     error = false;
   }
 
-  function createDeviceObject(fields : FieldValue[]) : DeviceMessageObject {
-    const typeObject : DeviceMessageObject = {};
-    for (const field of fields) {
-      if (field.type === "Device" && selectedDeviceBucketFields) {
-        typeObject[field.getKey()] = createDeviceObject(selectedDeviceBucketFields);
-      } else {
-        typeObject[field.getKey()] = field.getValue();
-      }
-    }
-    return typeObject;
-  }
-
   function handleSave() {
-    if(!selectedTypeFields) {
-      // TODO: Some error thing
-      return;
-    }
-    const TypeMessage = deviceProto.lookupType("devicepackage." + selectedDeviceType?.type);
-
-    const typeObject = createDeviceObject(selectedTypeFields);
-
-    const errorMessage = TypeMessage.verify(typeObject);
-    if (errorMessage) {
-      throw errorMessage;
-    }
-
-    const DeviceMessage = deviceProto.lookupType("devicepackage.Device");
-    const deviceObject = {
-      name: deviceName,
-      type: typeObject,
-    };
-
-    const errorMessage2 = DeviceMessage.verify(deviceObject);
-    if (errorMessage2) {
-      throw errorMessage2;
-    }
-
-    const deviceKey = selectedDeviceType?.key + '_' + deviceKeyIndex++;
-    const device = edit ?
-        selectedSavedDevice :
-        new SavedDevice(deviceKey, deviceName);
-    device.type = selectedDeviceType;
-    device.label = deviceName;
-    device.fields = selectedTypeFields;
-    if (selectedDeviceBucket) {
-      device.bucketType = selectedDeviceBucket;
-      device.bucketFields = selectedDeviceBucketFields;
-    }
-    if (!edit) {
-      savedDevices.push(device);
-    }
-    deviceName = "";
-    openAddDevice();
+    console.log(deviceList);
   }
 
   function handleAdd() {
-    console.log(selectedSavedDevice);
+
 	}
 </script>
 
@@ -270,11 +145,11 @@
   </div>
   <div class="header" slot="header">
     {#if createDevice}
-      {#if savedDevices.length > 0}
+      <!-- {#if savedDevices.length > 0}
         <button class="back-button" on:click={openAddDevice}>
           <Icon icon={roundArrowBackIos} />
         </button>
-      {/if}
+      {/if} -->
       <h1>{edit ? "Edit" : "Create"} Device</h1>
     {:else}
       <h1>Add Device</h1>
@@ -282,7 +157,7 @@
   </div>
   <div class="content" slot="content">
     <div class="outer-section">
-      {#if createDevice || savedDevices.length == 0}
+      {#if createDevice}
       <!-- createDevice should be true when savedDevices is empty -->
         <div class="device-name-container">
           <input class:error
@@ -291,21 +166,10 @@
                  bind:value={deviceName}
                  placeholder="New device" />
         </div>
-        <CreateDeviceObject deviceTypes={deviceList} units={units} />
-
-        <!-- <CreateDevice bind:selectedItem={selectedDeviceType} 
-                      bind:selectedItemOptions={selectedTypeFields}
-                      deviceTypes={deviceTypes}
-                      units={units}>
-          <div class="inner-section" slot="type-field">
-            <CreateDevice bind:selectedItem={selectedDeviceBucket} 
-                          bind:selectedItemOptions={selectedDeviceBucketFields}
-                          deviceTypes={deviceTypesNoBuckets}
-                          units={units} />
-          </div>
-        </CreateDevice> -->
+        <CreateDeviceObject deviceTypes={deviceList} 
+                            units={units} />
       {:else}
-        <div class="saved-device-container">
+        <!-- <div class="saved-device-container">
           <div class="saved-select">
             <Select items={savedDevices} 
                     bind:selectedItem={selectedSavedDevice} />
@@ -323,7 +187,7 @@
             New
             <div class="add-button-icon"><Icon icon={roundPlus} /></div>
           </button>
-        </div>
+        </div> -->
       {/if}
     </div>
   </div>

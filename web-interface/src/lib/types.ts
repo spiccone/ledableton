@@ -149,10 +149,19 @@ export class SavedDevice {
   }
 }
 
+export type Unit = {
+  selectedUnit: number
+}
+
 export type Dimension = {
-  unit: number, 
+  unit: Unit, 
   dimension: number
 }
+
+export type RepeatedNumber = {
+  repeatedNumber: number[];
+}
+
 
 export type FieldValue = number|string|boolean|Dimension|DeviceMessageObject|FieldValue[]|OneOf;
 
