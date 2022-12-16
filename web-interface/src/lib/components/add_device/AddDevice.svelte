@@ -111,6 +111,9 @@
   }
 
   function openCreateNewDevice() {
+    deviceList.length = 0;
+    deviceList = JSON.parse(JSON.stringify(defaultDeviceList));
+    createDeviceIndex = 0;
     createDevice = true;
   }
 
@@ -127,13 +130,14 @@
 
   function copyDevice() {
     createDevice = true;
-    openCreateNewDevice();
+    createDevice = true;
   }
 
   function deleteDevice() {
     savedDevices.splice(savedDeviceIndex, 1);
     savedDevices = savedDevices;
     updateSavedDeviceNames();
+    createDevice = savedDevices.length === 0;
   }
 
   function handleSave() {
