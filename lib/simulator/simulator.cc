@@ -1,8 +1,8 @@
 
 #include <google/protobuf/util/json_util.h>
 
-#include <iostream>
 #include <fstream>
+#include <iostream>
 #include <websocketpp/config/asio_no_tls.hpp>
 #include <websocketpp/server.hpp>
 
@@ -29,11 +29,35 @@ void on_message(Server *s, websocketpp::connection_hdl hdl,
     return;
   }
 
-  std::ofstream myfile;
-  myfile.open("devices.json");
-  if (myfile.is_open()) {
-    myfile << msg->get_payload() << std::endl;
-    myfile.close();
+  if (msg->get_payload() == "load-files") {
+    std::cout << "Load";
+    std::ifstream file;
+    file.open("devices.json");
+    std::string string;
+    std::string sTotal;
+    if (file.is_open()) {
+      while(!file.eof()) {
+        getline(file, string);
+        sTotal += string + "\n";
+      }
+      std::cout << "String " << sTotal;
+    } else {
+      std::cout << "Unable to open file";
+    }
+    try {
+      s->send(hdl, sTotal, msg->get_opcode());
+    } catch (websocketpp::exception const &e)  {
+      std::cout << "Echo failed because: "
+              << "(" << e.what() << ")" << std::endl;
+    }
+    return;
+  }
+
+  std::ofstream file;
+  file.open("devices.json");
+  if (file.is_open()) {
+    file << msg->get_payload() << std::endl;
+    file.close();
   } else {
     std::cout << "Unable to open file";
   }

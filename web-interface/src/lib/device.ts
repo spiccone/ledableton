@@ -58,13 +58,19 @@ export class Field {
   }
 }
 
-export type Unit = {
-  selectedUnit: number
+export type Value = {
+  value: number|string|boolean,
+  type: string
+}
+
+export type UnitValue = {
+  value: number,
+  type: "Unit"
 }
 
 export type Dimension = {
-  unit: Unit, 
-  dimension: number
+  unit: UnitValue, 
+  dimension: Value
 }
 
 export type RepeatedNumber = {
@@ -80,7 +86,7 @@ export type DeviceMessageObject = {
 export type BucketMessageObject = {
   devices: DeviceMessageObject[];
   selectedDevice: number
-
+  type: "Settings"
 }
 
 export type SavedDevice = {

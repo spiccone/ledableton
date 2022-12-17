@@ -21,6 +21,8 @@
   let oppositeLayoutDirection = Layout.row;
   let columnLayout = true;
 
+
+
   let devices: Array<Device> = [
     new Device(1, 'Device 1', '#FCB900'), 
     new Device(2, 'Device 2', '#F78DA7')];
@@ -63,7 +65,7 @@
            'grid-template-columns: minmax(200px, ' + previewWidth + 'px) 4px minmax(100px, '+previewHeight+'px) 4px minmax(60px, 1fr);' +
            'grid-template-rows: 1fr;'}">
   <div class="preview-area">
-    <PreviewArea 
+    <PreviewArea
       bind:devices={devices} 
       locked = {locked} />
   </div>

@@ -21,7 +21,7 @@
     {/each}
   </div>
   {#if !locked}
-    <AddDevice />
+    <AddDevice/>
   {/if}
 </div>
 

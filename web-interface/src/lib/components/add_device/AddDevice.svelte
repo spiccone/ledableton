@@ -1,6 +1,6 @@
 <script lang="ts">
   import {onMount} from 'svelte';
-  import type {BucketMessageObject, DeviceMessageObject, OneOf, SavedDevice, Value} from '$lib/device';
+  import type {DeviceMessageObject, OneOf, SavedDevice, Value} from '$lib/device';
   import Modal from '../Modal.svelte';
   import Select from '../basic/Select.svelte';
   import Icon from '@iconify/svelte';
@@ -11,6 +11,8 @@
   import roundArrowBackIos from '@iconify/icons-ic/round-arrow-back-ios';
   import protobuf from 'protobufjs';
 	import CreateDevice from './CreateDevice.svelte';
+
+  let socket: WebSocket;
  
   let units : {key: string, label: string}[] = [];
 
@@ -25,7 +27,7 @@
 
   let savedDeviceNames : {key: string, label: string}[] = [];
 
-  let createDevice = true;
+  let createDevice = false;
 
   let error = false;
   let deviceName = "";
@@ -80,6 +82,7 @@
   }
 
   onMount(() => {
+    socket = new WebSocket('ws://localhost:9001');
     protobuf.load("src/protos/device.proto").then(function(root) {
       if (!root) {
         throw "Error loading device.proto in AddDevice.";
@@ -96,8 +99,20 @@
         defaultDeviceList.push(device);
       }
       deviceList = JSON.parse(JSON.stringify(defaultDeviceList));
+      loadJson();
     });
   });
+
+  async function loadJson() {
+    const socket = new WebSocket('ws://localhost:9001');
+    socket.addEventListener('open', (event) => {
+      socket.send("load-files");
+    });
+    socket.addEventListener('message', (event) => {
+      savedDevices = JSON.parse(event.data).devices;
+      updateSavedDeviceNames();
+    });
+  }
 
   function updateSavedDeviceNames() {
     savedDeviceNames.length = 0;
@@ -129,6 +144,7 @@
   function deleteDevice() {
     savedDevices.splice(savedDeviceIndex, 1);
     savedDevices = savedDevices;
+    sendJson();
     updateSavedDeviceNames();
     createDevice = savedDevices.length === 0;
   }
@@ -224,7 +240,6 @@
 
     const DeviceMessage = DeviceProto.lookupType("devicepackage.Device");
     const errorMessage = DeviceMessage.verify(newDevice);
-    console.log(newDevice);
     if (errorMessage) throw errorMessage;
 
     if (!edit) {
@@ -252,11 +267,7 @@
     if (errorMessage) throw errorMessage;
 
     const json = JSON.stringify(savedDevicesMessages);
-
-    const socket = new WebSocket('ws://localhost:9001');
-    socket.addEventListener('open', (event) => {
-      socket.send(json);
-    });
+    socket.send(json);
   }
 
   function handleAdd() {
