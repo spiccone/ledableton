@@ -135,7 +135,8 @@
 
 <div class="Select {open ? 'open' : 'closed'}
                    {showArrow ? 'has-arrow' : ''}
-                   {arrowRight ? 'arrow-right' : ''}">
+                   {arrowRight ? 'arrow-right' : ''}
+                   {items.length > 1 ? 'enabled' : 'disabled'}">
   <div class="select-box">
     <div class="item-spacer-list">
       {#each items as item, i ("spacer_" + i)}
@@ -149,7 +150,7 @@
     <div class="select-list-container"
          role="button"
          on:keydown={keydown}
-         tabindex=0>
+         tabindex={items.length>1 ? 0 : -1}>
       <!-- svelte-ignore a11y-click-events-have-key-events -->
       <div class="selected-list-item"
            on:click={toggleSelect}>
@@ -185,6 +186,10 @@
   }
   .Select:focus-within {
     z-index: 20;
+  }
+
+  .Select.disabled {
+    pointer-events: none;
   }
   
   .select-box {
@@ -255,7 +260,7 @@
     color: #ccc;
   }
 
-  .selected-list-item:hover,
+  .enabled .selected-list-item:hover,
   .select-list-item:hover,
   .select-list-item.focused {
     background: var(--select-color-bg-hover, var(--color-input-bg-hover));
@@ -269,7 +274,7 @@
   .selected-list-item {
     color: var(--select-color, var(--color-input-text));
   }
-  .closed .selected-list-item:hover {
+  .closed.enabled .selected-list-item:hover {
     color: var(--select-color-hover, var(--color-input-text-hover));
   }
 
@@ -278,7 +283,7 @@
     overflow: hidden;
     text-overflow: ellipsis;
   }
-  .has-arrow .selected-list-item::after {
+  .enabled.has-arrow .selected-list-item::after {
     border: 2px solid #999;;
     border-radius: 1px;
     border-right: 0;
@@ -295,12 +300,11 @@
     width: var(--select-arrow-size, 6px);
   }
   .has-arrow.arrow-right .selected-list-item::after {
-    content: " ";
     position: absolute;
     right: 1em;
     top: 12px;
   }
-  .has-arrow .selected-list-item:hover::after {
+  .enabled.has-arrow .selected-list-item:hover::after {
     border-color: #ccc;
   }
   .has-arrow.open .selected-list-item::after {
