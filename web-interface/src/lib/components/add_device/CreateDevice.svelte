@@ -37,7 +37,7 @@
                                  allowableBuckets={allowableBuckets-1} />
       {:else}
         {#each Object.entries(deviceFieldList[selectedTypeIndex]) as [key, value], i (key)}
-          {#if key === "bucket"}   
+          {#if value === "GENERATE_DEVICE" || value.type === "Settings"}   
             <Bucket deviceTypes={deviceTypes}
                     key={key}
                     fields={deviceFieldList[selectedTypeIndex]}
@@ -45,9 +45,9 @@
                     allowableBuckets={allowableBuckets-1} />
           {:else}
             <FieldDisplay key={key} 
-                                bind:fields={deviceFieldList[selectedTypeIndex]}
-                                units={units}
-                                zIndex={10-i} />
+                          bind:fields={deviceFieldList[selectedTypeIndex]}
+                          units={units}
+                          zIndex={10-i} />
           {/if}
         {/each}
       {/if}

@@ -39,11 +39,13 @@
   initalize();
 
   function initalize() {
-    rowSpacing.pop();
-    // This to change the default value object to a number
-    // We could also use all Value objects
-    columnSpacing.pop();
-    columnSpacing.push({repeatedNumber: [0]});
+    if (rowSpacing.length === 1 && typeof rowSpacing[0] === "object" ) {
+      rowSpacing.pop();
+      // This is to change from using the value object to just numbers
+      // We could also use all Value objects
+      columnSpacing.pop();
+      columnSpacing.push({repeatedNumber: [0]});
+    }
   }
 
   function addToColumn(index: number) {

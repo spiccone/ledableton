@@ -150,23 +150,24 @@
   }
 
   function editDevice() {
-    resetCreateDevice();
-    deviceName = savedDevices[savedDeviceIndex].name;
     edit = true;
     copyDevice();
+    deviceName = savedDevices[savedDeviceIndex].name;
   }
 
   function copyDevice() {
-    populateDeviceList(deviceList, savedDevices[savedDeviceIndex]);
+    resetCreateDevice();
+    createDeviceIndex = populateDeviceList(deviceList, savedDevices[savedDeviceIndex].settings);
     createDevice = true;
   }
 
-  function populateDeviceList(deviceList : DeviceMessageObject[], savedDevice: SavedDevice) {
-    const savedDeviceTypeKey = Object.keys(savedDevice.settings)[0];
-    for (const device of deviceList) {
+  function populateDeviceList(deviceList : DeviceMessageObject[], savedDevice: DeviceMessageObject) : number {
+    const savedDeviceTypeKey = Object.keys(savedDevice)[0];
+    for (let i=0; i<deviceList.length; i++) {
+      const device = deviceList[i];
       if (Object.keys(device)[0] === savedDeviceTypeKey) {
-        populateDevice(device[savedDeviceTypeKey], savedDevice.settings[savedDeviceTypeKey]);
-        return;
+        populateDevice(device[savedDeviceTypeKey], savedDevice[savedDeviceTypeKey]);
+        return i;
       }
     }
     throw "Could not load saved device";
@@ -186,6 +187,19 @@
             }
           }
         }
+      } else if (Array.isArray(savedSettings[key])) {
+        device[key] = [];
+        for (const item of savedSettings[key]) {
+          if (typeof item === "object") {
+            // TODO - handle object - currently will update without saving
+            // const obj = {};
+            // device[key].push(obj);
+            // populateDevice(obj, item);
+            device[key].push(item);
+          } else {
+            device[key].push(item);
+          }
+        }
       } else if (typeof value === "object") {
         const valueTest = value as Value;
         if (valueTest?.type !== undefined && valueTest.value !== undefined) {
@@ -193,6 +207,13 @@
         } else {
           populateDevice(value, savedSettings[key]);
         }
+      } else if (value === "GENERATE_DEVICE") {
+        device[key] = {
+          devices: JSON.parse(JSON.stringify(defaultDeviceList)),
+          type: "Settings",
+          selectDevice: 0
+        }
+        device[key].selectedDevice = populateDeviceList(device[key].devices, savedSettings[key]);
       } else {
         device[key] = savedSettings[key];
       }

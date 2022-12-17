@@ -18,6 +18,9 @@
   }
 
   let deviceField = fields[key] as BucketMessageObject;
+  if(deviceField.type !== "Settings") {
+    throw "Not a bucket";
+  }
 
   function hasBucket(element : DeviceMessageObject) {
     return allowableBuckets > 1 || 
@@ -28,9 +31,9 @@
 {#if allowableBuckets > 0}
   <div class="section">
     <CreateDevice deviceTypes={deviceField.devices} 
-                        bind:selectedTypeIndex={deviceField.selectedDevice}
-                        units={units} 
-                        allowableBuckets={allowableBuckets} />
+                  bind:selectedTypeIndex={deviceField.selectedDevice}
+                  units={units} 
+                  allowableBuckets={allowableBuckets} />
   </div>
 {/if}
 
