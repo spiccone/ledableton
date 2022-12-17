@@ -25,7 +25,7 @@
 </script>
 
 <FieldInput bind:fieldValue={fieldValueEntries[fieldValue.selectedIndex]} units={units}>
-  <span slot="label">
+  <span slot="label" style="z-index: {zIndex}">
     <Select items={oneOfList} 
     bind:selectedIndex={fieldValue.selectedIndex}
     arrowRight={false}

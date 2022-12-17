@@ -1,18 +1,26 @@
-syntax = "proto3";
 package devicepackage;
 
-message Device {
-  string name = 1;
-  Type type = 2;
+message SavedDevices {
+  repeated Device devices = 1;
 }
 
-message Type {
-  oneof type {
-    Strip strip = 1;
-    Arc arc = 2;
-    Grid grid = 3;
-    BucketedGrid bucketed_grid = 4;
+message Device {
+  required string name = 1;
+  required Settings settings = 2;
+}
+
+message Settings {
+  oneof settings {
+    Strip strip = 2;
+    Arc arc = 3;
+    Grid grid = 4;
+    BucketedGrid bucketed_grid = 5;
+    BucketedVariableColumns bucketed_variable_columns = 6;
   }
+}
+
+message RepeatedNumber {
+  repeated int32 repeated_number = 1;
 }
 
 enum Unit {
@@ -20,32 +28,44 @@ enum Unit {
   IN = 1;
 }
 
+message Dimension {
+  required Unit unit = 1;
+  required float dimension = 2;
+}
+
 message Strip {
-  int32 leds = 1;
-  int32 spacing = 2;
+  required int32 leds = 1;
+  required Dimension spacing = 2;
 }
 
 message Arc {
-  int32 leds = 1;
-  int32 radius = 2;
+  required int32 leds = 1;
+  required Dimension radius = 2;
   oneof dimension {
-    uint32 arc_length = 3;
-    uint32 angle = 4;
-    uint32 chord_length = 5;
+    Dimension arc_length = 3;
+    int32 angle = 4;
+    Dimension chord_length = 5;
   }
 }
 
 message Grid {
-  int32 rows = 1;
-  int32 columns = 2;
-  int32 row_spacing = 3;
-  int32 column_spacing = 4;
+  required int32 rows = 1;
+  required int32 columns = 2;
+  required Dimension row_spacing = 3;
+  required Dimension column_spacing = 4;
 }
 
 message BucketedGrid {
-  int32 rows = 1;
-  int32 columns = 2;
-  int32 row_spacing = 3;
-  int32 column_spacing = 4;
-  Type bucket_type = 5;
+  required int32 rows = 1;
+  required int32 columns = 2;
+  required Dimension row_spacing = 3;
+  required Dimension column_spacing = 4;
+  required Settings bucket = 5;
+}
+
+message BucketedVariableColumns {
+  repeated uint32 row_spacing = 2;
+  repeated RepeatedNumber column_spacing = 3;
+  required Unit units = 4;
+  required Settings bucket = 5;
 }

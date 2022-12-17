@@ -11,7 +11,6 @@
   import roundArrowBackIos from '@iconify/icons-ic/round-arrow-back-ios';
   import protobuf from 'protobufjs';
 	import CreateDevice from './CreateDevice.svelte';
-  import * as fs from 'fs';
  
   let units : {key: string, label: string}[] = [];
 
@@ -186,6 +185,9 @@
 
   function convertSettings(object: DeviceMessageObject) : DeviceMessageObject {
     const result : DeviceMessageObject = {};
+    if (object?.type !== undefined && object.value !== undefined) {
+      return object.value;
+    }
     for (const [key, value] of Object.entries(object)) {
       if (Array.isArray(value)) {
         result[key] = [];
@@ -193,16 +195,14 @@
           result[key].push(typeof v === "object" ? convertSettings(v) : v);
         }
       } else if (typeof value === "object") {
-        const valueTest = value as Value;
         const oneOfTest = value as OneOf;
-        const bucketTest = value as BucketMessageObject;
-        if (valueTest?.type !== undefined && valueTest.value !== undefined) {
-          result[key] = valueTest.value;
-        } else if (oneOfTest?.selectedIndex !== undefined && oneOfTest.oneOf) {
+        if (value?.type !== undefined && value.value !== undefined) {
+          result[key] = value.value;
+        } else if (value?.selectedIndex !== undefined && value.oneOf) {
           const oneOf = oneOfTest.oneOf[oneOfTest.selectedIndex];
           result[Object.keys(oneOf)[0]] = convertSettings(Object.values(oneOf)[0]);
-        } else if (bucketTest?.devices && bucketTest.selectedDevice !== undefined) {
-          result[key] = convertSettings(bucketTest.devices[bucketTest.selectedDevice]);
+        } else if (value?.devices && value.selectedDevice !== undefined) {
+          result[key] = convertSettings(value.devices[value.selectedDevice]);
         } else {
           result[key] = convertSettings(value);
         }
@@ -224,6 +224,7 @@
 
     const DeviceMessage = DeviceProto.lookupType("devicepackage.Device");
     const errorMessage = DeviceMessage.verify(newDevice);
+    console.log(newDevice);
     if (errorMessage) throw errorMessage;
 
     if (!edit) {
@@ -234,14 +235,14 @@
       throw "Could not edit device";
     }
 
-    saveToJson();
+    sendJson();
 
     updateSavedDeviceNames();
     deviceName = "";
     openAddDevice();
   }
 
-  async function saveToJson() {
+  async function sendJson() {
     const savedDevicesMessages = {
       devices: savedDevices
     }
@@ -250,14 +251,12 @@
     const errorMessage = SavedDeviceMessage.verify(savedDevicesMessages);
     if (errorMessage) throw errorMessage;
 
-    await fetch(`/saved`, {
-            credentials: 'include',
-            method: 'POST',
-            headers: {
-                'Content-Type': 'text/plain'
-            },
-            body: JSON.stringify(savedDevicesMessages)
-        });
+    const json = JSON.stringify(savedDevicesMessages);
+
+    const socket = new WebSocket('ws://localhost:9001');
+    socket.addEventListener('open', (event) => {
+      socket.send(json);
+    });
   }
 
   function handleAdd() {
@@ -430,8 +429,7 @@
     width: 36px;
   }
   
-  .outer-section,
-  .inner-section {
+  .outer-section {
     border: 1px dashed var(--color-border);
   }
   .outer-section {
@@ -439,11 +437,6 @@
     display: flex;
     flex-direction: column;
     padding: 8px;
-  }
-  .inner-section {
-    border-radius: 12px;
-    padding: 8px;
-    width: 100%;
   }
 
   .device-name-container {

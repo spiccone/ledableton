@@ -14,7 +14,7 @@
 
   checkType();
 
-  $: fields, checkType(); // checkTop when fields changes
+  $: fields, checkType(); // checkType when fields changes
 
   function checkType() {
     if(typeof fields[key] === "object" && (fields[key] as OneOf)?.oneOf) {
@@ -24,12 +24,11 @@
     }
   }
 
-
   let label = nameFormat(key);
   
 </script>
 
-<div class="field" style="z-index: zIndex">
+<div class="field" style="z-index: {zIndex}">
   {#if fieldOneOf}
     <FieldDisplayOneOf bind:fieldValue={fieldOneOf} units={units} />
   {:else}

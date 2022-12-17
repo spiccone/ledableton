@@ -2,6 +2,7 @@
 #include <google/protobuf/util/json_util.h>
 
 #include <iostream>
+#include <fstream>
 #include <websocketpp/config/asio_no_tls.hpp>
 #include <websocketpp/server.hpp>
 
@@ -12,7 +13,9 @@ using Server = websocketpp::server<websocketpp::config::asio>;
 namespace ledableton {
 
 using google::protobuf::util::JsonOptions;
+using google::protobuf::util::JsonParseOptions;
 using google::protobuf::util::MessageToJsonString;
+using google::protobuf::util::JsonStringToMessage;
 
 void on_message(Server *s, websocketpp::connection_hdl hdl,
                 Server::message_ptr msg) {
@@ -26,19 +29,38 @@ void on_message(Server *s, websocketpp::connection_hdl hdl,
     return;
   }
 
-  devicepackage::Device device;
-  *device.mutable_name() = "My Device";
+  std::ofstream myfile;
+  myfile.open("devices.json");
+  if (myfile.is_open()) {
+    myfile << msg->get_payload() << std::endl;
+    myfile.close();
+  } else {
+    std::cout << "Unable to open file";
+  }
+
 
   try {
-    // s->send(hdl, msg->get_payload(), msg->get_opcode());
-    std::string messageJson;
-    JsonOptions options;
-    MessageToJsonString(device, &messageJson, options);
-    s->send(hdl, messageJson, msg->get_opcode());
+    devicepackage::SavedDevices savedDevices;
+    google::protobuf::util::JsonParseOptions options;  
+    JsonStringToMessage(msg->get_payload(), &savedDevices, options);
+    for(int i = 0; i < savedDevices.devices_size(); i++)
+    std::cout << "Device: " << savedDevices.devices(i).name() << std::endl;
   } catch (websocketpp::exception const &e) {
     std::cout << "Echo failed because: "
               << "(" << e.what() << ")" << std::endl;
   }
+
+  // try {
+  //   // s->send(hdl, msg->get_payload(), msg->get_opcode());
+  //   std::string messageJson;
+  //   JsonOptions options;
+  //   MessageToJsonString(devices, &messageJson, options);
+  //   std::cout << "Devices" << messageJson;
+  //   s->send(hdl, messageJson, msg->get_opcode());
+  // } catch (websocketpp::exception const &e) {
+  //   std::cout << "Echo failed because: "
+  //             << "(" << e.what() << ")" << std::endl;
+  // }
 }
 
 }  // namespace ledableton

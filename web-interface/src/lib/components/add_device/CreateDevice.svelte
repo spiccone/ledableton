@@ -18,11 +18,6 @@
     deviceTypeList.push({key: key, label: nameFormat(key)});
     deviceFieldList.push(Object.values(deviceType)[0] as DeviceMessageObject);
   }
-
-  function handleDeviceSelect() {
-
-  }
-
 </script>
 
 <div class="CreateDevice">
@@ -30,8 +25,7 @@
     <label class="label" for="deviceTypes">Device type</label>
     <div class="device-select" style="z-index: {allowableBuckets * 3}">
       <Select items={deviceTypeList} 
-              bind:selectedIndex={selectedTypeIndex}
-              on:select={handleDeviceSelect}/>
+              bind:selectedIndex={selectedTypeIndex}/>
     </div>
   {/if}
   {#if selectedTypeIndex < deviceTypes.length}

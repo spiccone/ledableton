@@ -43,7 +43,7 @@ message Arc {
   required Dimension radius = 2;
   oneof dimension {
     Dimension arc_length = 3;
-    int32 angle = 4;
+    float angle = 4;
     Dimension chord_length = 5;
   }
 }
