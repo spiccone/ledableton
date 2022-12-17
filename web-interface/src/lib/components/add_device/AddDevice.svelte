@@ -213,30 +213,29 @@
   }
 
   function handleSave() {
+    const key = Object.keys(deviceList[createDeviceIndex])[0] as string;
+    const setting = convertSettings(Object.values(deviceList[createDeviceIndex])[0]);
+
+    const newDevice : SavedDevice = {
+      name: deviceName,
+      settings: {}
+    };
+    newDevice.settings[key] = setting;
+
+    const DeviceMessage = DeviceProto.lookupType("devicepackage.Device");
+    const errorMessage = DeviceMessage.verify(newDevice);
+    if (errorMessage) throw errorMessage;
+
+    // const buffer = DeviceMessage.encode(newDevice).finish();
+
     if (!edit) {
-
-      const key = Object.keys(deviceList[createDeviceIndex])[0] as string;
-      const setting = convertSettings(Object.values(deviceList[createDeviceIndex])[0]);
-
-      const newDevice : SavedDevice = {
-        name: deviceName,
-        settings: {}
-      };
-      newDevice.settings[key] = setting;
-
-      const DeviceMessage = DeviceProto.lookupType("devicepackage.Device");
-      const errorMessage = DeviceMessage.verify(newDevice);
-      if (errorMessage) throw errorMessage;
-
-      // const buffer = DeviceMessage.encode(newDevice).finish();
-
       savedDevices.push(newDevice);
     } else if(savedDeviceIndex < savedDevices.length) {
-      savedDevices[savedDeviceIndex].name = deviceName;
-      savedDevices[savedDeviceIndex].settings = deviceList[createDeviceIndex];
+      savedDevices[savedDeviceIndex] = newDevice;
     } else {
       throw "Could not edit device";
     }
+
     updateSavedDeviceNames();
     deviceName = "";
     openAddDevice();
@@ -258,10 +257,9 @@
 
 <Modal>
   <div slot="trigger" let:open>
-    <!-- svelte-ignore a11y-click-events-have-key-events -->
-    <div class="add-device" on:click={open}>
+    <button class="add-device" on:click={open}>
       <Icon icon={roundPlus} />
-    </div>
+    </button>
   </div>
   <div class="header" slot="header">
     {#if createDevice}
