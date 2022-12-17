@@ -56,12 +56,12 @@ message BucketedGrid {
   required int32 columns = 2;
   required Dimension row_spacing = 3;
   required Dimension column_spacing = 4;
-  required Device bucket = 5;
+  required Settings bucket = 5;
 }
 
 message BucketedVariableColumns {
   repeated uint32 row_spacing = 2;
   repeated RepeatedNumber column_spacing = 3;
   required Unit units = 4;
-  required Device bucket = 5;
+  required Settings bucket = 5;
 }

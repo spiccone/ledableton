@@ -12,7 +12,8 @@
   if (generate && allowableBuckets > 0) {
     fields[key] = {
       selectedDevice: 0,
-      devices: (JSON.parse(JSON.stringify(deviceTypes))).filter(hasBucket)
+      devices: (JSON.parse(JSON.stringify(deviceTypes))).filter(hasBucket),
+      type: "Settings"
     };
   }
 

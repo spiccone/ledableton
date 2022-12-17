@@ -1,6 +1,6 @@
 <script lang="ts">
   import {onMount} from 'svelte';
-  import type {DeviceMessageObject, OneOf, SavedDevice} from '$lib/device';
+  import type {BucketMessageObject, DeviceMessageObject, OneOf, SavedDevice, Value} from '$lib/device';
   import Modal from '../Modal.svelte';
   import Select from '../basic/Select.svelte';
   import Icon from '@iconify/svelte';
@@ -11,7 +11,6 @@
   import roundArrowBackIos from '@iconify/icons-ic/round-arrow-back-ios';
   import protobuf from 'protobufjs';
 	import CreateDevice from './CreateDevice.svelte';
-	import { snakeToCamel } from '$lib/helper-functions';
  
   let units : {key: string, label: string}[] = [];
 
@@ -34,7 +33,7 @@
   let edit = false;
   
   let DeviceProto : protobuf.Root;
-  let DeviceMessage : protobuf.Type;
+  let SettingsMessage : protobuf.Type;
 
   function createObjectFromMessage(message : protobuf.Type) : DeviceMessageObject {
     const object : DeviceMessageObject = {};
@@ -73,7 +72,7 @@
       case "float":
       case "Unit":
         return {value: 0, type: value.type};
-      case "Device":
+      case "Settings":
         return "GENERATE_DEVICE";
       default:
         return createObjectFromMessage(DeviceProto.lookupType("devicepackage." + value.type));
@@ -92,8 +91,8 @@
         units.push({key: key, label: value});
       }
 
-      DeviceMessage = root.lookupType("devicepackage.Device");
-      for (const device of (createObjectFromMessage(DeviceMessage).settings.settings as OneOf).oneOf) {
+      SettingsMessage = root.lookupType("devicepackage.Settings");
+      for (const device of (createObjectFromMessage(SettingsMessage).settings as OneOf).oneOf) {
         defaultDeviceList.push(device);
       }
       deviceList = JSON.parse(JSON.stringify(defaultDeviceList));
@@ -110,27 +109,21 @@
     }
   }
 
-  function openCreateNewDevice() {
+  function resetCreateDevice() {
     deviceList.length = 0;
     deviceList = JSON.parse(JSON.stringify(defaultDeviceList));
     createDeviceIndex = 0;
+    deviceName = "";
+  }
+
+  function openCreateNewDevice() {
+    resetCreateDevice();
     createDevice = true;
   }
 
   function openAddDevice() {
     createDevice = false;
     edit = false;
-  }
-
-  function editDevice() {
-    deviceName = savedDevices[savedDeviceIndex].name;
-    edit = true;
-    copyDevice();
-  }
-
-  function copyDevice() {
-    createDevice = true;
-    createDevice = true;
   }
 
   function deleteDevice() {
@@ -140,9 +133,83 @@
     createDevice = savedDevices.length === 0;
   }
 
+  function editDevice() {
+    resetCreateDevice();
+    deviceName = savedDevices[savedDeviceIndex].name;
+    edit = true;
+    copyDevice();
+  }
+
+  function copyDevice() {
+    populateDeviceList(deviceList, savedDevices[savedDeviceIndex]);
+    createDevice = true;
+  }
+
+  function populateDeviceList(deviceList : DeviceMessageObject[], savedDevice: SavedDevice) {
+    const savedDeviceTypeKey = Object.keys(savedDevice.settings)[0];
+    for (const device of deviceList) {
+      if (Object.keys(device)[0] === savedDeviceTypeKey) {
+        populateDevice(device[savedDeviceTypeKey], savedDevice.settings[savedDeviceTypeKey]);
+        return;
+      }
+    }
+    throw "Could not load saved device";
+  }
+
+  function populateDevice(device : DeviceMessageObject, savedSettings: DeviceMessageObject) {
+    for (const [key, value] of Object.entries(device)) {
+      if (savedSettings[key] === undefined) {
+        const oneOfTest = value as OneOf;
+        if (oneOfTest?.selectedIndex !== undefined && oneOfTest.oneOf) {
+          for (let i = 0; i < oneOfTest.oneOf.length; i++) {
+            const [k, v] = Object.entries(oneOfTest.oneOf[i])[0];
+            if (savedSettings[k] !== undefined) {
+              value.selectedIndex = i;
+              populateDevice(v, savedSettings[k]);
+              break;
+            }
+          }
+        }
+      } else if (typeof value === "object") {
+        const valueTest = value as Value;
+        if (valueTest?.type !== undefined && valueTest.value !== undefined) {
+          valueTest.value = savedSettings[key];
+        } else {
+          populateDevice(value, savedSettings[key]);
+        }
+      } else {
+        device[key] = savedSettings[key];
+      }
+    }
+  }
+
   function convertSettings(object: DeviceMessageObject) : DeviceMessageObject {
-    console.log(object);
-    return object;
+    const result : DeviceMessageObject = {};
+    for (const [key, value] of Object.entries(object)) {
+      if (Array.isArray(value)) {
+        result[key] = [];
+        for (const v of value) {
+          result[key].push(typeof v === "object" ? convertSettings(v) : v);
+        }
+      } else if (typeof value === "object") {
+        const valueTest = value as Value;
+        const oneOfTest = value as OneOf;
+        const bucketTest = value as BucketMessageObject;
+        if (valueTest?.type !== undefined && valueTest.value !== undefined) {
+          result[key] = valueTest.value;
+        } else if (oneOfTest?.selectedIndex !== undefined && oneOfTest.oneOf) {
+          const oneOf = oneOfTest.oneOf[oneOfTest.selectedIndex];
+          result[Object.keys(oneOf)[0]] = convertSettings(Object.values(oneOf)[0]);
+        } else if (bucketTest?.devices && bucketTest.selectedDevice !== undefined) {
+          result[key] = convertSettings(bucketTest.devices[bucketTest.selectedDevice]);
+        } else {
+          result[key] = convertSettings(value);
+        }
+      } else {
+        result[key] = value;
+      }
+    }
+    return result;
   }
 
   function handleSave() {
@@ -150,25 +217,20 @@
 
       const key = Object.keys(deviceList[createDeviceIndex])[0] as string;
       const setting = convertSettings(Object.values(deviceList[createDeviceIndex])[0]);
-      const newDevice : DeviceMessageObject = {};
-      newDevice[key] = setting;
-      newDevice["name"] = deviceName;
 
-      const type = key.charAt(0).toUpperCase() + key.slice(1);
-      console.log(type);
-      console.log(setting);
-      const TypeMessage = DeviceProto.lookupType("devicepackage." + type);
-      console.log(TypeMessage.verify(setting));
-      console.log(DeviceMessage.decode(TypeMessage.encode(setting).finish()));
+      const newDevice : SavedDevice = {
+        name: deviceName,
+        settings: {}
+      };
+      newDevice.settings[key] = setting;
 
+      const DeviceMessage = DeviceProto.lookupType("devicepackage.Device");
       const errorMessage = DeviceMessage.verify(newDevice);
       if (errorMessage) throw errorMessage;
 
+      // const buffer = DeviceMessage.encode(newDevice).finish();
 
-      const buffer = DeviceMessage.encode(newDevice).finish();
-      console.log(DeviceMessage.decode(buffer));
-
-      //savedDevices.push(newDevice);
+      savedDevices.push(newDevice);
     } else if(savedDeviceIndex < savedDevices.length) {
       savedDevices[savedDeviceIndex].name = deviceName;
       savedDevices[savedDeviceIndex].settings = deviceList[createDeviceIndex];

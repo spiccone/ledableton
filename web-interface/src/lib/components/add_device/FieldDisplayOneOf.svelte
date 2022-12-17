@@ -9,8 +9,6 @@
   export let units: {key: string, label: string}[] = [];
   export let zIndex = 1;
 
-  let selectedIndex = 0;
-
   let fieldValueEntries: FieldValue[] = [];
   let oneOfList : {key: string, label: string}[]  = [];
 
@@ -26,10 +24,10 @@
   }
 </script>
 
-<FieldInput bind:fieldValue={fieldValueEntries[selectedIndex]} units={units}>
+<FieldInput bind:fieldValue={fieldValueEntries[fieldValue.selectedIndex]} units={units}>
   <span slot="label">
     <Select items={oneOfList} 
-    bind:selectedIndex={selectedIndex}
+    bind:selectedIndex={fieldValue.selectedIndex}
     arrowRight={false}
     on:select={handleSelect} />
   </span>

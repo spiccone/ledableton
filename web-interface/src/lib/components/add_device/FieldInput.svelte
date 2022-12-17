@@ -46,7 +46,7 @@
       <input id={id} 
           class="field-input has-select"
           type="number"
-          bind:value={dimension.dimension}
+          bind:value={dimension.dimension.value}
           size=10 />
       <div class="dimension-select">
         <Select items={units} 
