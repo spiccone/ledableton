@@ -11,6 +11,7 @@
   import roundArrowBackIos from '@iconify/icons-ic/round-arrow-back-ios';
   import protobuf from 'protobufjs';
 	import CreateDevice from './CreateDevice.svelte';
+	import { snakeToCamel } from '$lib/helper-functions';
  
   let units : {key: string, label: string}[] = [];
 
@@ -32,7 +33,8 @@
 
   let edit = false;
   
-  let deviceProto : protobuf.Root;
+  let DeviceProto : protobuf.Root;
+  let DeviceMessage : protobuf.Type;
 
   function createObjectFromMessage(message : protobuf.Type) : DeviceMessageObject {
     const object : DeviceMessageObject = {};
@@ -63,20 +65,18 @@
   function getValueFromField(value: protobuf.Field) {
     switch (value.type) {
       case "string":
-        return '';
+        return {value: "", type: value.type};
       case "boolean":
-        return false;
+        return {value: false, type: value.type};
       case "uint32":
       case "int32":
-        return 0;
       case "float":
-        return 0.1;
       case "Unit":
-        return {selectedUnit: 0};
+        return {value: 0, type: value.type};
       case "Device":
         return "GENERATE_DEVICE";
       default:
-        return createObjectFromMessage(deviceProto.lookupType("devicepackage." + value.type));
+        return createObjectFromMessage(DeviceProto.lookupType("devicepackage." + value.type));
     }
   }
 
@@ -85,15 +85,15 @@
       if (!root) {
         throw "Error loading device.proto in AddDevice.";
       }
-      deviceProto = root;
+      DeviceProto = root;
 
       let unitMessage = root.lookupEnum("devicepackage.Unit");
       for (const [key, value] of Object.entries(unitMessage.valuesById)) {
         units.push({key: key, label: value});
       }
 
-      let TypeMessage = root.lookupType("devicepackage.Device");
-      for (const device of (createObjectFromMessage(TypeMessage).device as OneOf).oneOf) {
+      DeviceMessage = root.lookupType("devicepackage.Device");
+      for (const device of (createObjectFromMessage(DeviceMessage).settings.settings as OneOf).oneOf) {
         defaultDeviceList.push(device);
       }
       deviceList = JSON.parse(JSON.stringify(defaultDeviceList));
@@ -140,18 +140,41 @@
     createDevice = savedDevices.length === 0;
   }
 
+  function convertSettings(object: DeviceMessageObject) : DeviceMessageObject {
+    console.log(object);
+    return object;
+  }
+
   function handleSave() {
     if (!edit) {
-      savedDevices.push({
-        name: deviceName,
-        settings: deviceList[createDeviceIndex]});
+
+      const key = Object.keys(deviceList[createDeviceIndex])[0] as string;
+      const setting = convertSettings(Object.values(deviceList[createDeviceIndex])[0]);
+      const newDevice : DeviceMessageObject = {};
+      newDevice[key] = setting;
+      newDevice["name"] = deviceName;
+
+      const type = key.charAt(0).toUpperCase() + key.slice(1);
+      console.log(type);
+      console.log(setting);
+      const TypeMessage = DeviceProto.lookupType("devicepackage." + type);
+      console.log(TypeMessage.verify(setting));
+      console.log(DeviceMessage.decode(TypeMessage.encode(setting).finish()));
+
+      const errorMessage = DeviceMessage.verify(newDevice);
+      if (errorMessage) throw errorMessage;
+
+
+      const buffer = DeviceMessage.encode(newDevice).finish();
+      console.log(DeviceMessage.decode(buffer));
+
+      //savedDevices.push(newDevice);
     } else if(savedDeviceIndex < savedDevices.length) {
       savedDevices[savedDeviceIndex].name = deviceName;
       savedDevices[savedDeviceIndex].settings = deviceList[createDeviceIndex];
     } else {
       throw "Could not edit device";
     }
-    console.log(savedDevices);
     updateSavedDeviceNames();
     deviceName = "";
     openAddDevice();

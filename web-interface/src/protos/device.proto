@@ -1,10 +1,12 @@
-syntax = "proto3";
 package devicepackage;
 
 message Device {
-  string name = 1;
+  required string name = 1;
+  required Settings settings = 2;
+}
 
-  oneof device {
+message Settings {
+  oneof settings {
     Strip strip = 2;
     Arc arc = 3;
     Grid grid = 4;
@@ -23,18 +25,18 @@ enum Unit {
 }
 
 message Dimension {
-  Unit unit = 1;
-  float dimension = 2;
+  required Unit unit = 1;
+  required float dimension = 2;
 }
 
 message Strip {
-  int32 leds = 1;
-  Dimension spacing = 2;
+  required int32 leds = 1;
+  required Dimension spacing = 2;
 }
 
 message Arc {
-  int32 leds = 1;
-  Dimension radius = 2;
+  required int32 leds = 1;
+  required Dimension radius = 2;
   oneof dimension {
     Dimension arc_length = 3;
     int32 angle = 4;
@@ -43,23 +45,23 @@ message Arc {
 }
 
 message Grid {
-  int32 rows = 1;
-  int32 columns = 2;
-  Dimension row_spacing = 3;
-  Dimension column_spacing = 4;
+  required int32 rows = 1;
+  required int32 columns = 2;
+  required Dimension row_spacing = 3;
+  required Dimension column_spacing = 4;
 }
 
 message BucketedGrid {
-  int32 rows = 1;
-  int32 columns = 2;
-  Dimension row_spacing = 3;
-  Dimension column_spacing = 4;
-  Device bucket = 5;
+  required int32 rows = 1;
+  required int32 columns = 2;
+  required Dimension row_spacing = 3;
+  required Dimension column_spacing = 4;
+  required Device bucket = 5;
 }
 
 message BucketedVariableColumns {
   repeated uint32 row_spacing = 2;
   repeated RepeatedNumber column_spacing = 3;
-  Unit units = 4;
-  Device bucket = 5;
+  required Unit units = 4;
+  required Device bucket = 5;
 }

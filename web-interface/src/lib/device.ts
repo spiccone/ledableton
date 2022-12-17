@@ -74,7 +74,7 @@ export type RepeatedNumber = {
 export type FieldValue = number|string|boolean|BucketMessageObject|Dimension|DeviceMessageObject|FieldValue[]|OneOf;
 
 export type DeviceMessageObject = {
-  [key: string]: FieldValue;
+  [key: string]: any;
 }
 
 export type BucketMessageObject = {

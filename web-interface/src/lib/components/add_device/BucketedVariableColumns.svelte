@@ -40,29 +40,33 @@
 
   function initalize() {
     rowSpacing.pop();
+    // This to change the default value object to a number
+    // We could also use all Value objects
+    columnSpacing.pop();
+    columnSpacing.push({repeatedNumber: [0]});
   }
 
-  function addColumn(index: number) {
+  function addToColumn(index: number) {
     if(index < columnSpacing.length) {
       columnSpacing[index].repeatedNumber.push(columnAutoFill);
     }
     columnSpacing = columnSpacing;
   }
 
-  function subtractColumn(index: number) {
+  function subtractFromColumn(index: number) {
     if (columnSpacing[index]?.repeatedNumber.length > 1) {
       columnSpacing[index].repeatedNumber.pop();
       columnSpacing = columnSpacing;
     }
   }
 
-  function addRow() {
+  function addToRow() {
     rowSpacing.push(rowAutoFill);
     columnSpacing.push({repeatedNumber: [0]});
     columnSpacing = columnSpacing;
   }
 
-  function subtractRow() {
+  function subtractFromRow() {
     rowSpacing.pop();
     columnSpacing.pop();
     columnSpacing = columnSpacing;
@@ -154,12 +158,12 @@
                 <div class="bucket"></div>
             {/if}
           {/each}
-          <button class="add" on:click|preventDefault={() => addColumn(i)}>
+          <button class="add" on:click|preventDefault={() => addToColumn(i)}>
             <Icon icon={roundPlus} />
           </button>
           <button class="subtract"
                   disabled={columnSpacing[i].repeatedNumber.length < 2}
-                  on:click|preventDefault={() => subtractColumn(i)}>
+                  on:click|preventDefault={() => subtractFromColumn(i)}>
             <Icon icon={roundMinus} />
           </button>
         </div>
@@ -172,12 +176,12 @@
         {/if}
       {/each}
       <div class="row-buttons">
-        <button class="add" on:click|preventDefault={() => addRow()}>
+        <button class="add" on:click|preventDefault={() => addToRow()}>
           <Icon icon={roundPlus} />
         </button>
         <button class="subtract" 
                 disabled={columnSpacing.length < 2}
-                on:click|preventDefault={() => subtractRow()}>
+                on:click|preventDefault={() => subtractFromRow()}>
           <Icon icon={roundMinus} />
         </button>
       </div>

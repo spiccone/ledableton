@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type {Dimension, FieldValue, Unit} from "$lib/device";
+	import type {Dimension, FieldValue, UnitValue, Value} from "$lib/device";
 	import Labeled from "../basic/Labeled.svelte";
 	import Select from "../basic/Select.svelte";
 
@@ -8,7 +8,8 @@
   export let units : {key: string, label: string}[] = [];
 
   let dimension : Dimension | null = null;
-  let unit : Unit | null = null;
+  let unit : UnitValue | null = null;
+  let value : Value | null = null;
 
   checkTypes();
   
@@ -17,18 +18,23 @@
   function checkTypes() {
     if (typeof (fieldValue) === "object") {
       dimension = fieldValue as Dimension;
-      if (dimension?.dimension !== undefined && dimension.unit?.selectedUnit !== undefined) {
+      if (dimension?.dimension?.value !== undefined && dimension.unit?.value !== undefined) {
         unit = dimension.unit;
         return;
       }
       dimension = null;
-      unit = fieldValue as Unit;
-      if (unit?.selectedUnit !== undefined) {
+      unit = fieldValue as UnitValue;
+      if (unit?.type !== undefined && unit.type === "Unit" && unit.value !== undefined) {
         return;
       }
+      unit = null;
+      value = fieldValue as Value;
+      if (value.type === undefined || value.value === undefined) {
+        throw "FieldValue invalid";
+      }
+    } else {
+      throw "FieldValue should be object";
     }
-    dimension = null;
-    unit = null;
   }
 
 </script>
@@ -44,17 +50,17 @@
           size=10 />
       <div class="dimension-select">
         <Select items={units} 
-                bind:selectedIndex={unit.selectedUnit}
+                bind:selectedIndex={unit.value}
                 showArrow={false} />
       </div>
     {:else if unit}
       <Select items={units} 
-              bind:selectedIndex={unit.selectedUnit} />
-    {:else}
+              bind:selectedIndex={unit.value} />
+    {:else if value}
      <input id={id} 
           class="field-input"
           type="number"
-          bind:value={fieldValue}
+          bind:value={value.value}
           size=10 />
     {/if}
   </span>

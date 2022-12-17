@@ -37,3 +37,7 @@ export function nameFormat(name: string) : string {
   let result = name.replace(/([A-Z]+)/g, ' $1');
   return result.charAt(0).toUpperCase() + result.slice(1);
 }
+
+export function snakeToCamel(str : string) : string {
+  return str.toLowerCase().replace(/[-_][a-z]/g, (group) => group.slice(-1).toUpperCase());
+}
