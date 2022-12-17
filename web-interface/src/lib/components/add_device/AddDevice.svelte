@@ -143,6 +143,9 @@
 
   function deleteDevice() {
     savedDevices.splice(savedDeviceIndex, 1);
+    if (savedDeviceIndex === savedDevices.length) {
+      savedDeviceIndex--;
+    }
     savedDevices = savedDevices;
     sendJson();
     updateSavedDeviceNames();
@@ -191,11 +194,7 @@
         device[key] = [];
         for (const item of savedSettings[key]) {
           if (typeof item === "object") {
-            // TODO - handle object - currently will update without saving
-            // const obj = {};
-            // device[key].push(obj);
-            // populateDevice(obj, item);
-            device[key].push(item);
+            device[key].push(JSON.parse(JSON.stringify(item)));
           } else {
             device[key].push(item);
           }
