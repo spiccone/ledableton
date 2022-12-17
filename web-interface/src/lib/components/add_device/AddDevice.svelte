@@ -1,6 +1,6 @@
 <script lang="ts">
   import {onMount} from 'svelte';
-  import type {DeviceMessageObject, OneOf, SavedDevice, Value} from '$lib/device';
+  import {SavedDevice, type DeviceMessageObject, type OneOf, type Value} from '$lib/device';
   import Modal from '../Modal.svelte';
   import Select from '../basic/Select.svelte';
   import Icon from '@iconify/svelte';
@@ -230,10 +230,7 @@
   }
 
   function handleSave() {
-    const newDevice : SavedDevice = {
-      name: deviceName,
-      settings: {}
-    };
+    const newDevice = new SavedDevice(deviceName, {});
     const key = Object.keys(deviceList[createDeviceIndex])[0] as string;
     const setting = convertSettings(Object.values(deviceList[createDeviceIndex])[0]);
     newDevice.settings[key] = setting;
@@ -250,12 +247,24 @@
       throw "Could not edit device";
     }
 
+    savedDevices.sort(SavedDevice.compare);
+    savedDeviceIndex = findIndexOf(newDevice);
+
     sendJson();
 
     updateSavedDeviceNames();
     deviceName = "";
-    savedDeviceIndex = savedDevices.length - 1;
     openAddDevice();
+  }
+
+
+  function findIndexOf(device: SavedDevice) {
+    for(let i=0; i<savedDevices.length; i++) {
+      if(device === savedDevices[i]) {
+        return i;
+      }
+    }
+    throw "Could not find device";
   }
 
   async function sendJson() {

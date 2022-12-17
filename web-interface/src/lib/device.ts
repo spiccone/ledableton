@@ -22,6 +22,26 @@ export class Device {
   }
 }
 
+export class SavedDevice {
+  static compare(a: SavedDevice, b: SavedDevice) {
+    if (a.name < b.name) {
+      return -1;
+    }
+    if (a.name > b.name) {
+      return 1;
+    }
+    return 0;
+  }
+  
+  name: string;
+  settings: DeviceMessageObject;
+
+  constructor(name: string, settings: DeviceMessageObject) {
+    this.name = name;
+    this.settings = settings;
+  }
+}
+
 export interface Position {
   left: number;
   top: number;
@@ -87,11 +107,6 @@ export type BucketMessageObject = {
   devices: DeviceMessageObject[];
   selectedDevice: number
   type: "Settings"
-}
-
-export type SavedDevice = {
-  name: string,
-  settings: DeviceMessageObject,
 }
 
 export type OneOf = {
