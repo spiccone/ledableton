@@ -254,6 +254,7 @@
 
     updateSavedDeviceNames();
     deviceName = "";
+    savedDeviceIndex = savedDevices.length - 1;
     openAddDevice();
   }
 

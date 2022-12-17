@@ -2,8 +2,7 @@
   import {onMount, createEventDispatcher} from 'svelte';
 
   export let items : {key : string, label : string}[] = [];
-  export let selectedItem : {key : string, label : string} | undefined | null = undefined;
-  export let selectedIndex : number | null = 0;
+  export let selectedIndex : number = 0;
   export let showArrow = true;
   export let arrowRight = true;
 
@@ -15,7 +14,7 @@
   const dispatch = createEventDispatcher();
 
   onMount(() => {
-    if (!selectedIndex && !selectedItem && items.length > 0) {
+    if (!selectedIndex && items.length > 0) {
       selectedIndex = 0;
       selectItem(0);
     } else if (selectedIndex && selectedIndex < items.length) {
@@ -51,7 +50,6 @@
 
   function selectItem(index : number) {
     selectedIndex = index;
-    selectedItem = items[index];
     closeSelect();
     dispatch('select', {
 			selectedIndex: selectedIndex
@@ -156,7 +154,11 @@
       <div class="selected-list-item"
            on:click={toggleSelect}>
         <div class="item-label">
-          {selectedItem?.label}
+          {#if selectedIndex < items.length}
+            {items[selectedIndex].label}
+          {:else if items.length > 0}
+            {items[items.length - 1].label}
+          {/if}
         </div>
       </div>
       <div class="select-list">
