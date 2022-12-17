@@ -249,6 +249,10 @@
     padding-right: var(--select-arrow-gap, 34px);
   }
 
+  .open .selected-list-item {
+    pointer-events: none;
+  }
+
   .select-list-item {
     color: #ccc;
   }
