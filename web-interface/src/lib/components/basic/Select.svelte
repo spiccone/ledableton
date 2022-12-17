@@ -133,7 +133,7 @@
   }
 </script>
 
-<svelte:window on:mouseup={handleWindowClick} />
+<svelte:window on:mousedown={handleWindowClick} />
 
 <div class="Select {open ? 'open' : 'closed'}
                    {showArrow ? 'has-arrow' : ''}
@@ -161,11 +161,9 @@
       </div>
       <div class="select-list">
         {#each items as item, i (item.key)}
-          <!-- If this id is removed focus highlight doesn't work - no clue why -->
-          <!-- svelte-ignore a11y-click-events-have-key-events -->
           <div class="select-list-item" 
                class:focused={focusedElements[i]}
-               on:click={() => selectItem(i)}>
+               on:mousedown={() => selectItem(i)}>
             <div class="item-label">
               {item.label}
             </div>
@@ -174,8 +172,6 @@
       </div>
     </div>
   </div>
-  <!-- Not using cover so it scrolls. Downside is you can click other items while open. -->
-  <!-- <div class="cover"></div> -->
 </div>
 
 <style>
@@ -222,7 +218,7 @@
     border-radius: var(--select-border-radius-open, 12px);
     max-height: 400px;
     transition: max-height 0.25s ease-in;
-    z-index: 3;
+    z-index: 40;
   }
 
   .select-list {
@@ -308,18 +304,5 @@
   .has-arrow.open .selected-list-item::after {
     -webkit-transform: rotate(135deg);
     transform: rotate(135deg);
-  }
-
-  .cover {
-    display: none;
-    position: fixed;
-    bottom: 0;
-    top: 0;
-    left: 0;
-    right: 0;
-  }
-
-  .open .cover {
-    display: block;
   }
 </style>

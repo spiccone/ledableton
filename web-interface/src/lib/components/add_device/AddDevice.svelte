@@ -11,6 +11,7 @@
   import roundArrowBackIos from '@iconify/icons-ic/round-arrow-back-ios';
   import protobuf from 'protobufjs';
 	import CreateDevice from './CreateDevice.svelte';
+  import * as fs from 'fs';
  
   let units : {key: string, label: string}[] = [];
 
@@ -213,20 +214,17 @@
   }
 
   function handleSave() {
-    const key = Object.keys(deviceList[createDeviceIndex])[0] as string;
-    const setting = convertSettings(Object.values(deviceList[createDeviceIndex])[0]);
-
     const newDevice : SavedDevice = {
       name: deviceName,
       settings: {}
     };
+    const key = Object.keys(deviceList[createDeviceIndex])[0] as string;
+    const setting = convertSettings(Object.values(deviceList[createDeviceIndex])[0]);
     newDevice.settings[key] = setting;
 
     const DeviceMessage = DeviceProto.lookupType("devicepackage.Device");
     const errorMessage = DeviceMessage.verify(newDevice);
     if (errorMessage) throw errorMessage;
-
-    // const buffer = DeviceMessage.encode(newDevice).finish();
 
     if (!edit) {
       savedDevices.push(newDevice);
@@ -236,9 +234,30 @@
       throw "Could not edit device";
     }
 
+    saveToJson();
+
     updateSavedDeviceNames();
     deviceName = "";
     openAddDevice();
+  }
+
+  async function saveToJson() {
+    const savedDevicesMessages = {
+      devices: savedDevices
+    }
+
+    const SavedDeviceMessage = DeviceProto.lookupType("devicepackage.SavedDevices");
+    const errorMessage = SavedDeviceMessage.verify(savedDevicesMessages);
+    if (errorMessage) throw errorMessage;
+
+    await fetch(`/saved`, {
+            credentials: 'include',
+            method: 'POST',
+            headers: {
+                'Content-Type': 'text/plain'
+            },
+            body: JSON.stringify(savedDevicesMessages)
+        });
   }
 
   function handleAdd() {

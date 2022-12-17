@@ -40,6 +40,7 @@
 	},
 	"type": "module",
 	"dependencies": {
+		"browserify-fs": "^1.0.0",
 		"colormap": "^2.3.2",
 		"protobufjs": "^7.1.2",
 		"waveform-data": "^4.3.0",

@@ -1,5 +1,9 @@
 package devicepackage;
 
+message SavedDevices {
+  repeated Device devices = 1;
+}
+
 message Device {
   required string name = 1;
   required Settings settings = 2;
