@@ -6,23 +6,20 @@
 
   const LED_SIZE = 6;
   const PI2 = Math.PI * 2;
-  let width = 0;
-  let height = 0;
 
   let canvasElement : HTMLCanvasElement;
   let ctx: CanvasRenderingContext2D | null; 
-
-  let mounted = false;
 
   $: ledPositions, updateCanvas();
 
   onMount(() => {
     console.log(ledPositions);
-    mounted = true;
     updateCanvas();
   });
 
   function updateSizes() {
+    let width = 0;
+    let height = 0;
     for (const position of ledPositions) {
       width = Math.max(width, position.x + LED_SIZE + 4);
       height = Math.max(height, position.y + LED_SIZE + 4);
@@ -32,7 +29,7 @@
   }
 
   function updateCanvas() { 
-    if (!mounted) {
+    if (!canvasElement) {
       return;
     } 
     updateSizes();
@@ -53,8 +50,6 @@
     }
     ctx.stroke();
     ctx.fill();
-    console.log(ctx);
-    width = width;
   }
 
 </script>
@@ -65,17 +60,18 @@
 
 <style>
   .DevicePreview {
-    position: relative;
-    display: flex;
     align-items: center;
+    display: flex;
     justify-content: center;
     padding: 8px;
+    position: relative;
+    margin: 12px 0;
   }
 
   .canvas {
-    border: 2px solid #777;
-    padding: 12px;
-    border-radius: 20px;
     background: #222;
+    border: 2px solid #777;
+    border-radius: 20px;
+    padding: 12px;
   }
 </style>

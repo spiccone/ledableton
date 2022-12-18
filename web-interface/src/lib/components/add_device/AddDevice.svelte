@@ -1,6 +1,6 @@
 <script lang="ts">
   import {onMount} from 'svelte';
-  import {SavedDevice, type DeviceMessageObject, type OneOf, type Value} from '$lib/device';
+  import {SavedDevice, type DeviceMessageObject, type OneOf, type Position, type Value} from '$lib/device';
   import Modal from '../Modal.svelte';
   import Select from '../basic/Select.svelte';
   import Icon from '@iconify/svelte';
@@ -19,6 +19,7 @@
 
   let deviceList : DeviceMessageObject[] = [];
   let savedDevices : SavedDevice[] = [];
+  let ledPositions : Position[] = [];
   let createDeviceIndex = 0;
   let savedDeviceIndex = 0;
 
@@ -111,7 +112,7 @@
     socket.addEventListener('message', (event) => {
       const object = JSON.parse(event.data);
       if(Object.keys(object)[0] === "positions") {
-        savedDevices[savedDeviceIndex].ledPositions = object.positions;
+        ledPositions = object.positions;
       } else if (Object.keys(object)[0] === "devices") {
         savedDevices = JSON.parse(event.data).devices;
         updateSavedDeviceNames();
@@ -322,6 +323,12 @@
   function mouseLeaveSave() {
     error = false;
   }
+
+  function handleSelect() {
+    if (savedDevices[savedDeviceIndex].ledPositions.length == 0) {
+      getLedPositions(savedDevices[savedDeviceIndex].settings);
+    }
+  }
 </script>
 
 <Modal>
@@ -362,7 +369,8 @@
         <div class="saved-device-container">
           <div class="saved-select">
             <Select items={savedDeviceNames} 
-                    bind:selectedIndex={savedDeviceIndex} />
+                    bind:selectedIndex={savedDeviceIndex}
+                    on:select={handleSelect} />
           </div>
           <button class="icon-button" on:click={editDevice}>
             <Icon icon={editOutlineRounded} />
@@ -379,9 +387,9 @@
           </button>
         </div>
       </div>
-      {#if savedDevices[savedDeviceIndex]?.ledPositions?.length > 0}
-        <div class="device-preview-container outer-section">
-          <DevicePreview ledPositions={savedDevices[savedDeviceIndex].ledPositions} />
+      {#if ledPositions.length > 0}
+        <div class="device-preview-container">
+          <DevicePreview ledPositions={ledPositions} />
         </div>
       {/if}
     {/if}
