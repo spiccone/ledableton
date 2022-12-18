@@ -73,7 +73,12 @@ void on_message(Server *s, websocketpp::connection_hdl hdl,
       JsonStringToMessage(msg->get_payload().substr(11), &settings, options);
       if(settings.has_strip()) {
         std::cout << "Strip" << std::endl;  
-        Strip::GetPositionsForDisplay(settings.mutable_strip()->leds());
+        devicepackage::DisplayPositions positions =
+          Strip::GetPositionsForDisplay(settings.mutable_strip()->leds(), settings.mutable_strip()->spacing());
+        std::string messageJson;
+        JsonOptions options;
+        MessageToJsonString(positions, &messageJson, options);
+        s->send(hdl, messageJson, msg->get_opcode());
       }
     } catch (websocketpp::exception const &e) {
       std::cout << "Echo failed because: "

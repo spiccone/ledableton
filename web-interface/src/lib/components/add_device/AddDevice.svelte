@@ -105,13 +105,17 @@
   });
 
   async function loadJson() {
-    const socket = new WebSocket('ws://localhost:9001');
     socket.addEventListener('open', (event) => {
       socket.send("load-files");
     });
     socket.addEventListener('message', (event) => {
-      savedDevices = JSON.parse(event.data).devices;
-      updateSavedDeviceNames();
+      const object = JSON.parse(event.data);
+      if(Object.keys(object)[0] === "positions") {
+        savedDevices[savedDeviceIndex].ledPositions = object.positions;
+      } else if (Object.keys(object)[0] === "devices") {
+        savedDevices = JSON.parse(event.data).devices;
+        updateSavedDeviceNames();
+      }
     });
   }
 
@@ -339,20 +343,22 @@
     {/if}
   </div>
   <div class="content" slot="content">
-    <div class="outer-section">
-      {#if createDevice || savedDevices.length === 0}
+    {#if createDevice || savedDevices.length === 0}
+      <div class="outer-section">
       <!-- createDevice should be true when savedDevices is empty -->
         <div class="device-name-container">
           <input class:error
-                 type="text" 
-                 class="device-name" 
-                 bind:value={deviceName}
-                 placeholder="New device" />
+                type="text" 
+                class="device-name" 
+                bind:value={deviceName}
+                placeholder="New device" />
         </div>
         <CreateDevice bind:deviceTypes={deviceList} 
                       bind:selectedTypeIndex={createDeviceIndex}
                       units={units} />
-      {:else}
+      </div>
+    {:else}
+      <div class="outer-section">
         <div class="saved-device-container">
           <div class="saved-select">
             <Select items={savedDeviceNames} 
@@ -372,13 +378,13 @@
             <div class="add-button-icon"><Icon icon={roundPlus} /></div>
           </button>
         </div>
-        {#if savedDevices[savedDeviceIndex]?.ledPositions?.length > 0}
-          <div class="device-preview-container">
-            <DevicePreview ledPositions={savedDevices[savedDeviceIndex].ledPositions} />
-          </div>
-        {/if}
+      </div>
+      {#if savedDevices[savedDeviceIndex]?.ledPositions?.length > 0}
+        <div class="device-preview-container outer-section">
+          <DevicePreview ledPositions={savedDevices[savedDeviceIndex].ledPositions} />
+        </div>
       {/if}
-    </div>
+    {/if}
   </div>
   <div class="footer" slot="footer">
     <!-- svelte-ignore a11y-mouse-events-have-key-events -->
@@ -483,12 +489,13 @@
   
   .outer-section {
     border: 1px dashed var(--color-border);
-  }
-  .outer-section {
     border-radius: 18px;
     display: flex;
     flex-direction: column;
     padding: 8px;
+  }
+  .outer-section:not(:first-child) {
+    margin-top: 18px;
   }
 
   .device-name-container {

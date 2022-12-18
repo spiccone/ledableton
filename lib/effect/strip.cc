@@ -3,13 +3,15 @@
 
 Strip::Strip() : Effect() {}
 
-static std::vector<devicepackage::Position> GetPositionsForDisplay(int leds) {
-  const int SIZE = 1000;
-
-  std::vector<devicepackage::Position> result;
-  // for (int i=0; i<leds; i++) {
-  //   result.emplace_back();
-  // }
+//static
+devicepackage::DisplayPositions Strip::GetPositionsForDisplay(int leds, devicepackage::Dimension spacing) {
+  devicepackage::DisplayPositions result;
+  float spacingMM = ConvertToMM(spacing);
+  for (int i=0; i<leds; i++) {
+    devicepackage::Position* p = result.add_positions();
+    p->set_x(i*spacingMM);
+    p->set_y(0);
+  }
 
   return result;
 };

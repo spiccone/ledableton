@@ -36,6 +36,7 @@ find_package(Protobuf REQUIRED)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -pedantic -g")
 
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
+include_directories(${Protobuf_INCLUDE_DIRS})
 protobuf_generate_cpp(PROTO_SRCS PROTO_HDRS proto/device.proto)
 
 file(GLOB LIBRARY_SOURCES "lib/effect/*.cc" "lib/led-manager/*.cc")
