@@ -11,6 +11,7 @@
   import roundArrowBackIos from '@iconify/icons-ic/round-arrow-back-ios';
   import protobuf from 'protobufjs';
 	import CreateDevice from './CreateDevice.svelte';
+	import DevicePreview from './DevicePreview.svelte';
 
   let socket: WebSocket;
  
@@ -270,6 +271,8 @@
     savedDevices.sort(SavedDevice.compare);
     savedDeviceIndex = findIndexOf(newDevice);
 
+    getLedPositions(newDevice.settings);
+
     sendJson();
 
     updateSavedDeviceNames();
@@ -277,8 +280,11 @@
     openAddDevice();
   }
 
+  function getLedPositions(settings: DeviceMessageObject) {
+    socket.send("getPosition" + JSON.stringify(settings));
+  }
 
-  function findIndexOf(device: SavedDevice) {
+  function findIndexOf(device: SavedDevice) : number {
     for(let i=0; i<savedDevices.length; i++) {
       if(device === savedDevices[i]) {
         return i;
@@ -321,7 +327,7 @@
     </button>
   </div>
   <div class="header" slot="header">
-    {#if createDevice}
+    {#if createDevice || savedDevices.length === 0}
       {#if savedDevices.length > 0}
         <button class="back-button" on:click={openAddDevice}>
           <Icon icon={roundArrowBackIos} />
@@ -334,7 +340,7 @@
   </div>
   <div class="content" slot="content">
     <div class="outer-section">
-      {#if createDevice}
+      {#if createDevice || savedDevices.length === 0}
       <!-- createDevice should be true when savedDevices is empty -->
         <div class="device-name-container">
           <input class:error
@@ -366,6 +372,11 @@
             <div class="add-button-icon"><Icon icon={roundPlus} /></div>
           </button>
         </div>
+        {#if savedDevices[savedDeviceIndex]?.ledPositions?.length > 0}
+          <div class="device-preview-container">
+            <DevicePreview ledPositions={savedDevices[savedDeviceIndex].ledPositions} />
+          </div>
+        {/if}
       {/if}
     </div>
   </div>
@@ -374,7 +385,7 @@
     <div class="submit-container"
          on:mouseover={mouseOverSave}
          on:mouseleave={mouseLeaveSave}>
-      {#if createDevice}
+      {#if createDevice || savedDevices.length === 0}
         <button on:click={handleSave}
                 disabled={deviceName === ''}>
           Save Device

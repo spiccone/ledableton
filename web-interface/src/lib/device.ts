@@ -21,7 +21,7 @@ export interface Position {
 export class SavedDevice {
   name: string;
   settings: DeviceMessageObject;
-  ledPositions: Position[] | null = null;
+  ledPositions: Position[] = [];
 
   constructor(name: string, settings: DeviceMessageObject) {
     this.name = name;

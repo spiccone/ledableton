@@ -7,6 +7,7 @@
 #include <websocketpp/server.hpp>
 
 #include "device.pb.h"
+#include "strip.h"
 
 using Server = websocketpp::server<websocketpp::config::asio>;
 
@@ -40,9 +41,8 @@ void on_message(Server *s, websocketpp::connection_hdl hdl,
         getline(file, string);
         sTotal += string + "\n";
       }
-      std::cout << "String " << sTotal;
     } else {
-      std::cout << "Unable to open file";
+      std::cout << "Unable to open devices.json";
     }
     try {
       s->send(hdl, sTotal, msg->get_opcode());
@@ -53,15 +53,34 @@ void on_message(Server *s, websocketpp::connection_hdl hdl,
     return;
   }
 
-  std::ofstream file;
-  file.open("devices.json");
-  if (file.is_open()) {
-    file << msg->get_payload() << std::endl;
-    file.close();
-  } else {
-    std::cout << "Unable to open file";
+  if ((msg->get_payload()).substr(2,7) == "devices") {
+    std::ofstream file;
+    file.open("devices.json");
+    if (file.is_open()) {
+      file << msg->get_payload() << std::endl;
+      file.close();
+    } else {
+      std::cout << "Unable to open devices.json";
+    }
+    return;
   }
 
+  if ((msg->get_payload()).substr(0,11) == "getPosition") {
+    std::cout << "Get Position";
+    try {
+      devicepackage::Settings settings;
+      google::protobuf::util::JsonParseOptions options;  
+      JsonStringToMessage(msg->get_payload().substr(11), &settings, options);
+      if(settings.has_strip()) {
+        std::cout << "Strip" << std::endl;  
+        Strip::GetPositionsForDisplay(settings.mutable_strip()->leds());
+      }
+    } catch (websocketpp::exception const &e) {
+      std::cout << "Echo failed because: "
+                << "(" << e.what() << ")" << std::endl;
+    }
+    return;
+  }
 
   try {
     devicepackage::SavedDevices savedDevices;
@@ -73,18 +92,6 @@ void on_message(Server *s, websocketpp::connection_hdl hdl,
     std::cout << "Echo failed because: "
               << "(" << e.what() << ")" << std::endl;
   }
-
-  // try {
-  //   // s->send(hdl, msg->get_payload(), msg->get_opcode());
-  //   std::string messageJson;
-  //   JsonOptions options;
-  //   MessageToJsonString(devices, &messageJson, options);
-  //   std::cout << "Devices" << messageJson;
-  //   s->send(hdl, messageJson, msg->get_opcode());
-  // } catch (websocketpp::exception const &e) {
-  //   std::cout << "Echo failed because: "
-  //             << "(" << e.what() << ")" << std::endl;
-  // }
 }
 
 }  // namespace ledableton

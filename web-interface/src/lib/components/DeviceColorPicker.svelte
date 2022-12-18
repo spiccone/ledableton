@@ -181,6 +181,7 @@
     background: none;
     border: none;
     box-sizing: border-box;
+    color: #333;
     flex: 0 1 auto;
     font-family: monospace;
     height: 100%;

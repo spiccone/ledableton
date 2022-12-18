@@ -4,6 +4,15 @@ message SavedDevices {
   repeated Device devices = 1;
 }
 
+message Position {
+  required int32 x = 1;
+  required int32 y = 2;
+}
+
+message DisplayPositions {
+  repeated Position positions = 1;
+}
+
 message Device {
   required string name = 1;
   required Settings settings = 2;
