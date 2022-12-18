@@ -35,9 +35,12 @@ find_package(Protobuf REQUIRED)
 # Set appropriate warning levels and include debug symbols.
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -pedantic -g")
 
+include_directories(${CMAKE_CURRENT_BINARY_DIR})
+protobuf_generate_cpp(PROTO_SRCS PROTO_HDRS proto/device.proto)
+
 file(GLOB LIBRARY_SOURCES "lib/effect/*.cc" "lib/led-manager/*.cc")
-add_library(generic ${LIBRARY_SOURCES})
-target_link_libraries(generic fake-fast-led)
+add_library(generic ${LIBRARY_SOURCES} ${PROTO_SRCS} ${PROTO_HDRS})
+target_link_libraries(generic fake-fast-led ${PROTOBUF_LIBRARY} ${Protobuf_LIBRARIES})
 
 target_include_directories(
   generic
@@ -57,10 +60,8 @@ install(
   DESTINATION include)
 install(EXPORT websocketpp-config DESTINATION share/websocketpp/cmake)
 
-include_directories(${CMAKE_CURRENT_BINARY_DIR})
-protobuf_generate_cpp(PROTO_SRCS PROTO_HDRS proto/device.proto)
 file(GLOB SIMULATOR_SOURCES "lib/simulator/*.cc")
-add_executable(simulator ${SIMULATOR_SOURCES} ${PROTO_SRCS} ${PROTO_HDRS})
+add_executable(simulator ${SIMULATOR_SOURCES} ${PROTO_HDRS})
 target_link_libraries(simulator generic websocketpp ${PROTOBUF_LIBRARY}
                       ${Protobuf_LIBRARIES})
 
