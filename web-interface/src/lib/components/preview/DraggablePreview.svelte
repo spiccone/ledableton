@@ -3,6 +3,9 @@
   import {onMount} from 'svelte';
 	import DevicePreview from './DevicePreview.svelte';
   import DeviceColorPicker from '../DeviceColorPicker.svelte';
+  import Icon from '@iconify/svelte';
+  import roundZoomIn from '@iconify/icons-ic/round-zoom-in';
+  import roundZoomOut from '@iconify/icons-ic/round-zoom-out';
 
   export let device: DeviceDisplay;
   export let dragging = false;
@@ -12,6 +15,7 @@
   let hovering = false;
   let drag = false;
   let colorPickerOpen = false;
+  let scale = {index: 0, levels: []}; //levels will be initalized in DevicePreview
 
   let left: number;
   let top: number;
@@ -81,6 +85,14 @@
     element.scrollIntoView();
   }
 
+  function zoomOut() {
+    scale.index = Math.max(scale.index - 1, 0);
+  }
+
+  function zoomIn() {
+    scale.index = Math.min(scale.index + 1, scale.levels.length - 1);
+  }
+
 </script>
 
 <div class="DraggablePreview {drag || (hovering && !locked) ? 'hovering' : ''} {locked ? 'locked' : ' '}"
@@ -94,9 +106,26 @@
       bind:open={colorPickerOpen}
       bind:color={device.color} />
     <div class="device-label">{device.label}</div>
+    {#if hovering}
+      <div class="actions">
+        <div class="scale">
+          {Math.round(scale.levels[scale.index] * 100)}%
+        </div>
+        <!-- svelte-ignore a11y-click-events-have-key-events -->
+        <div role="button" class="icon-button" on:click={zoomOut}>
+          <Icon icon={roundZoomOut} />
+        </div>
+        <!-- svelte-ignore a11y-click-events-have-key-events -->
+        <div role="button" class="icon-button" on:click={zoomIn}>
+          <Icon icon={roundZoomIn} />
+        </div>
+      </div>
+    {/if}
   </div>
   <div class="display">
-    <DevicePreview bind:ledPositions={device.ledPositions} bind:ledColors={device.ledColors} />
+    <DevicePreview bind:ledPositions={device.ledPositions} 
+                   bind:ledColors={device.ledColors}
+                   bind:scale={scale} />
   </div>
 </div>
 
@@ -118,7 +147,7 @@
   }
 
   .device-toolbar {
-    align-content: center;
+    align-items: center;
     box-sizing: border-box;
     display: flex;
     padding-bottom: 8px;
@@ -126,6 +155,28 @@
   .device-label {
     font-size: 14px;
     flex: 1 1 auto;
+  }
+  
+  .actions {
+    align-items: center;
+    display: flex;
+    flex-direction: row;
+    font-size: 10px;
+  }
+  .icon-button {
+    color: var(--color-input-text);
+    cursor: pointer;
+    height: 24px;
+    width: 24px;
+  }
+  .icon-button:hover {
+    color: var(--color-input-text-hover);
+  }
+  .icon-button:active {
+    color: var(--color-input-text-active);
+  }
+  .scale {
+    padding: 0 4px;
   }
 
   .display {

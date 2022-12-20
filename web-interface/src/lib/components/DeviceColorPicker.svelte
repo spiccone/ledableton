@@ -79,8 +79,13 @@
 </div>
 
 <style>
-  .DeviceColorPicker.picker-open {
+  .DeviceColorPicker {
+    height: 14px;
+    margin: -2px 8px 0 0;
     position: relative;
+    width: 14px;
+  }
+  .DeviceColorPicker.picker-open {
     z-index: 10;
   }
   .color-icon {

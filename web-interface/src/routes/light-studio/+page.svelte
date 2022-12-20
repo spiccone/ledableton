@@ -28,10 +28,6 @@
   let previewHeight = 500;
   let previewWidth = 600;
 
-  onMount(async () => {
-		previewWidth = window.innerWidth - 400;
-	});
-
   function handleSave() {}
   function handleOpen() {}
 

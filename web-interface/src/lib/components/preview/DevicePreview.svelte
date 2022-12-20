@@ -4,44 +4,54 @@
 
   export let ledPositions: Position[];
   export let ledColors: Color[];
+  export let scale: {index: number, levels: number[]};
+
+  $: scale, updateSizes();
 
   let LED_SIZE = 4;
   const PI2 = Math.PI * 2;
-  let scale = 1;
+
   let width = 0;
   let height = 0;
+  let MAX_SIZE = 600; //largest of the larger dimension
+  let MIN_SIZE = 100; //smallest of the larger dimension
 
   let canvasElement : HTMLCanvasElement;
   let ctx: CanvasRenderingContext2D | null; 
 
-  $: ledPositions, updateCanvas();
-
   onMount(() => {
+    initSizes();
     updateCanvas();
   });
 
-  function updateSizes() {
-    width = 0;
-    height = 0;
-    scale = 1;
+  function initSizes() {
     for (const position of ledPositions) {
       width = Math.max(width, position.x);
       height = Math.max(height, position.y);
     }
     const max = Math.max(width, height);
-    if (max > 300) {
-      scale = 300/max;
+    for(let i=0; i<=4; i++) {
+      let size = MIN_SIZE*(4-i)/4 + MAX_SIZE*i/4;
+      scale.levels.push(size/max);
     }
-    canvasElement.width = scale * width + LED_SIZE + 4;
-    canvasElement.height = scale * height + LED_SIZE + 4;
+    if (max > MAX_SIZE/2 + MIN_SIZE/2) {
+      scale.index = 2;
+    }
+    updateSizes();
+  }
+
+  function updateSizes() {
+    if (canvasElement) {
+      canvasElement.width = scale.levels[scale.index] * width + LED_SIZE + 4;
+      canvasElement.height = scale.levels[scale.index] * height + LED_SIZE + 4;
+      updateCanvas();
+    }
   }
 
   function updateCanvas() { 
-    console.log(ledPositions);
     if (!canvasElement) {
       return;
     } 
-    updateSizes();
     ctx = canvasElement.getContext("2d");
     if (!ctx) {
       return;
@@ -51,9 +61,10 @@
     ctx.strokeStyle = '#333';
     ctx.beginPath();
     const hl = LED_SIZE/2;
+    const scaleValue = scale.levels[scale.index];
     for (let i=0; i<ledPositions.length; i++) {
-      const x = scale*ledPositions[i].x + hl + 2;
-      const y = scale*ledPositions[i].y + hl + 2;
+      const x = scaleValue*ledPositions[i].x + hl + 2;
+      const y = scaleValue*ledPositions[i].y + hl + 2;
 
       ctx.moveTo(x + hl, y); 
       ctx.arc(x, y, hl, 0, PI2, true);

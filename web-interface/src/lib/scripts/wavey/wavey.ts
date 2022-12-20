@@ -1,7 +1,7 @@
 
 import FFT from './fft';
 import {style} from './util';
-import WebAudio from './webAudio';
+import type WebAudio from './webAudio';
 
 interface WaveyParams {
   containerId:string;
