@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { DeviceDisplay } from '$lib/device';
   import {onMount} from 'svelte';
+	import DevicePreview from './DevicePreview.svelte';
   import DeviceColorPicker from '../DeviceColorPicker.svelte';
 
   export let device: DeviceDisplay;
@@ -94,6 +95,9 @@
       bind:color={device.color} />
     <div class="device-label">{device.label}</div>
   </div>
+  <div class="display">
+    <DevicePreview bind:ledPositions={device.ledPositions} bind:ledColors={device.ledColors} />
+  </div>
 </div>
 
 <style>
@@ -101,10 +105,9 @@
     cursor: move;
     border: 2px solid rgba(0,0,0,0);
     border-radius: 12px;
-    height: 300px;
-    padding: 6px;
+    padding: 12px;
     position: relative;
-    width: 300px;
+    width: fit-content;
   }
   .DraggablePreview.locked {
     cursor: default;
@@ -118,10 +121,14 @@
     align-content: center;
     box-sizing: border-box;
     display: flex;
-    padding: 8px;
+    padding-bottom: 8px;
   }
   .device-label {
     font-size: 14px;
     flex: 1 1 auto;
+  }
+
+  .display {
+    width: fit-content;
   }
 </style>

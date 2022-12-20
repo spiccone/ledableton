@@ -2,14 +2,19 @@
 export class DeviceDisplay {
   label: string;
   color: string = "#2CCCE4";
-  ledPositions: Position[] = [];
-  ledColors: Color[] = [];
+  ledPositions: Position[];
+  ledColors: Color[];
 
   previewLeft: number = 0;
   previewTop: number = 0;
 
-  constructor(name: string) {
+  constructor(name: string, positions: Position[]) {
     this.label = name;
+    this.ledPositions = positions;
+    this.ledColors = [];
+    for (const position of positions) {
+      this.ledColors.push({r: 0, g: 0, b: 0});
+    }
   }
 }
 

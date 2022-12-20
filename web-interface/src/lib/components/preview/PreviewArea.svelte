@@ -13,11 +13,9 @@
   <div class='room-button'>Room name</div>
   <div class="device-preview-container">
     {#each devices as device, i (i)}
-      <div class="device-wrapper">
-        <DraggablePreview bind:device={device} 
-                          bind:dragging={dragging}
-                          locked={locked || dragging} />
-      </div>
+      <DraggablePreview bind:device={device} 
+                        bind:dragging={dragging}
+                        locked={locked || dragging} />
     {/each}
   </div>
   {#if !locked}
@@ -51,11 +49,5 @@
     overflow: scroll;
     position:static;
     width: 100%;
-  }
-
-  .device-wrapper {
-    height: 0;
-    overflow: visible;
-    width: 0;
   }
 </style>

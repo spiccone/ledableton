@@ -330,10 +330,9 @@
     getLedPositions(savedDevices[savedDeviceIndex].settings);
   }
 
-  function handleAdd() {
+  async function handleAdd() {
     deviceDisplays.push(new DeviceDisplay(savedDevices[savedDeviceIndex].name, ledPositions));
     deviceDisplays = deviceDisplays;
-    booleanStore.call(p);
   }
 
 </script>
@@ -410,7 +409,7 @@
           Save Device
         </button>
       {:else}
-        <button on:mousedown={handleAdd} on:mouseup={close}>Add Device</button>
+        <button on:mousedown={() => {handleAdd().then(close)}}>Add Device</button>
       {/if}
     </div>
   </div>
