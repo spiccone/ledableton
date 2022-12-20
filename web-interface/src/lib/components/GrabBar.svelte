@@ -1,6 +1,6 @@
 <script lang="ts">
   import {afterUpdate } from 'svelte';
-  import {LayoutDirection as Layout} from "../types";
+  import {LayoutDirection as Layout} from "$lib/types";
 
   //export let elementIdToScale: string;
   export let layoutDirection: Layout;

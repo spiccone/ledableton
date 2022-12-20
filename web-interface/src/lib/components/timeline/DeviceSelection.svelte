@@ -1,13 +1,13 @@
 <script lang="ts">
 
-import type {Device} from "../types";
+import type {DeviceDisplay} from "$lib/device";
 
-export let devices: Array<Device> = [];
+export let devices: Array<DeviceDisplay> = [];
 
 </script>
 
 <div class="DeviceSelection">
-  {#each devices as device, i (device.previewElementId)}
+  {#each devices as device, i (i)}
     <!-- TODO: Check if device supports the current effect. -->
     <div class="device-button" style="background: {device.color}"></div>
   {/each}

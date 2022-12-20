@@ -1,6 +1,6 @@
 <script lang="ts">
   import {onMount} from 'svelte';
-  import {SavedDevice, type DeviceMessageObject, type OneOf, type Position, type Value} from '$lib/device';
+  import {DeviceDisplay, SavedDevice, type DeviceMessageObject, type OneOf, type Position, type Value} from '$lib/device';
   import Modal from '../Modal.svelte';
   import Select from '../basic/Select.svelte';
   import Icon from '@iconify/svelte';
@@ -12,6 +12,9 @@
   import protobuf from 'protobufjs';
 	import CreateDevice from './CreateDevice.svelte';
 	import DevicePreview from './DevicePreview.svelte';
+  import {booleanStore} from '$lib/stores';
+
+  export let deviceDisplays: DeviceDisplay[];
 
   let socket: WebSocket;
  
@@ -111,10 +114,10 @@
     });
     socket.addEventListener('message', (event) => {
       const object = JSON.parse(event.data);
-      if(Object.keys(object)[0] === "positions") {
+      if (Object.keys(object)[0] === "positions") {
         ledPositions = object.positions;
       } else if (Object.keys(object)[0] === "devices") {
-        savedDevices = JSON.parse(event.data).devices;
+        savedDevices = object.devices;
         updateSavedDeviceNames();
       }
     });
@@ -126,8 +129,9 @@
       savedDeviceNames.push({
         key: "device_" + savedIndex++,
         label: device.name
-      })
+      });
     }
+    savedDeviceNames = savedDeviceNames;
   }
 
   function resetCreateDevice() {
@@ -145,6 +149,7 @@
   function openAddDevice() {
     createDevice = false;
     edit = false;
+    socket.send("load-files");
   }
 
   function deleteDevice() {
@@ -156,6 +161,7 @@
     sendJson();
     updateSavedDeviceNames();
     createDevice = savedDevices.length === 0;
+    getLedPositions(savedDevices[savedDeviceIndex].settings);
   }
 
   function editDevice() {
@@ -311,10 +317,6 @@
     socket.send(json);
   }
 
-  function handleAdd() {
-
-	}
-
   function mouseOverSave() {
     if (deviceName === '') {
       error = true;
@@ -325,10 +327,15 @@
   }
 
   function handleSelect() {
-    if (savedDevices[savedDeviceIndex].ledPositions.length == 0) {
-      getLedPositions(savedDevices[savedDeviceIndex].settings);
-    }
+    getLedPositions(savedDevices[savedDeviceIndex].settings);
   }
+
+  function handleAdd() {
+    deviceDisplays.push(new DeviceDisplay(savedDevices[savedDeviceIndex].name, ledPositions));
+    deviceDisplays = deviceDisplays;
+    booleanStore.call(p);
+  }
+
 </script>
 
 <Modal>
@@ -387,14 +394,12 @@
           </button>
         </div>
       </div>
-      {#if ledPositions.length > 0}
-        <div class="device-preview-container">
-          <DevicePreview ledPositions={ledPositions} />
-        </div>
-      {/if}
+      <div class="device-preview-container">
+        <DevicePreview ledPositions={ledPositions} />
+      </div>
     {/if}
   </div>
-  <div class="footer" slot="footer">
+  <div class="footer" slot="footer" let:store={{close}}>
     <!-- svelte-ignore a11y-mouse-events-have-key-events -->
     <div class="submit-container"
          on:mouseover={mouseOverSave}
@@ -405,7 +410,7 @@
           Save Device
         </button>
       {:else}
-        <button on:click={handleAdd}>Add Device</button>
+        <button on:mousedown={handleAdd} on:mouseup={close}>Add Device</button>
       {/if}
     </div>
   </div>

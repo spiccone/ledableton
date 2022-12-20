@@ -1,10 +1,10 @@
 <script lang="ts">
   import { onMount } from 'svelte';
-  import Menu from '$lib/components/Menu.svelte';
-	import PreviewArea from '$lib/components/PreviewArea.svelte';
-  import TimelineList from '$lib/components/TimelineList.svelte';
+  import Menu from '$lib/components/timeline/Menu.svelte';
+	import PreviewArea from '$lib/components/preview/PreviewArea.svelte';
+  import TimelineList from '$lib/components/timeline/TimelineList.svelte';
   import GrabBar from '$lib/components/GrabBar.svelte'
-  import { Device, LayoutDirection as Layout, LayoutDirection } from '$lib/types';
+  import {LayoutDirection as Layout, LayoutDirection } from '$lib/types';
   import Icon from '@iconify/svelte';
   import createIcon from '@iconify/icons-gridicons/create';
   import folderOpenOutlineRounded from '@iconify/icons-material-symbols/folder-open-outline-rounded';
@@ -14,6 +14,7 @@
   import rotate90DegreesCwOutlineRounded from '@iconify/icons-material-symbols/rotate-90-degrees-cw-outline-rounded';
   import saveOutlineRounded from '@iconify/icons-material-symbols/save-outline-rounded';
   import settingsOutlineRounded from '@iconify/icons-material-symbols/settings-outline-rounded';
+	import type { DeviceDisplay } from '$lib/device';
 
   const audioMinimapId = "audio-minimap";
   let locked = false;
@@ -21,13 +22,7 @@
   let oppositeLayoutDirection = Layout.row;
   let columnLayout = true;
 
-
-
-  let devices: Array<Device> = [
-    new Device(1, 'Device 1', '#FCB900'), 
-    new Device(2, 'Device 2', '#F78DA7')];
-
-  devices[1].previewLeft = 300;
+  let devices: DeviceDisplay[] = [];
 
   let windowHeight = 0;
   let previewHeight = 500;
@@ -148,7 +143,6 @@
       "preview grabv menu grabh timeline";
   }
   .preview-area {
-    background: #000;
     grid-area: preview;
   }
 

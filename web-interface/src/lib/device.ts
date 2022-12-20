@@ -2,18 +2,23 @@
 export class DeviceDisplay {
   label: string;
   color: string = "#2CCCE4";
+  ledPositions: Position[] = [];
+  ledColors: Color[] = [];
 
-  previewElementId: string;
-  timelineElementId: string;
   previewLeft: number = 0;
   previewTop: number = 0;
 
-  constructor(id: number, device: SavedDevice) {
-    this.label = device.name;
-    this.previewElementId = "preview_" + id;
-    this.timelineElementId = "timeline_" + id;
+  constructor(name: string) {
+    this.label = name;
   }
 }
+
+export interface Color {
+  r: number;
+  g: number;
+  b: number;
+}
+
 export interface Position {
   x: number;
   y: number;
@@ -21,7 +26,6 @@ export interface Position {
 export class SavedDevice {
   name: string;
   settings: DeviceMessageObject;
-  ledPositions: Position[] = [];
 
   constructor(name: string, settings: DeviceMessageObject) {
     this.name = name;

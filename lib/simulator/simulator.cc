@@ -8,6 +8,7 @@
 
 #include "device.pb.h"
 #include "strip.h"
+#include "grid.h"
 
 using Server = websocketpp::server<websocketpp::config::asio>;
 
@@ -72,9 +73,21 @@ void on_message(Server *s, websocketpp::connection_hdl hdl,
       google::protobuf::util::JsonParseOptions options;  
       JsonStringToMessage(msg->get_payload().substr(11), &settings, options);
       if(settings.has_strip()) {
-        std::cout << "Strip" << std::endl;  
         devicepackage::DisplayPositions positions =
-          Strip::GetPositionsForDisplay(settings.mutable_strip()->leds(), settings.mutable_strip()->spacing());
+          Strip::GetPositionsForDisplay(
+            settings.mutable_strip()->leds(),
+            settings.mutable_strip()->spacing());
+        std::string messageJson;
+        JsonOptions options;
+        MessageToJsonString(positions, &messageJson, options);
+        s->send(hdl, messageJson, msg->get_opcode());
+      } else if(settings.has_grid()) {
+        devicepackage::DisplayPositions positions =
+          Grid::GetPositionsForDisplay(
+            settings.mutable_grid()->rows(),
+            settings.mutable_grid()->columns(),
+            settings.mutable_grid()->row_spacing(),
+            settings.mutable_grid()->column_spacing());
         std::string messageJson;
         JsonOptions options;
         MessageToJsonString(positions, &messageJson, options);

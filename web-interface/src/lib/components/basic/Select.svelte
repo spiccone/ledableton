@@ -266,7 +266,7 @@
     background: var(--select-color-bg-hover, var(--color-input-bg-hover));
   }
 
-  .selected-list-item:active,
+  .enabled .selected-list-item:active,
   .select-list-item:active {
     background: var(--select-color-bg-active, var(--color-input-bg-active));
   }

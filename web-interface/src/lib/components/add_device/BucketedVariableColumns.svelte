@@ -4,9 +4,9 @@
   import autoAwesomeMotionOutlineRounded from '@iconify/icons-material-symbols/auto-awesome-motion-outline-rounded';
   import roundPlus from '@iconify/icons-ic/round-plus';
   import roundMinus from '@iconify/icons-ic/round-minus';
-	import Checkbox from "../basic/Checkbox.svelte"
-  import Labeled from "../basic/Labeled.svelte";
-	import SplitInput from "../basic/SplitInput.svelte";
+	import Checkbox from '../basic/Checkbox.svelte';
+  import Labeled from '../basic/Labeled.svelte';
+	import SplitInput from '../basic/SplitInput.svelte';
 	import FieldDisplay from "./FieldDisplay.svelte";
 	import Bucket from "./Bucket.svelte";
 

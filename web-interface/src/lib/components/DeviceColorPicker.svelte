@@ -1,5 +1,5 @@
 <script lang="ts">
-  import {ColorLevel, getColorLevel} from "../helper-functions";
+  import {ColorLevel, getColorLevel} from "$lib/helper-functions";
 
   export let color: string;
   export let open: boolean = false;

@@ -7,7 +7,7 @@
 <script lang="ts">
   import Icon from '@iconify/svelte';
   import roundClose from '@iconify/icons-ic/round-close';
-  import {booleanStore} from '../stores';
+  import {booleanStore} from '$lib/stores';
 
   const store = booleanStore(false);
   const { isOpen, open, close } = store

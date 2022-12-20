@@ -1,9 +1,9 @@
 <script lang="ts">
+	import type { DeviceDisplay } from '$lib/device';
   import {onMount} from 'svelte';
-  import type {Device} from "../types";
-  import DeviceColorPicker from './DeviceColorPicker.svelte';
+  import DeviceColorPicker from '../DeviceColorPicker.svelte';
 
-  export let device: Device;
+  export let device: DeviceDisplay;
   export let dragging = false;
   export let locked: boolean;
 

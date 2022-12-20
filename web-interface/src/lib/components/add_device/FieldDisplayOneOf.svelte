@@ -1,7 +1,7 @@
 <script lang="ts">
-	import {nameFormat} from "$lib/helper-functions";
-  import type {FieldValue, OneOf} from "$lib/device";
-	import Select from "../basic/Select.svelte";
+	import {nameFormat} from '$lib/helper-functions';
+  import type {FieldValue, OneOf} from '$lib/device';
+	import Select from '../basic/Select.svelte';
   import FieldInput from './FieldInput.svelte';
 
   export let fieldValue: OneOf;

@@ -1,9 +1,9 @@
 <script lang="ts">
-  import type {Device} from "$lib/types";
-  import AddDevice from "./add_device/AddDevice.svelte";
+  import type {DeviceDisplay} from "$lib/device";
+  import AddDevice from "../add_device/AddDevice.svelte";
 	import DraggablePreview from './DraggablePreview.svelte';
 
-  export let devices: Array<Device> = [];
+  export let devices: Array<DeviceDisplay> = [];
   export let locked: boolean = false;
 
   let dragging= false;
@@ -12,7 +12,7 @@
 <div class="PreviewArea {locked ? 'locked' : ''}">
   <div class='room-button'>Room name</div>
   <div class="device-preview-container">
-    {#each devices as device, i (device.previewElementId)}
+    {#each devices as device, i (i)}
       <div class="device-wrapper">
         <DraggablePreview bind:device={device} 
                           bind:dragging={dragging}
@@ -21,7 +21,7 @@
     {/each}
   </div>
   {#if !locked}
-    <AddDevice/>
+    <AddDevice bind:deviceDisplays={devices}/>
   {/if}
 </div>
 

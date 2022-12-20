@@ -1,8 +1,9 @@
 <script lang="ts">
-  import {ColorLevel, getColorLevel} from "../helper-functions";
-  import {LayoutDirection as Layout, type Device} from "../types";
+	import type { DeviceDisplay } from "$lib/device";
+  import {ColorLevel, getColorLevel} from "$lib/helper-functions";
+  import {LayoutDirection as Layout} from "$lib/types";
 
-  export let device: Device;
+  export let device: DeviceDisplay;
   export let layoutDirection: Layout;
 </script>
 

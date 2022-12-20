@@ -1,10 +1,11 @@
 <script lang="ts">
-  import {Device, LayoutDirection as Layout} from "../types";
+	import type { DeviceDisplay } from "$lib/device";
+  import {LayoutDirection as Layout} from "$lib/types";
 	import DeviceTimeline from './DeviceTimeline.svelte';
   //import AudioDisplay from './AudioDisplay.svelte';
 
   export let layoutDirection: Layout = Layout.column;
-  export let devices: Array<Device> = [];
+  export let devices: Array<DeviceDisplay> = [];
   export let audioMinimapId: string|undefined;
   export let verticalAudio: boolean = false;
 
@@ -12,7 +13,7 @@
 
 <div class="TimelineList {layoutDirection == Layout.column ? 'layout-column' : 'layout-row'}">
   <div class="list">
-    {#each devices as device, i (device.previewElementId)}
+    {#each devices as device, i (i)}
       <DeviceTimeline device={device} layoutDirection={layoutDirection} />
     {/each}
   </div>
