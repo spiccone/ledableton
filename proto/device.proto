@@ -1,7 +1,41 @@
 package devicepackage;
 
-message SavedDevices {
-  repeated Device devices = 1;
+message ColorList {
+  repeated Color colors = 1;
+}
+
+message Color {
+  required int32 r = 1;
+  required int32 g = 2;
+  required int32 b = 3;
+}
+
+message DevicesInRoom {
+  repeated DeviceInRoom devicesInRoom = 1;
+}
+
+message DeviceInRoom {
+  required string name = 1;
+  required Settings settings = 2;
+  required PositionInRoom position = 3;
+}
+
+message PositionInRoom {
+  required float x = 1;
+  required float y = 2;
+  required float z = 3;
+  required Plane plane = 4;
+  required bool inverted = 5;
+}
+
+enum Plane {
+  XY = 1;
+  XZ = 2;
+  YZ = 3;
+}
+
+message DisplayPositions {
+  repeated Position positions = 1;
 }
 
 message Position {
@@ -9,8 +43,8 @@ message Position {
   required float y = 2;
 }
 
-message DisplayPositions {
-  repeated Position positions = 1;
+message SavedDevices {
+  repeated Device devices = 1;
 }
 
 message Device {

@@ -21,12 +21,18 @@
   let layoutDirection = Layout.column;
   let oppositeLayoutDirection = Layout.row;
   let columnLayout = true;
+  
+  let socket;
 
   let devices: DeviceDisplay[] = [];
 
   let windowHeight = 0;
   let previewHeight = 700;
   let previewWidth = 900;
+
+  onMount(() => {
+    socket = new WebSocket('ws://localhost:9001');
+  });
 
   function handleSave() {}
   function handleOpen() {}
@@ -58,7 +64,8 @@
   <div class="preview-area">
     <PreviewArea
       bind:devices={devices} 
-      locked = {locked} />
+      locked = {locked} 
+      socket = {socket} />
   </div>
   <div class="grab-bar vertical">
     <GrabBar 

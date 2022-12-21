@@ -12,11 +12,10 @@
   import protobuf from 'protobufjs';
 	import CreateDevice from './CreateDevice.svelte';
 	import DevicePreview from './DevicePreview.svelte';
-  import {booleanStore} from '$lib/stores';
 
   export let deviceDisplays: DeviceDisplay[];
 
-  let socket: WebSocket;
+  export let socket: WebSocket;
  
   let units : {key: string, label: string}[] = [];
 
@@ -88,7 +87,6 @@
   }
 
   onMount(() => {
-    socket = new WebSocket('ws://localhost:9001');
     protobuf.load("src/protos/device.proto").then(function(root) {
       if (!root) {
         throw "Error loading device.proto in AddDevice.";
@@ -110,18 +108,17 @@
   });
 
   async function loadJson() {
-    socket.addEventListener('open', (event) => {
-      loadFiles();
-    });
-    socket.addEventListener('message', (event) => {
-      const object = JSON.parse(event.data);
+    socket.addEventListener('message', (event) => handleMessage(event));
+  }
+
+  function handleMessage(event: MessageEvent) {
+    const object = JSON.parse(event.data);
       if (Object.keys(object)[0] === "positions") {
         ledPositions = object.positions;
       } else if (Object.keys(object)[0] === "devices") {
         savedDevices = object.devices;
         updateSavedDeviceNames();
       }
-    });
   }
 
   function updateSavedDeviceNames() {
@@ -334,7 +331,12 @@
     getLedPositions(savedDevices[savedDeviceIndex].settings);
   }
 
-  async function handleAdd() {
+  async function handleClose() {
+    handleAdd();
+    socket.removeEventListener('message', (event) => handleMessage(event));
+  }
+
+  function handleAdd() {
     deviceDisplays.push(new DeviceDisplay(savedDeviceName, savedDevices[savedDeviceIndex], ledPositions));
     deviceDisplays = deviceDisplays;
   }
@@ -420,7 +422,7 @@
           Save Device
         </button>
       {:else}
-        <button on:click={() => {handleAdd().then(close)}}>Add Device</button>
+        <button on:click={() => {handleClose().then(close)}}>Add Device</button>
       {/if}
     </div>
   </div>

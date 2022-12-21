@@ -1,10 +1,30 @@
 <script lang="ts">
   import type {DeviceDisplay} from "$lib/device";
+	import { onMount } from "svelte";
   import AddDevice from "../add_device/AddDevice.svelte";
 	import DraggablePreview from './DraggablePreview.svelte';
 
   export let devices: Array<DeviceDisplay> = [];
   export let locked: boolean = false;
+  export let socket: WebSocket;
+
+  onMount(() => {
+    socket.addEventListener('message', (event) => handleMessage(event));
+    
+  });
+
+  function handleMessage(event: MessageEvent) {
+
+  }
+
+  function play() {
+    socket.send("run-effects");
+  }
+
+  function pause() {
+    socket.send("stop-effects");
+  }
+  
 
   let dragging= false;
 </script>
@@ -19,7 +39,8 @@
     {/each}
   </div>
   {#if !locked}
-    <AddDevice bind:deviceDisplays={devices}/>
+    <AddDevice bind:deviceDisplays={devices}
+               socket={socket}/>
   {/if}
 </div>
 
