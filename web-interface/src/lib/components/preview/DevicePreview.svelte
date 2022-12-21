@@ -15,6 +15,8 @@
   let height = 0;
   let MAX_SIZE = 600; //largest of the larger dimension
   let MIN_SIZE = 100; //smallest of the larger dimension
+  let GLOW_SIZE = 2;
+  let PADDING = GLOW_SIZE + LED_SIZE;
 
   let canvasElement : HTMLCanvasElement;
   let ctx: CanvasRenderingContext2D | null; 
@@ -24,6 +26,7 @@
     updateCanvas();
   });
 
+  // TODO: Make one of the level 100% if it fits constraints
   function initSizes() {
     for (const position of ledPositions) {
       width = Math.max(width, position.x);
@@ -42,8 +45,8 @@
 
   function updateSizes() {
     if (canvasElement) {
-      canvasElement.width = scale.levels[scale.index] * width + LED_SIZE + 4;
-      canvasElement.height = scale.levels[scale.index] * height + LED_SIZE + 4;
+      canvasElement.width = scale.levels[scale.index] * width + LED_SIZE + PADDING*2;
+      canvasElement.height = scale.levels[scale.index] * height + LED_SIZE + PADDING*2;
       updateCanvas();
     }
   }
@@ -63,13 +66,15 @@
     const hl = LED_SIZE/2;
     const scaleValue = scale.levels[scale.index];
     for (let i=0; i<ledPositions.length; i++) {
-      const x = scaleValue*ledPositions[i].x + hl + 2;
-      const y = scaleValue*ledPositions[i].y + hl + 2;
+      const x = scaleValue*ledPositions[i].x + hl + PADDING;
+      const y = scaleValue*ledPositions[i].y + hl + PADDING;
 
       ctx.moveTo(x + hl, y); 
       ctx.arc(x, y, hl, 0, PI2, true);
-      //ctx.fillStyle = 'rgb('+ledColors[i].r+','+ledColors[i].g+','+ledColors[i].b+'}';
-      ctx.fillStyle = "#000";
+      const color = 'rgb('+ledColors[i].r+','+ledColors[i].g+','+ledColors[i].b+'}';
+      ctx.fillStyle = color;
+      ctx.shadowBlur = GLOW_SIZE;
+      ctx.shadowColor = color;
       ctx.fill();
     }
     

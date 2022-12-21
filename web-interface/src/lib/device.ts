@@ -4,12 +4,14 @@ export class DeviceDisplay {
   color: string = "#2CCCE4";
   ledPositions: Position[];
   ledColors: Color[];
+  settings: SavedDevice;
 
   previewLeft: number = 0;
   previewTop: number = 0;
 
-  constructor(name: string, positions: Position[]) {
+  constructor(name: string, settings: SavedDevice, positions : Position[]) {
     this.label = name;
+    this.settings = settings;
     this.ledPositions = positions;
     this.ledColors = [];
     for (const position of positions) {

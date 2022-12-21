@@ -2,7 +2,8 @@
   import {ColorLevel, getColorLevel} from "$lib/helper-functions";
 
   export let color: string;
-  export let open: boolean = false;
+  export let open = false;
+  export let locked = false;
 
   let customColor: string = color.slice(1);
   let inputColor = color;
@@ -44,7 +45,7 @@
   }
 </script>
 
-<div class="DeviceColorPicker {open ? 'picker-open' : ''}">
+<div class="DeviceColorPicker" class:open class:locked>
   <!-- svelte-ignore a11y-click-events-have-key-events -->
   <div class="color-icon" style="background: {color}" on:click={openPicker}></div>
   <div class="color-picker">
@@ -85,7 +86,10 @@
     position: relative;
     width: 14px;
   }
-  .DeviceColorPicker.picker-open {
+  .DeviceColorPicker.locked {
+    pointer-events: none;
+  }
+  .DeviceColorPicker.open {
     z-index: 10;
   }
   .color-icon {
@@ -99,7 +103,7 @@
     position: relative;
     z-index: 3;
   }
-  .picker-open .color-icon {
+  .open .color-icon {
     pointer-events: none;
   }
 
@@ -111,7 +115,7 @@
     width: 0;
     z-index: 2;
   }
-  .picker-open .color-picker {
+  .open .color-picker {
     transition: width .23s ease-out;
     width: 245px;
   }
@@ -207,7 +211,7 @@
     left: 0;
     right: 0;
   }
-  .picker-open .cover {
+  .open .cover {
     display: block;
     z-index: 1;
   }

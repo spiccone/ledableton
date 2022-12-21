@@ -15,7 +15,7 @@
     {#each devices as device, i (i)}
       <DraggablePreview bind:device={device} 
                         bind:dragging={dragging}
-                        locked={locked || dragging} />
+                        locked={locked} />
     {/each}
   </div>
   {#if !locked}

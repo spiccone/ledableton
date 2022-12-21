@@ -25,8 +25,8 @@
   let devices: DeviceDisplay[] = [];
 
   let windowHeight = 0;
-  let previewHeight = 500;
-  let previewWidth = 600;
+  let previewHeight = 700;
+  let previewWidth = 900;
 
   function handleSave() {}
   function handleOpen() {}

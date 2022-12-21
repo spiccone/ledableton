@@ -2,14 +2,16 @@
 	import type { DeviceDisplay } from '$lib/device';
   import {onMount} from 'svelte';
 	import DevicePreview from './DevicePreview.svelte';
-  import DeviceColorPicker from '../DeviceColorPicker.svelte';
+  import DeviceColorPicker from './DeviceColorPicker.svelte';
   import Icon from '@iconify/svelte';
   import roundZoomIn from '@iconify/icons-ic/round-zoom-in';
   import roundZoomOut from '@iconify/icons-ic/round-zoom-out';
+  import settingsOutlineRounded from '@iconify/icons-material-symbols/settings-outline-rounded';
+
 
   export let device: DeviceDisplay;
   export let dragging = false;
-  export let locked: boolean;
+  export let locked = false;
 
   let element: HTMLElement;
   let hovering = false;
@@ -93,9 +95,14 @@
     scale.index = Math.min(scale.index + 1, scale.levels.length - 1);
   }
 
+  function openSettings() {
+
+  }
+
 </script>
 
-<div class="DraggablePreview {drag || (hovering && !locked) ? 'hovering' : ''} {locked ? 'locked' : ' '}"
+<div class="DraggablePreview {drag || (hovering && !locked) ? 'hovering' : ''}"
+    class:locked
     bind:this={element}
     on:mouseenter={enter}
     on:mouseleave={leave}
@@ -104,9 +111,25 @@
   <div class="device-toolbar">
     <DeviceColorPicker 
       bind:open={colorPickerOpen}
-      bind:color={device.color} />
+      bind:color={device.color}
+      locked={locked} />
     <div class="device-label">{device.label}</div>
-    {#if hovering}
+    {#if hovering && !locked}
+      <div class="actions">
+        <!-- svelte-ignore a11y-click-events-have-key-events -->
+        <div role="button" class="icon-button settings-button" on:click={openSettings}>
+          <Icon icon={settingsOutlineRounded} />
+        </div>
+      </div>
+    {/if}
+  </div>
+  <div class="display">
+    <DevicePreview bind:ledPositions={device.ledPositions} 
+                   bind:ledColors={device.ledColors}
+                   bind:scale={scale} />
+  </div>
+  <div class="device-bottom-toolbar">
+    {#if hovering && !locked}
       <div class="actions">
         <div class="scale">
           {Math.round(scale.levels[scale.index] * 100)}%
@@ -122,11 +145,6 @@
       </div>
     {/if}
   </div>
-  <div class="display">
-    <DevicePreview bind:ledPositions={device.ledPositions} 
-                   bind:ledColors={device.ledColors}
-                   bind:scale={scale} />
-  </div>
 </div>
 
 <style>
@@ -134,7 +152,7 @@
     cursor: move;
     border: 2px solid rgba(0,0,0,0);
     border-radius: 12px;
-    padding: 12px;
+    padding: 12px 12px 6px;
     position: relative;
     width: fit-content;
   }
@@ -146,11 +164,19 @@
     cursor: move;
   }
 
-  .device-toolbar {
+  .device-toolbar,
+  .device-bottom-toolbar {
     align-items: center;
     box-sizing: border-box;
     display: flex;
-    padding-bottom: 8px;
+  }
+  .device-toolbar {
+    height: 32px;
+    padding-bottom: 12px;
+  }
+  .device-bottom-toolbar {
+    height: 26px;
+    justify-content: flex-end;
   }
   .device-label {
     font-size: 14px;
@@ -164,6 +190,7 @@
     font-size: 10px;
   }
   .icon-button {
+    box-sizing: border-box;
     color: var(--color-input-text);
     cursor: pointer;
     height: 24px;
@@ -174,6 +201,10 @@
   }
   .icon-button:active {
     color: var(--color-input-text-active);
+  }
+
+  .settings-button {
+    padding: 2px;
   }
   .scale {
     padding: 0 4px;

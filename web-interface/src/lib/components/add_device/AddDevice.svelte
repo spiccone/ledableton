@@ -36,6 +36,7 @@
 
   let error = false;
   let deviceName = "";
+  let savedDeviceName = "";
 
   let edit = false;
   
@@ -110,7 +111,7 @@
 
   async function loadJson() {
     socket.addEventListener('open', (event) => {
-      socket.send("load-files");
+      loadFiles();
     });
     socket.addEventListener('message', (event) => {
       const object = JSON.parse(event.data);
@@ -146,10 +147,13 @@
     createDevice = true;
   }
 
+  async function loadFiles() {
+    socket.send("load-files");
+  }
+
   function openAddDevice() {
     createDevice = false;
     edit = false;
-    socket.send("load-files");
   }
 
   function deleteDevice() {
@@ -331,7 +335,7 @@
   }
 
   async function handleAdd() {
-    deviceDisplays.push(new DeviceDisplay(savedDevices[savedDeviceIndex].name, ledPositions));
+    deviceDisplays.push(new DeviceDisplay(savedDeviceName, savedDevices[savedDeviceIndex], ledPositions));
     deviceDisplays = deviceDisplays;
   }
 
@@ -339,7 +343,7 @@
 
 <Modal>
   <div slot="trigger" let:open>
-    <button class="add-device" on:click={open}>
+    <button class="add-device" on:click={() => {loadFiles().then(open)}}>
       <Icon icon={roundPlus} />
     </button>
   </div>
@@ -371,6 +375,13 @@
                       units={units} />
       </div>
     {:else}
+      <div class="add-device-name-container">
+        <input class:error
+              type="text" 
+              class="device-name" 
+              bind:value={savedDeviceName}
+              placeholder="New device" />
+      </div>
       <div class="outer-section">
         <div class="saved-device-container">
           <div class="saved-select">
@@ -409,7 +420,7 @@
           Save Device
         </button>
       {:else}
-        <button on:mousedown={() => {handleAdd().then(close)}}>Add Device</button>
+        <button on:click={() => {handleAdd().then(close)}}>Add Device</button>
       {/if}
     </div>
   </div>
@@ -510,10 +521,17 @@
     margin-top: 18px;
   }
 
+  .device-name-container,
+  .add-device-name-container {
+    display: flex;
+  }
+  
   .device-name-container {
     /* This is so the text is aligned instead of the focus border. */
     margin: -4px -4px 12px -4px;
-    display: flex;
+  }
+  .add-device-name-container {
+    margin: 2px 2px 0 2px;
   }
 
   .device-name {
