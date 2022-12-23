@@ -1,6 +1,6 @@
 <script lang="ts">
   import {onMount} from 'svelte';
-  import {DeviceDisplay, SavedDevice, type DeviceMessageObject, type OneOf, type Position, type Value} from '$lib/device';
+  import {DeviceEffectDisplay, DeviceDisplay, DeviceInRoom, SavedDevice, type DeviceMessageObject, type OneOf, type Position, type Value, SavedRoom} from '$lib/device';
   import Modal from '../Modal.svelte';
   import Select from '../basic/Select.svelte';
   import Icon from '@iconify/svelte';
@@ -13,7 +13,8 @@
 	import CreateDevice from './CreateDevice.svelte';
 	import DevicePreview from './DevicePreview.svelte';
 
-  export let deviceDisplays: DeviceDisplay[];
+  export let room: SavedRoom;
+  export let deviceEffectDisplays: DeviceEffectDisplay[];
 
   export let socket: WebSocket;
  
@@ -144,8 +145,8 @@
     createDevice = true;
   }
 
-  async function loadFiles() {
-    socket.send("load-files");
+  async function loadDevices() {
+    socket.send("load-devices");
   }
 
   function openAddDevice() {
@@ -337,15 +338,22 @@
   }
 
   function handleAdd() {
-    deviceDisplays.push(new DeviceDisplay(savedDeviceName, savedDevices[savedDeviceIndex], ledPositions));
-    deviceDisplays = deviceDisplays;
+    // TODO: Add position in room
+    const deviceInRoom = new DeviceInRoom(savedDevices[savedDeviceIndex]);
+    const deviceDisplay = new DeviceDisplay(savedDeviceName, deviceInRoom);
+    room.devices.push(deviceDisplay);
+    const devicePreview = new DeviceEffectDisplay(deviceDisplay, ledPositions);
+    deviceEffectDisplays.push(devicePreview);
+    deviceEffectDisplays = deviceEffectDisplays;
+    console.log(room);
+    console.log(deviceEffectDisplays);
   }
 
 </script>
 
 <Modal>
   <div slot="trigger" let:open>
-    <button class="add-device" on:click={() => {loadFiles().then(open)}}>
+    <button class="add-device" on:click={() => {loadDevices().then(open)}}>
       <Icon icon={roundPlus} />
     </button>
   </div>

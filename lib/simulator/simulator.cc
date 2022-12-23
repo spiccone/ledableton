@@ -31,6 +31,52 @@ void on_message(Server *s, websocketpp::connection_hdl hdl,
     return;
   }
 
+  if (msg->get_payload() == "load-devices") {
+    std::cout << "Load";
+    std::ifstream file;
+    file.open("devices.json");
+    std::string string;
+    std::string sTotal;
+    if (file.is_open()) {
+      while(!file.eof()) {
+        getline(file, string);
+        sTotal += string + "\n";
+      }
+    } else {
+      std::cout << "Unable to open devices.json";
+    }
+    try {
+      s->send(hdl, sTotal, msg->get_opcode());
+    } catch (websocketpp::exception const &e)  {
+      std::cout << "Echo failed because: "
+              << "(" << e.what() << ")" << std::endl;
+    }
+    return;
+  }
+
+  if (msg->get_payload() == "load-rooms") {
+    std::cout << "Load";
+    std::ifstream file;
+    file.open("rooms.json");
+    std::string string;
+    std::string sTotal;
+    if (file.is_open()) {
+      while(!file.eof()) {
+        getline(file, string);
+        sTotal += string + "\n";
+      }
+    } else {
+      std::cout << "Unable to open devices.json";
+    }
+    try {
+      s->send(hdl, sTotal, msg->get_opcode());
+    } catch (websocketpp::exception const &e)  {
+      std::cout << "Echo failed because: "
+              << "(" << e.what() << ")" << std::endl;
+    }
+    return;
+  }
+
   if (msg->get_payload() == "load-files") {
     std::cout << "Load";
     std::ifstream file;
@@ -50,6 +96,18 @@ void on_message(Server *s, websocketpp::connection_hdl hdl,
     } catch (websocketpp::exception const &e)  {
       std::cout << "Echo failed because: "
               << "(" << e.what() << ")" << std::endl;
+    }
+    return;
+  }
+
+  if ((msg->get_payload()).substr(2,5) == "rooms") {
+    std::ofstream file;
+    file.open("rooms.json");
+    if (file.is_open()) {
+      file << msg->get_payload() << std::endl;
+      file.close();
+    } else {
+      std::cout << "Unable to open rooms.json";
     }
     return;
   }

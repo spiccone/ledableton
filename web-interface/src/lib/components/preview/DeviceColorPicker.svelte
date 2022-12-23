@@ -99,7 +99,7 @@
     height: 14px;
     width: 14px;
     margin: 0 10px 10px 0;
-    cursor: url("../static/eye-dropper.cur") 0 16, pointer;
+    cursor: url("../../static/eye-dropper.cur") 0 16, pointer;
     position: relative;
     z-index: 3;
   }
@@ -204,7 +204,7 @@
   
   .cover {
     display: none;
-    cursor: url('../static/close-palette.png') 7 7, auto;
+    cursor: url('../../static/close-palette.png') 7 7, auto;
     position: fixed;
     top: 0;
     bottom: 0;

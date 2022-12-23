@@ -10,14 +10,13 @@ message Color {
   required int32 b = 3;
 }
 
-message DevicesInRoom {
+message Room {
   repeated DeviceInRoom devicesInRoom = 1;
 }
 
 message DeviceInRoom {
-  required string name = 1;
-  required Settings settings = 2;
-  required PositionInRoom position = 3;
+  required Settings settings = 1;
+  required PositionInRoom position = 2;
 }
 
 message PositionInRoom {

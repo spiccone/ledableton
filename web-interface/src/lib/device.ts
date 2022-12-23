@@ -1,23 +1,62 @@
-
-export class DeviceDisplay {
-  label: string;
-  color: string = "#2CCCE4";
+/**
+ * This is to preview the device effect. The positions will be generated on load.
+ */
+ export class DeviceEffectDisplay {
+  deviceDisplay: DeviceDisplay;
   ledPositions: Position[];
   ledColors: Color[];
-  settings: SavedDevice;
 
-  previewLeft: number = 0;
-  previewTop: number = 0;
-
-  constructor(name: string, settings: SavedDevice, positions : Position[]) {
-    this.label = name;
-    this.settings = settings;
+  constructor(device: DeviceDisplay, positions : Position[]) {
+    this.deviceDisplay = device;
     this.ledPositions = positions;
     this.ledColors = [];
     for (const position of positions) {
       this.ledColors.push({r: 0, g: 0, b: 0});
     }
   }
+}
+
+/**
+ * This is what will be saved to a file.
+ */
+export class SavedRoom {
+  label: string = "Room";
+  devices: DeviceDisplay[] = [];
+}
+
+
+/**
+ * This is the device info that will be saved for the web interface.
+ * We're keeping this seperate from anything generated on load to 
+ * make saving easier.
+ */
+export class DeviceDisplay {
+  device: DeviceInRoom;
+  label: string;
+  color: string = "#2CCCE4";
+  previewLeft: number = 0;
+  previewTop: number = 0;
+
+  constructor(name: string, device: DeviceInRoom) {
+    this.label = name;
+    this.device = device;
+  }
+}
+
+/**
+ * This is the device info needed by both the c++ and the web interface.
+ */
+export class DeviceInRoom {
+  settings: SavedDevice;
+  positionInRoom: PositionInRoom | null = null;
+
+  constructor(settings: SavedDevice) {
+    this.settings = settings;
+  }
+}
+
+export interface PositionInRoom {
+
 }
 
 export interface Color {
@@ -46,22 +85,22 @@ export class SavedDevice {
   }
 }
 
-export type Value = {
+export interface Value {
   value: number|string|boolean,
   type: string
 }
 
-export type UnitValue = {
+export interface UnitValue {
   value: number,
   type: "Unit"
 }
 
-export type Dimension = {
+export interface Dimension {
   unit: UnitValue, 
   dimension: Value
 }
 
-export type RepeatedNumber = {
+export interface RepeatedNumber {
   repeatedNumber: number[];
 }
 
@@ -72,13 +111,13 @@ export type DeviceMessageObject = {
   [key: string]: any;
 }
 
-export type BucketMessageObject = {
+export interface BucketMessageObject {
   devices: DeviceMessageObject[];
-  selectedDevice: number
-  type: "Settings"
+  selectedDevice: number;
+  type: "Settings";
 }
 
-export type OneOf = {
+export interface OneOf {
   selectedIndex: number,
   oneOf: DeviceMessageObject[]
 }

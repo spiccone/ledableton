@@ -77,7 +77,6 @@
       ctx.shadowColor = color;
       ctx.fill();
     }
-    
   }
 
 </script>

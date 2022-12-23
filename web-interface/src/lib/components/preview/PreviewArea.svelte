@@ -1,21 +1,21 @@
 <script lang="ts">
-  import type {DeviceDisplay} from "$lib/device";
+  import type {DeviceDisplay, DeviceEffectDisplay, SavedRoom} from "$lib/device";
 	import { onMount } from "svelte";
   import AddDevice from "../add_device/AddDevice.svelte";
 	import DraggablePreview from './DraggablePreview.svelte';
 
-  export let devices: Array<DeviceDisplay> = [];
   export let locked: boolean = false;
   export let socket: WebSocket;
+  export let deviceEffectDisplays: DeviceEffectDisplay[];
 
   onMount(() => {
-    socket.addEventListener('message', (event) => handleMessage(event));
-    
+    updateDisplays();
   });
 
-  function handleMessage(event: MessageEvent) {
+  function updateDisplays(){
 
   }
+
 
   function play() {
     socket.send("run-effects");
@@ -30,42 +30,15 @@
 </script>
 
 <div class="PreviewArea {locked ? 'locked' : ''}">
-  <div class='room-button'>Room name</div>
-  <div class="device-preview-container">
-    {#each devices as device, i (i)}
+    {#each deviceEffectDisplays as device, i (i)}
       <DraggablePreview bind:device={device} 
                         bind:dragging={dragging}
                         locked={locked} />
     {/each}
-  </div>
-  {#if !locked}
-    <AddDevice bind:deviceDisplays={devices}
-               socket={socket}/>
-  {/if}
 </div>
 
 <style>
   .PreviewArea {
-    height: 100%;
-    position: relative;
-    width: 100%;
-  }
-
-  .room-button {
-    border: 2px solid rgba(0,0,0,0);
-    border-radius: 8px;
-    cursor: pointer;
-    padding: 6px 9px;
-    position: absolute;
-    font-size: 18px;
-    margin: 7px 40px;
-    z-index: 10;
-  }
-  .room-button:hover {
-    border: 2px solid var(--color-border);
-  }
-
-  .device-preview-container {
     height: 100%;
     overflow: scroll;
     position:static;

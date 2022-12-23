@@ -1,15 +1,15 @@
 <script lang="ts">
-	import type { DeviceDisplay } from '$lib/device';
+	import type {DeviceEffectDisplay} from '$lib/device';
   import {onMount} from 'svelte';
 	import DevicePreview from './DevicePreview.svelte';
   import DeviceColorPicker from './DeviceColorPicker.svelte';
   import Icon from '@iconify/svelte';
-  import roundZoomIn from '@iconify/icons-ic/round-zoom-in';
-  import roundZoomOut from '@iconify/icons-ic/round-zoom-out';
+  import zoomInRounded from '@iconify/icons-material-symbols/zoom-in-rounded';
+  import zoomOutRounded from '@iconify/icons-material-symbols/zoom-out-rounded';
   import settingsOutlineRounded from '@iconify/icons-material-symbols/settings-outline-rounded';
 
 
-  export let device: DeviceDisplay;
+  export let device: DeviceEffectDisplay;
   export let dragging = false;
   export let locked = false;
 
@@ -23,8 +23,8 @@
   let top: number;
 
   onMount(() => {
-    left = device.previewLeft - element.getBoundingClientRect().left;
-    top = device.previewTop - element.getBoundingClientRect().top;
+    left = device.deviceDisplay.previewLeft - element.getBoundingClientRect().left;
+    top = device.deviceDisplay.previewTop - element.getBoundingClientRect().top;
   });
 
   let xOffset = 0;
@@ -67,8 +67,8 @@
     removeEventListener('mousemove', onMouseMove);
     removeEventListener('mouseup', onMouseUp);
     const rect = element.getBoundingClientRect();
-    device.previewLeft = rect.x;
-    device.previewTop = rect.y;
+    device.deviceDisplay.previewLeft = rect.x;
+    device.deviceDisplay.previewTop = rect.y;
     dragging = false;
     drag = false;
   }
@@ -77,11 +77,11 @@
   function keepOnPage() {
     const rect = element.getBoundingClientRect();
     if(rect.left < 0) {
-      device.previewLeft = 0;
+      device.deviceDisplay.previewLeft = 0;
       left -= rect.left;
     }
     if(rect.top < 0) {
-      device.previewTop = 0;
+      device.deviceDisplay.previewTop = 0;
       top -= rect.top;
     }
     element.scrollIntoView();
@@ -111,9 +111,9 @@
   <div class="device-toolbar">
     <DeviceColorPicker 
       bind:open={colorPickerOpen}
-      bind:color={device.color}
+      bind:color={device.deviceDisplay.color}
       locked={locked} />
-    <div class="device-label">{device.label}</div>
+    <div class="device-label">{device.deviceDisplay.label}</div>
     {#if hovering && !locked}
       <div class="actions">
         <!-- svelte-ignore a11y-click-events-have-key-events -->
@@ -136,11 +136,11 @@
         </div>
         <!-- svelte-ignore a11y-click-events-have-key-events -->
         <div role="button" class="icon-button" on:click={zoomOut}>
-          <Icon icon={roundZoomOut} />
+          <Icon icon={zoomOutRounded} />
         </div>
         <!-- svelte-ignore a11y-click-events-have-key-events -->
         <div role="button" class="icon-button" on:click={zoomIn}>
-          <Icon icon={roundZoomIn} />
+          <Icon icon={zoomInRounded} />
         </div>
       </div>
     {/if}

@@ -14,7 +14,8 @@
   import rotate90DegreesCwOutlineRounded from '@iconify/icons-material-symbols/rotate-90-degrees-cw-outline-rounded';
   import saveOutlineRounded from '@iconify/icons-material-symbols/save-outline-rounded';
   import settingsOutlineRounded from '@iconify/icons-material-symbols/settings-outline-rounded';
-	import type { DeviceDisplay } from '$lib/device';
+	import {DeviceDisplay, DeviceEffectDisplay, SavedRoom} from '$lib/device';
+	import AddDevice from '$lib/components/add_device/AddDevice.svelte';
 
   const audioMinimapId = "audio-minimap";
   let locked = false;
@@ -22,9 +23,13 @@
   let oppositeLayoutDirection = Layout.row;
   let columnLayout = true;
   
-  let socket;
+  let socket : WebSocket;
 
-  let devices: DeviceDisplay[] = [];
+  let room = new SavedRoom();
+  let roomIndex = -1;
+  let rooms: SavedRoom[] = [];
+  let deviceEffectDisplays: DeviceEffectDisplay[] = [];
+  let devicesToLoad: DeviceDisplay[] = []; 
 
   let windowHeight = 0;
   let previewHeight = 700;
@@ -32,10 +37,61 @@
 
   onMount(() => {
     socket = new WebSocket('ws://localhost:9001');
+    socket.addEventListener('message', (event) => handleMessage(event));
   });
 
-  function handleSave() {}
-  function handleOpen() {}
+  function handleMessage(event: MessageEvent) {
+    const object = JSON.parse(event.data);
+    console.log(object);
+    if (Object.keys(object)[0] === "rooms") {
+      rooms = object.rooms;
+      loadRoom();
+    } else if (Object.keys(object)[0] === "positions") {
+      const device = devicesToLoad.shift();
+      if (device) {
+        deviceEffectDisplays.push(new DeviceEffectDisplay(device, object.positions));
+        deviceEffectDisplays = deviceEffectDisplays;
+        maybeGetPosition();
+      }
+    }
+  }
+
+  function loadRoom() {
+    if(rooms.length > 0) {
+      room = rooms[0];
+      deviceEffectDisplays = [];
+      for (const device of room.devices) {
+        devicesToLoad.push(device);
+      }
+      maybeGetPosition();
+      roomIndex = 0;
+    }
+  }
+
+  function maybeGetPosition() {
+    if (devicesToLoad.length > 0) {
+      socket.send("getPosition" + JSON.stringify(devicesToLoad[0].device.settings.settings));
+    }
+  }
+
+  function handleSave() {
+    if (roomIndex < 0) {
+      roomIndex = rooms.length;
+      rooms.push(room);
+    }
+    socket.send(JSON.stringify({rooms: rooms}));
+  }
+
+  function handleNew() {
+    // TODO: Confirm dialog
+    room = new SavedRoom();
+    deviceEffectDisplays = [];
+    roomIndex = -1;
+  }
+
+  function handleOpen() {
+    socket.send("load-rooms");
+  }
 
   function handleRotate() {
     columnLayout = !columnLayout;
@@ -62,10 +118,16 @@
            'grid-template-columns: minmax(200px, ' + previewWidth + 'px) 4px minmax(100px, '+previewHeight+'px) 4px minmax(60px, 1fr);' +
            'grid-template-rows: 1fr;'}">
   <div class="preview-area">
+    <div class='room-button'>{room.label}</div>
     <PreviewArea
-      bind:devices={devices} 
+      bind:deviceEffectDisplays={deviceEffectDisplays} 
       locked = {locked} 
       socket = {socket} />
+    {#if !locked}
+    <AddDevice bind:room={room}
+               bind:deviceEffectDisplays={deviceEffectDisplays}
+               socket={socket}/>
+    {/if}
   </div>
   <div class="grab-bar vertical">
     <GrabBar 
@@ -74,7 +136,7 @@
       locked = {locked} />
   </div>
   <div class="menu-area">
-    <Menu minimapId={audioMinimapId} bind:devices={devices} />
+    <Menu minimapId={audioMinimapId} bind:devices={room.devices} />
   </div>
   <div class="grab-bar horizontal">
     <GrabBar 
@@ -84,7 +146,7 @@
   </div>
   <div class="timeline-area">
     <TimelineList 
-      bind:devices={devices} 
+      bind:devices={room.devices} 
       layoutDirection={layoutDirection}
       audioMinimapId={audioMinimapId} 
       verticalAudio={!columnLayout} />
@@ -92,7 +154,7 @@
 
   <div class="layout-button-area">
     <!-- svelte-ignore a11y-click-events-have-key-events -->
-    <div class="layout-button" on:click={handleOpen}>
+    <div class="layout-button" on:click={handleNew}>
       <Icon icon={createIcon} />
     </div>
     <!-- svelte-ignore a11y-click-events-have-key-events -->
@@ -147,6 +209,9 @@
   }
   .preview-area {
     grid-area: preview;
+    height: 100%;
+    position: relative;
+    width: 100%;
   }
 
   .menu-area {
@@ -180,6 +245,20 @@
   .layout-row .grab-bar.horizontal {
     width: 4px;
     height: 100%;
+  }
+
+  .room-button {
+    border: 2px solid rgba(0,0,0,0);
+    border-radius: 8px;
+    cursor: pointer;
+    padding: 6px 9px;
+    position: absolute;
+    font-size: 18px;
+    margin: 7px 40px;
+    z-index: 10;
+  }
+  .room-button:hover {
+    border: 2px solid var(--color-border);
   }
 
   .layout-button-area {
