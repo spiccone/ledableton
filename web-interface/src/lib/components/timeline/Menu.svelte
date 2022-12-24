@@ -1,9 +1,9 @@
 <script lang="ts">
-	import type { DeviceDisplay } from "$lib/device";
+	import type {DeviceEffectDisplay } from "$lib/device";
   import {LayoutDirection as Layout} from "$lib/types";
   import DeviceSelection from "./DeviceSelection.svelte";
 
-  export let devices: DeviceDisplay[] = [];
+  export let devices: DeviceEffectDisplay[] = [];
   export let layoutDirection: Layout = Layout.column;
   export let minimapId: string|undefined;
   //export let CurrentEffect: Effect|null = null;

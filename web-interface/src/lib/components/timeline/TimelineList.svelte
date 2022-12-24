@@ -1,11 +1,11 @@
 <script lang="ts">
-	import type { DeviceDisplay } from "$lib/device";
+	import type { DeviceEffectDisplay } from "$lib/device";
   import {LayoutDirection as Layout} from "$lib/types";
 	import DeviceTimeline from './DeviceTimeline.svelte';
   //import AudioDisplay from './AudioDisplay.svelte';
 
   export let layoutDirection: Layout = Layout.column;
-  export let devices: Array<DeviceDisplay> = [];
+  export let devices: DeviceEffectDisplay[] = [];
   export let audioMinimapId: string|undefined;
   export let verticalAudio: boolean = false;
 

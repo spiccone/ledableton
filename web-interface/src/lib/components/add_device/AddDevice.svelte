@@ -345,8 +345,6 @@
     const devicePreview = new DeviceEffectDisplay(deviceDisplay, ledPositions);
     deviceEffectDisplays.push(devicePreview);
     deviceEffectDisplays = deviceEffectDisplays;
-    console.log(room);
-    console.log(deviceEffectDisplays);
   }
 
 </script>

@@ -1,3 +1,7 @@
+export class DisplayRoom {
+  devices: DeviceEffectDisplay[] = [];
+}
+
 /**
  * This is to preview the device effect. The positions will be generated on load.
  */

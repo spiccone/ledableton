@@ -1,18 +1,18 @@
 <script lang="ts">
-	import type { DeviceDisplay } from "$lib/device";
+	import type { DeviceEffectDisplay } from "$lib/device";
   import {ColorLevel, getColorLevel} from "$lib/helper-functions";
   import {LayoutDirection as Layout} from "$lib/types";
 
-  export let device: DeviceDisplay;
+  export let device: DeviceEffectDisplay;
   export let layoutDirection: Layout;
 </script>
 
 <div class="DeviceTimeline {layoutDirection === Layout.column ? 'horizontal' : 'vertical'}">
-  <div class="device-label-container" style="background: {device.color}">
+  <div class="device-label-container" style="background: {device.deviceDisplay.color}">
     <div 
       class="device-label" 
-      style="color: {getColorLevel(device.color) === ColorLevel.light ? '#000' : '#fff'}">
-        {device.label}
+      style="color: {getColorLevel(device.deviceDisplay.color) === ColorLevel.light ? '#000' : '#fff'}">
+        {device.deviceDisplay.label}
     </div>
   </div>
 </div>

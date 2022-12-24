@@ -14,7 +14,7 @@
   import rotate90DegreesCwOutlineRounded from '@iconify/icons-material-symbols/rotate-90-degrees-cw-outline-rounded';
   import saveOutlineRounded from '@iconify/icons-material-symbols/save-outline-rounded';
   import settingsOutlineRounded from '@iconify/icons-material-symbols/settings-outline-rounded';
-	import {DeviceDisplay, DeviceEffectDisplay, SavedRoom} from '$lib/device';
+	import {DeviceDisplay, DeviceEffectDisplay, DisplayRoom, SavedRoom} from '$lib/device';
 	import AddDevice from '$lib/components/add_device/AddDevice.svelte';
 
   const audioMinimapId = "audio-minimap";
@@ -25,10 +25,10 @@
   
   let socket : WebSocket;
 
+  let displayRoom = new DisplayRoom();
   let room = new SavedRoom();
   let roomIndex = -1;
   let rooms: SavedRoom[] = [];
-  let deviceEffectDisplays: DeviceEffectDisplay[] = [];
   let devicesToLoad: DeviceDisplay[] = []; 
 
   let windowHeight = 0;
@@ -42,15 +42,14 @@
 
   function handleMessage(event: MessageEvent) {
     const object = JSON.parse(event.data);
-    console.log(object);
     if (Object.keys(object)[0] === "rooms") {
       rooms = object.rooms;
       loadRoom();
     } else if (Object.keys(object)[0] === "positions") {
       const device = devicesToLoad.shift();
       if (device) {
-        deviceEffectDisplays.push(new DeviceEffectDisplay(device, object.positions));
-        deviceEffectDisplays = deviceEffectDisplays;
+        displayRoom.devices.push(new DeviceEffectDisplay(device, object.positions));
+        displayRoom = displayRoom;
         maybeGetPosition();
       }
     }
@@ -59,7 +58,6 @@
   function loadRoom() {
     if(rooms.length > 0) {
       room = rooms[0];
-      deviceEffectDisplays = [];
       for (const device of room.devices) {
         devicesToLoad.push(device);
       }
@@ -85,7 +83,7 @@
   function handleNew() {
     // TODO: Confirm dialog
     room = new SavedRoom();
-    deviceEffectDisplays = [];
+    displayRoom = new DisplayRoom();
     roomIndex = -1;
   }
 
@@ -114,18 +112,18 @@
 <div class="LightShowStudio {columnLayout ? 'layout-column' : 'layout-row'}"
      style="{columnLayout ?
            'grid-template-columns: minmax(200px, ' + previewWidth + 'px) 4px minmax(200px, 1fr); ' + 
-           'grid-template-rows: minmax(20px, ' + previewHeight + 'px) 4px minmax(60px, 1fr)' :
+           'grid-template-rows: minmax(100px, ' + previewHeight + 'px) 4px minmax(60px, 1fr)' :
            'grid-template-columns: minmax(200px, ' + previewWidth + 'px) 4px minmax(100px, '+previewHeight+'px) 4px minmax(60px, 1fr);' +
            'grid-template-rows: 1fr;'}">
   <div class="preview-area">
     <div class='room-button'>{room.label}</div>
     <PreviewArea
-      bind:deviceEffectDisplays={deviceEffectDisplays} 
+      bind:deviceEffectDisplays={displayRoom.devices} 
       locked = {locked} 
       socket = {socket} />
     {#if !locked}
     <AddDevice bind:room={room}
-               bind:deviceEffectDisplays={deviceEffectDisplays}
+               bind:deviceEffectDisplays={displayRoom.devices}
                socket={socket}/>
     {/if}
   </div>
@@ -136,7 +134,7 @@
       locked = {locked} />
   </div>
   <div class="menu-area">
-    <Menu minimapId={audioMinimapId} bind:devices={room.devices} />
+    <Menu minimapId={audioMinimapId} bind:devices={displayRoom.devices} />
   </div>
   <div class="grab-bar horizontal">
     <GrabBar 
@@ -146,7 +144,7 @@
   </div>
   <div class="timeline-area">
     <TimelineList 
-      bind:devices={room.devices} 
+      bind:devices={displayRoom.devices} 
       layoutDirection={layoutDirection}
       audioMinimapId={audioMinimapId} 
       verticalAudio={!columnLayout} />
