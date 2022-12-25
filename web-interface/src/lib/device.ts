@@ -1,7 +1,3 @@
-export class DisplayRoom {
-  devices: DeviceEffectDisplay[] = [];
-}
-
 /**
  * This is to preview the device effect. The positions will be generated on load.
  */
@@ -9,6 +5,7 @@ export class DisplayRoom {
   deviceDisplay: DeviceDisplay;
   ledPositions: Position[];
   ledColors: Color[];
+  //effectLayers: EffectList[];
 
   constructor(device: DeviceDisplay, positions : Position[]) {
     this.deviceDisplay = device;
@@ -20,6 +17,23 @@ export class DisplayRoom {
   }
 }
 
+// export class EffectList {
+
+// }
+
+// export class Effect {
+//   type: EffectType;
+//   params: DeviceMessageObject;
+//   startTime: number;
+//   duration: number;
+// }
+
+// export class EffectType {
+//   key: string;
+//   label: string;
+//   params: DeviceMessageObject;
+// }
+
 /**
  * This is what will be saved to a file.
  */
@@ -27,7 +41,6 @@ export class SavedRoom {
   label: string = "Room";
   devices: DeviceDisplay[] = [];
 }
-
 
 /**
  * This is the device info that will be saved for the web interface.
@@ -73,6 +86,7 @@ export interface Position {
   x: number;
   y: number;
 }
+
 export class SavedDevice {
   name: string;
   settings: DeviceMessageObject;

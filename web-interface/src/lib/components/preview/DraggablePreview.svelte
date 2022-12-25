@@ -108,58 +108,65 @@
     on:mouseleave={leave}
     on:mousedown={startDragging}
     style="left: {left}px; top: {top}px;">
-  <div class="device-toolbar">
-    <DeviceColorPicker 
-      bind:open={colorPickerOpen}
-      bind:color={device.deviceDisplay.color}
-      locked={locked} />
-    <div class="device-label">{device.deviceDisplay.label}</div>
-    {#if hovering && !locked}
-      <div class="actions">
-        <!-- svelte-ignore a11y-click-events-have-key-events -->
-        <div role="button" class="icon-button settings-button" on:click={openSettings}>
-          <Icon icon={settingsOutlineRounded} />
+  <div class="content-wrapper">
+    <div class="device-toolbar">
+      <DeviceColorPicker 
+        bind:open={colorPickerOpen}
+        bind:color={device.deviceDisplay.color}
+        locked={locked} />
+      <div class="device-label">{device.deviceDisplay.label}</div>
+      {#if hovering && !locked}
+        <div class="actions">
+          <!-- svelte-ignore a11y-click-events-have-key-events -->
+          <div role="button" class="icon-button settings-button" on:click={openSettings}>
+            <Icon icon={settingsOutlineRounded} />
+          </div>
         </div>
-      </div>
-    {/if}
-  </div>
-  <div class="display">
-    <DevicePreview bind:ledPositions={device.ledPositions} 
-                   bind:ledColors={device.ledColors}
-                   bind:scale={scale} />
-  </div>
-  <div class="device-bottom-toolbar">
-    {#if hovering && !locked}
-      <div class="actions">
-        <div class="scale">
-          {Math.round(scale.levels[scale.index] * 100)}%
+      {/if}
+    </div>
+    <div class="display">
+      <DevicePreview bind:ledPositions={device.ledPositions} 
+                    bind:ledColors={device.ledColors}
+                    bind:scale={scale} />
+    </div>
+    <div class="device-bottom-toolbar">
+      {#if hovering && !locked}
+        <div class="actions">
+          <div class="scale">
+            {Math.round(scale.levels[scale.index] * 100)}%
+          </div>
+          <!-- svelte-ignore a11y-click-events-have-key-events -->
+          <div role="button" class="icon-button" on:click={zoomOut}>
+            <Icon icon={zoomOutRounded} />
+          </div>
+          <!-- svelte-ignore a11y-click-events-have-key-events -->
+          <div role="button" class="icon-button" on:click={zoomIn}>
+            <Icon icon={zoomInRounded} />
+          </div>
         </div>
-        <!-- svelte-ignore a11y-click-events-have-key-events -->
-        <div role="button" class="icon-button" on:click={zoomOut}>
-          <Icon icon={zoomOutRounded} />
-        </div>
-        <!-- svelte-ignore a11y-click-events-have-key-events -->
-        <div role="button" class="icon-button" on:click={zoomIn}>
-          <Icon icon={zoomInRounded} />
-        </div>
-      </div>
-    {/if}
+      {/if}
+    </div>
   </div>
 </div>
 
 <style>
   .DraggablePreview {
+    height: 0;
+    position: relative;
+    width: 0;
+  }
+  .content-wrapper {
     cursor: move;
     border: 2px solid rgba(0,0,0,0);
     border-radius: 12px;
     padding: 12px 12px 6px;
-    position: relative;
     width: fit-content;
   }
-  .DraggablePreview.locked {
+
+  .locked .content-wrapper {
     cursor: default;
   }
-  .DraggablePreview.hovering {
+  .hovering .content-wrapper {
     border-color: var(--color-border);
     cursor: move;
   }

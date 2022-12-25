@@ -1,15 +1,5 @@
 package devicepackage;
 
-message DeviceInRoom {
-  required string name = 1;
-  required Device device = 2;
-  //positionInRoom
-}
-
-message DisplayPositions {
-  repeated Position positions = 1;
-}
-
 message SavedDevices {
   repeated Device devices = 1;
 }
@@ -17,6 +7,10 @@ message SavedDevices {
 message Position {
   required float x = 1;
   required float y = 2;
+}
+
+message DisplayPositions {
+  repeated Position positions = 1;
 }
 
 message Device {

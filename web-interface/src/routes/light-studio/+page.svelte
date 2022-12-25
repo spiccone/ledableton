@@ -14,7 +14,7 @@
   import rotate90DegreesCwOutlineRounded from '@iconify/icons-material-symbols/rotate-90-degrees-cw-outline-rounded';
   import saveOutlineRounded from '@iconify/icons-material-symbols/save-outline-rounded';
   import settingsOutlineRounded from '@iconify/icons-material-symbols/settings-outline-rounded';
-	import {DeviceDisplay, DeviceEffectDisplay, DisplayRoom, SavedRoom} from '$lib/device';
+	import {DeviceDisplay, DeviceEffectDisplay, SavedRoom} from '$lib/device';
 	import AddDevice from '$lib/components/add_device/AddDevice.svelte';
 
   const audioMinimapId = "audio-minimap";
@@ -25,10 +25,10 @@
   
   let socket : WebSocket;
 
-  let displayRoom = new DisplayRoom();
+  let devicesToDisplay: DeviceEffectDisplay[] = [];
   let room = new SavedRoom();
   let roomIndex = -1;
-  let rooms: SavedRoom[] = [];
+  let rooms : SavedRoom[] = [];
   let devicesToLoad: DeviceDisplay[] = []; 
 
   let windowHeight = 0;
@@ -48,8 +48,8 @@
     } else if (Object.keys(object)[0] === "positions") {
       const device = devicesToLoad.shift();
       if (device) {
-        displayRoom.devices.push(new DeviceEffectDisplay(device, object.positions));
-        displayRoom = displayRoom;
+        devicesToDisplay.push(new DeviceEffectDisplay(device, object.positions));
+        devicesToDisplay = devicesToDisplay;
         maybeGetPosition();
       }
     }
@@ -83,7 +83,7 @@
   function handleNew() {
     // TODO: Confirm dialog
     room = new SavedRoom();
-    displayRoom = new DisplayRoom();
+    devicesToDisplay.length = 0;
     roomIndex = -1;
   }
 
@@ -118,12 +118,12 @@
   <div class="preview-area">
     <div class='room-button'>{room.label}</div>
     <PreviewArea
-      bind:deviceEffectDisplays={displayRoom.devices} 
+      bind:deviceEffectDisplays={devicesToDisplay} 
       locked = {locked} 
       socket = {socket} />
     {#if !locked}
     <AddDevice bind:room={room}
-               bind:deviceEffectDisplays={displayRoom.devices}
+               bind:deviceEffectDisplays={devicesToDisplay}
                socket={socket}/>
     {/if}
   </div>
@@ -134,7 +134,7 @@
       locked = {locked} />
   </div>
   <div class="menu-area">
-    <Menu minimapId={audioMinimapId} bind:devices={displayRoom.devices} />
+    <Menu minimapId={audioMinimapId} bind:devices={devicesToDisplay} />
   </div>
   <div class="grab-bar horizontal">
     <GrabBar 
@@ -144,7 +144,7 @@
   </div>
   <div class="timeline-area">
     <TimelineList 
-      bind:devices={displayRoom.devices} 
+      bind:devices={devicesToDisplay} 
       layoutDirection={layoutDirection}
       audioMinimapId={audioMinimapId} 
       verticalAudio={!columnLayout} />
